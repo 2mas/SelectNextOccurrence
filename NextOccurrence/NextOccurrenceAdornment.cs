@@ -156,6 +156,9 @@ namespace NextOccurrence
         /// <param name="e"></param>
         private void OnSelectNextOccurrencePressed(object sender, EventArgs e)
         {
+            if (!this.view.HasAggregateFocus)
+                return;
+
             // Caret placed on a word, but nothing selected
             if (!this.selections.Any() && this.view.Selection.IsEmpty)
             {
