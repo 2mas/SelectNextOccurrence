@@ -1,0 +1,35 @@
+# Select Next Occurrence
+
+Download this extension from the [VS Gallery](https://marketplace.visualstudio.com/items?itemName=thomaswelen.SelectNextOccurrence).
+
+---------------------------------------
+
+This extension makes it possible to select next occurrences of a selected text for editing.
+
+Aims to replicate the Ctrl+D command of Sublime Text for faster coding.
+
+See the [change log](CHANGELOG.md) for changes.
+
+## Features
+
+- Select next occurrence of current selection. 
+- Use multiple carets to edit
+  - Alt-Click to add caret
+
+![Select Next Occurrence](select_next.gif)
+
+### Key-bindings
+The command name is Edit.SelectNextOccurrence, and it is bound to Ctrl+D by default, override at your choice.
+
+## Contribute
+Check out the [contribution guidelines](CONTRIBUTING.md)
+if you want to contribute to this project.
+
+For cloning and building this project yourself, make sure
+to install the
+[Extensibility Tools 2015](https://visualstudiogallery.msdn.microsoft.com/ab39a092-1343-46e2-b0f1-6a3f91155aa6)
+extension for Visual Studio which enables some features
+used by this project.
+
+## License
+[Apache 2.0](LICENSE)
