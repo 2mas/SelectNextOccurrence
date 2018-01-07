@@ -1,16 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("NextOccurrence")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("SelectNextOccurrence")]
+[assembly: AssemblyDescription("Selects the next occurrence of the current selection and adds multiple cursors for editing.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("NextOccurrence")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyCompany("Thomas Welén")]
+[assembly: AssemblyProduct("SelectNextOccurrence")]
+[assembly: AssemblyCopyright("Thomas Welén")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
