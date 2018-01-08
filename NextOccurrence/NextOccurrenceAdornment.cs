@@ -379,10 +379,6 @@ namespace NextOccurrence
                         case ((uint)VSConstants.VSStd2KCmdID.RIGHT):
                         case ((uint)VSConstants.VSStd2KCmdID.UP):
                         case ((uint)VSConstants.VSStd2KCmdID.DOWN):
-                        case ((uint)VSConstants.VSStd2KCmdID.END):
-                        case ((uint)VSConstants.VSStd2KCmdID.HOME):
-                        case ((uint)VSConstants.VSStd2KCmdID.PAGEDN):
-                        case ((uint)VSConstants.VSStd2KCmdID.PAGEUP):
                         case ((uint)VSConstants.VSStd2KCmdID.WORDPREV):
                         case ((uint)VSConstants.VSStd2KCmdID.WORDNEXT):
                             // Remove selected spans but keep carets
@@ -390,6 +386,15 @@ namespace NextOccurrence
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.CANCEL):
                             this.selections.Clear();
+                            break;
+                        case ((uint)VSConstants.VSStd2KCmdID.PAGEDN):
+                        case ((uint)VSConstants.VSStd2KCmdID.PAGEUP):
+                        case ((uint)VSConstants.VSStd2KCmdID.END):
+                        case ((uint)VSConstants.VSStd2KCmdID.HOME):
+                        case ((uint)VSConstants.VSStd2KCmdID.END_EXT):
+                        case ((uint)VSConstants.VSStd2KCmdID.HOME_EXT):
+                            this.selections.Clear();
+                            result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.WORDPREV_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.WORDNEXT_EXT):
