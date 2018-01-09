@@ -213,7 +213,7 @@ namespace NextOccurrence
                         );
 
                         this.view.Caret.MoveTo(next_occurrence.Value.End);
-                        this.editorOperations.ScrollLineCenter();
+                        this.editorOperations.ScrollLineBottom();
                     }
                 }
 
