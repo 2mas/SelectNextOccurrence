@@ -4,8 +4,11 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
@@ -56,10 +59,25 @@ namespace NextOccurrence
 
         private IEditorOperations editorOperations;
 
+        /// <summary>
+        /// In case of case-sensitive search this is provided to FindData
+        /// </summary>
+        private readonly ITextStructureNavigator textStructureNavigator;
+
+        /// <summary>
+        /// The top level in the Visual Studio automation object model.
+        /// Needed to get the find-object to determine search-options
+        /// </summary>
+        private readonly DTE2 dte;
+
         private Brush caretBrush;
 
         private Brush selectionBrush;
 
+        /// <summary>
+        /// Contains all tracking-points for selections and carets
+        /// This is what is getting drawn in the adornment layer
+        /// </summary>
         private List<NextOccurrenceSelection> selections;
 
         private string searchText;
@@ -82,17 +100,24 @@ namespace NextOccurrence
             IWpfTextView view,
             ITextSearchService textSearchService,
             IEditorOperationsFactoryService editorOperationsService,
-            IEditorFormatMapService formatMapService = null)
+            IEditorFormatMapService formatMapService = null,
+            ITextStructureNavigator textStructureNavigator = null
+            )
         {
             if (editorOperationsService == null)
                 throw new ArgumentNullException("editorOperationsService");
 
             this.view = view ?? throw new ArgumentNullException("view");
-            this.textSearchService = textSearchService ?? throw new ArgumentNullException("textSearchService");
-            this.editorOperations = editorOperationsService.GetEditorOperations(this.view);
             this.layer = view.GetAdornmentLayer("NextOccurrenceAdornment");
 
+            // Services
+            this.textSearchService = textSearchService ?? throw new ArgumentNullException("textSearchService");
+            this.editorOperations = editorOperationsService.GetEditorOperations(this.view);
+            this.textStructureNavigator = textStructureNavigator;
+            this.dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
+
             this.SetupBrushes(formatMapService);
+
             this.selections = new List<NextOccurrenceSelection>();
 
             // events
@@ -100,6 +125,11 @@ namespace NextOccurrence
             NextOccurrenceCommands.OnSelectNextOccurrencePressed += OnSelectNextOccurrencePressed;
         }
 
+        /// <summary>
+        /// Gets the colors from Options/Environment/Fonts and colors.
+        /// Default values provided in case the service doesnt exist
+        /// </summary>
+        /// <param name="formatMapService"></param>
         private void SetupBrushes(IEditorFormatMapService formatMapService = null)
         {
             if (formatMapService == null)
@@ -174,7 +204,7 @@ namespace NextOccurrence
             if (!this.selections.Any() && !this.view.Selection.IsEmpty)
                 AddCurrentSelectionToSelections();
 
-            // Multiple selections
+            // Multiple selections This
             if (this.selections.Any())
             {
                 //select words at caret again, this is where have abandoned selections
@@ -193,12 +223,20 @@ namespace NextOccurrence
                 else
                 {
                     // Start the search from previous end-position if it exists, otherwise caret
+                    // If user has toggled match-case in their find-options we use this here too
                     var next_occurrence = textSearchService.FindNext(
                         this.selections.Last().End != null ?
                             this.selections.Last().End.GetPosition(this.snapshot)
                             : this.selections.Last().Caret.GetPosition(this.snapshot),
                         true,
-                        new FindData(searchText, this.snapshot)
+                        (this.textStructureNavigator != null && this.dte.Find.MatchCase) ?
+                        new FindData(
+                            this.searchText,
+                            this.snapshot,
+                            FindOptions.MatchCase,
+                            this.textStructureNavigator
+                        )
+                        : new FindData(this.searchText, this.snapshot)
                     );
 
                     if (next_occurrence.HasValue && !selections.Any(s => s.OverlapsWith(next_occurrence.Value, this.snapshot)))

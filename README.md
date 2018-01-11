@@ -18,6 +18,9 @@ See the [change log](CHANGELOG.md) for changes.
 
 ![Select Next Occurrence](select_next.gif)
 
+##### Options
+Toggle case-sensitive search by using the "Match case" setting from the find-dialog (Ctrl+F)
+
 ### Key-bindings
 The command name is Edit.SelectNextOccurrence, and it is bound to Ctrl+D by default, override at your choice.
 

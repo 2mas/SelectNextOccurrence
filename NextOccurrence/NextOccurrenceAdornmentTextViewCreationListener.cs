@@ -43,6 +43,9 @@ namespace NextOccurrence
         [Import(typeof(IEditorFormatMapService))]
         internal IEditorFormatMapService formatMapService = null;
 
+        [Import]
+        internal ITextStructureNavigatorSelectorService navigatorSelector = null;
+
 #pragma warning restore 649, 169
 
         #region IWpfTextViewCreationListener
@@ -55,7 +58,16 @@ namespace NextOccurrence
         public void TextViewCreated(IWpfTextView textView)
         {
             // The adornment will listen to any event that changes the layout (text changes, scrolling, etc)
-            AddCommandFilter(textView, new NextOccurrenceAdornment(textView, textSearchService, editorOperations, formatMapService));
+            AddCommandFilter(
+                textView,
+                new NextOccurrenceAdornment(
+                    textView,
+                    textSearchService,
+                    editorOperations,
+                    formatMapService,
+                    navigatorSelector.GetTextStructureNavigator(textView.TextBuffer)
+                )
+            );
         }
 
         void AddCommandFilter(IWpfTextView textView, NextOccurrenceAdornment commandFilter)

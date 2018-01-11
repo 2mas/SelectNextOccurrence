@@ -7,12 +7,14 @@
 These are the changes to each version that has been released
 on the official Visual Studio extension gallery.
 
+##### 1.0.3
+- [x] Toggle case-sensitive search by using the "Match case" setting from the find-dialog (Ctrl+F)
 
-#### 1.0.2
+##### 1.0.2
 - [x] Updated Nuget-packages
 - [x] When selecting an occurence out of visible scope, editor now scrolls so the item is visible at the bottom instead of center to avoid screen-jumping when starting to edit
 
-#### 1.0.1
+##### 1.0.1
 - [x] Fixed ctrl+shift+home/end to release selections
 
 ## 1.0
