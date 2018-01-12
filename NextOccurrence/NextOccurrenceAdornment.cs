@@ -204,10 +204,10 @@ namespace NextOccurrence
             if (!this.selections.Any() && !this.view.Selection.IsEmpty)
                 AddCurrentSelectionToSelections();
 
-            // Multiple selections This
+            // Multiple selections
             if (this.selections.Any())
             {
-                //select words at caret again, this is where have abandoned selections
+                // Select words at caret again, this is where have abandoned selections
                 if (selections.All(s => s.Start == null && s.End == null))
                 {
                     var oldSelections = selections;
@@ -251,7 +251,12 @@ namespace NextOccurrence
                         );
 
                         this.view.Caret.MoveTo(next_occurrence.Value.End);
-                        this.editorOperations.ScrollLineBottom();
+                        this.view.ViewScroller.EnsureSpanVisible(
+                            new SnapshotSpan(
+                                this.view.Caret.Position.BufferPosition,
+                                0
+                            )
+                        );
                     }
                 }
 
