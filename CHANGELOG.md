@@ -7,6 +7,12 @@
 These are the changes to each version that has been released
 on the official Visual Studio extension gallery.
 
+##### 1.0.4
+- [x] Changing scrolling-behaviour when selecting occurrences out of visible scope to use ViewScroller.EnsureSpanVisible
+    This prevents unnecessary scrolling
+- [x] Preventing some auto-scrolling when beginning to edit on multiple carets
+
+
 ##### 1.0.3
 - [x] Toggle case-sensitive search by using the "Match case" setting from the find-dialog (Ctrl+F)
 
