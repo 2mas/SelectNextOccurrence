@@ -1,6 +1,8 @@
 # Road map
 
 - [ ] Prevent scrolling to top when undoing multiple edits
+- [ ] Undo last selection
+- [ ] Skip next occurrence (Sublime Ctrl+K, Ctrl+D)
 
 # Change log
 
