@@ -468,14 +468,6 @@ namespace NextOccurrence
 
                     this.view.Caret.MoveTo(selection.Caret.GetPoint(this.snapshot));
 
-                    // To prevent some auto-scrolling when editing, better ways to do this? Efficiency?
-                    this.view.ViewScroller.EnsureSpanVisible(
-                        new SnapshotSpan(
-                            this.view.Caret.Position.BufferPosition,
-                            0
-                        )
-                    );
-
                     result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
                     // Backspace, delete, paste etc
