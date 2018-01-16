@@ -1,13 +1,19 @@
 # Road map
 
 - [ ] Prevent scrolling to top when undoing multiple edits
-- [ ] Undo last selection
-- [ ] Skip next occurrence (Sublime Ctrl+K, Ctrl+D)
+- [x] Undo last selection
+- [x] Skip next occurrence (Sublime Ctrl+K, Ctrl+D)
 
 # Change log
 
 These are the changes to each version that has been released
 on the official Visual Studio extension gallery.
+
+## 1.1
+- [x] Added command ```Skip Occurrence```
+- [x] Added command ```Undo Occurrence```
+- [x] Fixed scrolling-bug that caused unwanted scrolling when navigating.
+- [x] Better undoing if selections have been cleared.
 
 ##### 1.0.4
 - [x] Changing scrolling-behaviour when selecting occurrences out of visible scope to use ViewScroller.EnsureSpanVisible
