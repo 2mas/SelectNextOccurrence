@@ -123,6 +123,8 @@ namespace NextOccurrence
             // events
             this.view.LayoutChanged += this.OnLayoutChanged;
             NextOccurrenceCommands.OnSelectNextOccurrencePressed += OnSelectNextOccurrencePressed;
+            NextOccurrenceCommands.OnSkipOccurrencePressed += OnSkipOccurrencePressed;
+            NextOccurrenceCommands.OnUndoOccurrencePressed += OnUndoOccurrencePressed;
         }
 
         /// <summary>
@@ -180,6 +182,52 @@ namespace NextOccurrence
         #region interactions
 
         /// <summary>
+        /// Menu-command handler, undo the last occurrence
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnUndoOccurrencePressed(object sender, EventArgs e)
+        {
+            if (!this.view.HasAggregateFocus)
+                return;
+
+            if (this.selections.Count > 1)
+                this.selections.RemoveAt(this.selections.Count - 1);
+
+            if (this.selections.Any())
+            {
+                this.DrawAdornments();
+
+                this.view.Caret.MoveTo(this.selections.Last().Caret.GetPoint(this.snapshot));
+                this.view.ViewScroller.EnsureSpanVisible(
+                    new SnapshotSpan(
+                        this.view.Caret.Position.BufferPosition,
+                        0
+                    )
+                );
+            }
+        }
+
+        /// <summary>
+        /// Menu-command handler for skipping one occurrence
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnSkipOccurrencePressed(object sender, EventArgs e)
+        {
+            if (!this.view.HasAggregateFocus)
+                return;
+
+            SelectNextOccurrence();
+
+            if (this.selections.Count > 1)
+                this.selections.RemoveAt(this.selections.Count - 2);
+
+            if (this.selections.Any())
+                this.DrawAdornments();
+        }
+
+        /// <summary>
         /// Menu-command handler, aka Ctrl+D
         /// </summary>
         /// <param name="sender"></param>
@@ -189,6 +237,17 @@ namespace NextOccurrence
             if (!this.view.HasAggregateFocus)
                 return;
 
+            SelectNextOccurrence();
+
+            if (this.selections.Any())
+                this.DrawAdornments();
+        }
+
+        /// <summary>
+        /// Handles finding occurrences, selecting and adding to current selections
+        /// </summary>
+        private void SelectNextOccurrence()
+        {
             // Caret placed on a word, but nothing selected
             if (!this.selections.Any() && this.view.Selection.IsEmpty)
             {
@@ -261,8 +320,6 @@ namespace NextOccurrence
                 }
 
                 this.view.Selection.Clear();
-
-                DrawAdornments();
             }
         }
 
@@ -414,6 +471,17 @@ namespace NextOccurrence
 
             if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
             {
+                if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
+                {
+                    switch (nCmdID)
+                    {
+                        case ((uint)VSConstants.VSStd97CmdID.Undo):
+                        case ((uint)VSConstants.VSStd97CmdID.Redo):
+                            result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            DrawAdornments();
+                            return result;
+                    }
+                }
                 if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID)
                 {
                     switch (nCmdID)
@@ -453,6 +521,8 @@ namespace NextOccurrence
                     }
                 }
 
+                this.dte.UndoContext.Open("SelectNextOccurrence");
+
                 foreach (var selection in selections)
                 {
                     if (selection.Start != null && selection.End != null)
@@ -490,6 +560,9 @@ namespace NextOccurrence
                         PointTrackingMode.Positive
                     );
                 }
+
+                this.dte.UndoContext.Close();
+
 
                 // set new searchtext needed if selection is modified
                 if (modifySelections)

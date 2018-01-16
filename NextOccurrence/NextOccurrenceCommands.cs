@@ -9,10 +9,11 @@ namespace NextOccurrence
     /// </summary>
     internal sealed class NextOccurrenceCommands
     {
-        /// <summary>
-        /// Command ID.
-        /// </summary>
-        public const int CommandId = 0x0100;
+        public const int SelectNextOccurrenceCommandId = 0x0100;
+
+        public const int SkipOccurrenceCommandId = 0x0110;
+
+        public const int UndoOccurrenceCommandId = 0x0120;
 
         /// <summary>
         /// Command menu group (command set GUID).
@@ -41,9 +42,26 @@ namespace NextOccurrence
             OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
-                var menuCommandID = new CommandID(CommandSet, CommandId);
-                var menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
-                commandService.AddCommand(menuItem);
+                var SelectNextOccurrenceCmd = new MenuCommand(
+                    this.SelectNextOccurrenceCallback,
+                    new CommandID(CommandSet, SelectNextOccurrenceCommandId)
+                );
+
+                commandService.AddCommand(SelectNextOccurrenceCmd);
+
+                var SkipOccurrenceCmd = new MenuCommand(
+                    this.SkipOccurrenceCallback,
+                    new CommandID(CommandSet, SkipOccurrenceCommandId)
+                );
+
+                commandService.AddCommand(SkipOccurrenceCmd);
+
+                var UndoOccurrenceCmd = new MenuCommand(
+                    this.UndoOccurrenceCallback,
+                    new CommandID(CommandSet, UndoOccurrenceCommandId)
+                );
+
+                commandService.AddCommand(UndoOccurrenceCmd);
             }
         }
 
@@ -77,31 +95,26 @@ namespace NextOccurrence
             Instance = new NextOccurrenceCommands(package);
         }
 
-        /// <summary>
-        /// This function is the callback used to execute the command when the menu item is clicked.
-        /// See the constructor to see how the menu item is associated with this function using
-        /// OleMenuCommandService service and MenuCommand class.
-        /// </summary>
-        /// <param name="sender">Event sender.</param>
-        /// <param name="e">Event args.</param>
-        private void MenuItemCallback(object sender, EventArgs e)
+        private void SelectNextOccurrenceCallback(object sender, EventArgs e)
         {
-            SelectNextOccurrencePressed(EventArgs.Empty);
+            OnSelectNextOccurrencePressed?.Invoke(this, e);
         }
 
-        private void SelectNextOccurrencePressed(EventArgs e)
+        private void SkipOccurrenceCallback(object sender, EventArgs e)
         {
-            EventHandler handler = OnSelectNextOccurrencePressed;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            OnSkipOccurrencePressed?.Invoke(this, e);
         }
 
+        private void UndoOccurrenceCallback(object sender, EventArgs e)
+        {
+            OnUndoOccurrencePressed?.Invoke(this, e);
+        }
 
         /// <summary>
-        /// The event to be raised when command is run
+        /// The events to be raised when commands are invoked
         /// </summary>
         internal static event EventHandler OnSelectNextOccurrencePressed;
+        internal static event EventHandler OnSkipOccurrencePressed;
+        internal static event EventHandler OnUndoOccurrencePressed;
     }
 }

@@ -75,10 +75,9 @@ namespace NextOccurrence
             IOleCommandTarget next;
             IVsTextView view = editorFactory.GetViewAdapter(textView);
 
-            int hr = view.AddCommandFilter(commandFilter, out next);
-
-            if (hr == VSConstants.S_OK)
+            if (view.AddCommandFilter(commandFilter, out next) == VSConstants.S_OK)
             {
+                // Needed for MouseProcessor
                 textView.Properties.AddProperty(typeof(NextOccurrenceAdornment), commandFilter);
 
                 if (next != null)

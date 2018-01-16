@@ -13,6 +13,8 @@ See the [change log](CHANGELOG.md) for changes.
 ## Features
 
 - Select next occurrence of current selection. 
+- Skip occurrence
+- Undo occurrence
 - Use multiple carets to edit
   - Alt-Click to add caret
 
@@ -22,7 +24,11 @@ See the [change log](CHANGELOG.md) for changes.
 Toggle case-sensitive search by using the "Match case" setting from the find-dialog (Ctrl+F)
 
 ### Key-bindings
-The command name is Edit.SelectNextOccurrence, and it is bound to Ctrl+D by default, override at your choice.
+Go to Tools -> Options -> Keyboard and search for these command names to edit at your choice.
+
+- ```Edit.SelectNextOccurrence``` is bound to ***Ctrl+D*** by default.
+- ```Edit.SkipOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+K, Ctrl+D)*
+- ```Edit.UndoOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+U)*
 
 ## Contribute
 Check out the [contribution guidelines](CONTRIBUTING.md)

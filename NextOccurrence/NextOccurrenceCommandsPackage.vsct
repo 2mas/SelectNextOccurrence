@@ -47,13 +47,31 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
-      <Button guid="guidNextOccurrenceCommandsPackageCmdSet" id="NextOccurrenceCommandsId" priority="0x0100" type="Button">
+      <Button guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectNextOccurrenceCommandId" priority="0x0100" type="Button">
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Parent guid="guidSHLMainMenu" id="IDG_VS_EDIT_SELECT" />
         <Icon guid="guidImages" id="bmpPicSearch" />
         <Strings>
           <ButtonText>Select Next Occurrence</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidNextOccurrenceCommandsPackageCmdSet" id="SkipOccurrenceCommandId" priority="0x0200" type="Button">
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_EDIT_SELECT" />
+        <Icon guid="guidImages" id="bmpPicSearch" />
+        <Strings>
+          <ButtonText>Skip Occurrence</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidNextOccurrenceCommandsPackageCmdSet" id="UndoOccurrenceCommandId" priority="0x0300" type="Button">
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_EDIT_SELECT" />
+        <Icon guid="guidImages" id="bmpPicSearch" />
+        <Strings>
+          <ButtonText>Undo Occurrence</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -70,11 +88,13 @@
   </Commands>
 
   <VisibilityConstraints>
-    <VisibilityItem guid="guidNextOccurrenceCommandsPackageCmdSet" id="NextOccurrenceCommandsId" context="GUID_TextEditorFactory"></VisibilityItem>
+    <VisibilityItem guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectNextOccurrenceCommandId" context="GUID_TextEditorFactory"></VisibilityItem>
+    <VisibilityItem guid="guidNextOccurrenceCommandsPackageCmdSet" id="SkipOccurrenceCommandId" context="GUID_TextEditorFactory"></VisibilityItem>
+    <VisibilityItem guid="guidNextOccurrenceCommandsPackageCmdSet" id="UndoOccurrenceCommandId" context="GUID_TextEditorFactory"></VisibilityItem>
   </VisibilityConstraints>
 
   <KeyBindings>
-    <KeyBinding guid="guidNextOccurrenceCommandsPackageCmdSet" id="NextOccurrenceCommandsId" mod1="Control" key1="D" editor="GUID_TextEditorFactory"/>
+    <KeyBinding guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectNextOccurrenceCommandId" mod1="Control" key1="D" editor="GUID_TextEditorFactory"/>
   </KeyBindings>
 
   <Symbols>
@@ -83,7 +103,9 @@
 
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidNextOccurrenceCommandsPackageCmdSet" value="{66543491-5596-4e6c-94d2-bb507832fd49}">
-      <IDSymbol name="NextOccurrenceCommandsId" value="0x0100" />
+      <IDSymbol name="SelectNextOccurrenceCommandId" value="0x0100" />
+      <IDSymbol name="SkipOccurrenceCommandId" value="0x0110" />
+      <IDSymbol name="UndoOccurrenceCommandId" value="0x0120" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{e49d8c2f-b246-4f14-b0dd-ca956ca3046a}" >
