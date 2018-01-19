@@ -73,15 +73,18 @@ namespace NextOccurrence
         void AddCommandFilter(IWpfTextView textView, NextOccurrenceAdornment commandFilter)
         {
             IOleCommandTarget next;
-            IVsTextView view = editorFactory.GetViewAdapter(textView);
 
-            if (view.AddCommandFilter(commandFilter, out next) == VSConstants.S_OK)
+            if (editorFactory != null)
             {
-                // Needed for MouseProcessor
-                textView.Properties.AddProperty(typeof(NextOccurrenceAdornment), commandFilter);
+                IVsTextView view = editorFactory.GetViewAdapter(textView);
+                if (view.AddCommandFilter(commandFilter, out next) == VSConstants.S_OK)
+                {
+                    // Needed for MouseProcessor
+                    textView.Properties.AddProperty(typeof(NextOccurrenceAdornment), commandFilter);
 
-                if (next != null)
-                    commandFilter.NextCommandTarget = next;
+                    if (next != null)
+                        commandFilter.NextCommandTarget = next;
+                }
             }
         }
 
