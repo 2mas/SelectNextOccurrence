@@ -9,6 +9,9 @@
 These are the changes to each version that has been released
 on the official Visual Studio extension gallery.
 
+##### 1.1.1
+- [x] Fix for NullReference Exception when adding commandfilter
+
 ## 1.1
 - [x] Added command ```Skip Occurrence```
 - [x] Added command ```Undo Occurrence```
