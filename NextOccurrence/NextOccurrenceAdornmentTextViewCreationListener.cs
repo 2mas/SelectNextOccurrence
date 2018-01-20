@@ -77,13 +77,16 @@ namespace NextOccurrence
             if (editorFactory != null)
             {
                 IVsTextView view = editorFactory.GetViewAdapter(textView);
-                if (view.AddCommandFilter(commandFilter, out next) == VSConstants.S_OK)
+                if (view != null)
                 {
-                    // Needed for MouseProcessor
-                    textView.Properties.AddProperty(typeof(NextOccurrenceAdornment), commandFilter);
+                    if (view.AddCommandFilter(commandFilter, out next) == VSConstants.S_OK)
+                    {
+                        // Needed for MouseProcessor
+                        textView.Properties.AddProperty(typeof(NextOccurrenceAdornment), commandFilter);
 
-                    if (next != null)
-                        commandFilter.NextCommandTarget = next;
+                        if (next != null)
+                            commandFilter.NextCommandTarget = next;
+                    }
                 }
             }
         }
