@@ -24,11 +24,13 @@ See the [change log](CHANGELOG.md) for changes.
 Toggle case-sensitive search by using the "Match case" setting from the find-dialog (Ctrl+F)
 
 ### Key-bindings
-Go to Tools -> Options -> Keyboard and search for these command names to edit at your choice.
+Go to Tools -> Options -> Keyboard and search for these command names to edit at your choice. Make sure the _Use new shortcut in_ is set to: ***Text Editor***
 
 - ```Edit.SelectNextOccurrence``` is bound to ***Ctrl+D*** by default.
 - ```Edit.SkipOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+K, Ctrl+D)*
 - ```Edit.UndoOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+U)*
+
+![Select Next Occurrence Keyboard bindings](kbd_shortcuts.png)
 
 ## Contribute
 Check out the [contribution guidelines](CONTRIBUTING.md)
