@@ -32,7 +32,17 @@ Go to Tools -> Options -> Keyboard and search for these command names to edit at
 
 ![Select Next Occurrence Keyboard bindings](kbd_shortcuts.png)
 
-## Contribute
+### Troubleshooting
+
+- **Nothing happens when pressing assigned keys**
+
+Check that the key-bindings are correct and that the _Use new shortcut in_ is set to: ***Text Editor***.
+
+- **Nothing happens when ALT + left-clicking mouse button to add new caret, multiple edits are unresponsive**
+
+There is a possibility that other plugins use this functionality too, and a conflict occurs. Please check for other installed plugins with this feature and try to disable.
+
+### Contribute
 Check out the [contribution guidelines](CONTRIBUTING.md)
 if you want to contribute to this project.
 
@@ -42,5 +52,5 @@ to install the
 extension for Visual Studio which enables some features
 used by this project.
 
-## License
+### License
 [Apache 2.0](LICENSE)
