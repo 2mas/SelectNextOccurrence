@@ -9,7 +9,7 @@ This extension makes it possible to select next occurrences of a selected text f
 
 Aims to replicate the Ctrl+D command of Sublime Text for faster coding.
 
-See the [change log](CHANGELOG.md) for changes.
+See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 
 ## Features
 
