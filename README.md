@@ -1,3 +1,4 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/66dy10xgquyw3y7x?svg=true)](https://ci.appveyor.com/project/2mas/selectnextoccurrence)
 # Select Next Occurrence
 
 Download this extension from the [VS Gallery](https://marketplace.visualstudio.com/items?itemName=thomaswelen.SelectNextOccurrence).

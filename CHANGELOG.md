@@ -1,6 +1,8 @@
 # Road map
 
-- [ ] Prevent scrolling to top when undoing multiple edits
+- [ ] Command to add caret above/below current caret (modifier(s) + Up/Down-key)
+- [ ] Command to convert a block-selection into carets
+- [ ] Command to select all occurrences
 - [x] Undo last selection
 - [x] Skip next occurrence (Sublime Ctrl+K, Ctrl+D)
 
@@ -9,7 +11,7 @@
 These are the changes to each version that has been released
 on the official Visual Studio extension gallery.
 
-##### 1.1.1
+##### 1.1.1(.1)
 - [x] Fix for NullReference Exception when adding commandfilter
 
 ## 1.1
