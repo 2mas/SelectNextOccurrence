@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
+using NextOccurrence.Commands;
 
 namespace NextOccurrence
 {
@@ -17,7 +18,7 @@ namespace NextOccurrence
     [Export(typeof(IWpfTextViewCreationListener))]
     [ContentType("text")]
     [TextViewRole(PredefinedTextViewRoles.Editable)]
-    internal sealed class NextOccurrenceAdornmentTextViewCreationListener : IWpfTextViewCreationListener
+    internal sealed class ViewCreationListener : IWpfTextViewCreationListener
     {
         // Disable "Field is never assigned to..." and "Field is never used" compiler's warnings. Justification: the field is used by MEF.
 #pragma warning disable 649, 169
@@ -57,35 +58,33 @@ namespace NextOccurrence
         /// <param name="textView">The <see cref="IWpfTextView"/> upon which the adornment should be placed</param>
         public void TextViewCreated(IWpfTextView textView)
         {
-            // The adornment will listen to any event that changes the layout (text changes, scrolling, etc)
-            AddCommandFilter(
-                textView,
-                new NextOccurrenceAdornment(
+            new NextOccurrenceAdornment(
                     textView,
                     textSearchService,
                     editorOperations,
                     formatMapService,
                     navigatorSelector.GetTextStructureNavigator(textView.TextBuffer)
-                )
+                );
+
+            AddCommandFilter(
+                textView,
+                new CommandTarget(textView)
             );
         }
 
-        void AddCommandFilter(IWpfTextView textView, NextOccurrenceAdornment commandFilter)
+        void AddCommandFilter(IWpfTextView textView, CommandTarget commandTarget)
         {
             IOleCommandTarget next;
 
             if (editorFactory != null)
             {
-                IVsTextView view = editorFactory.GetViewAdapter(textView);
-                if (view != null)
+                IVsTextView viewAdapter = editorFactory.GetViewAdapter(textView);
+                if (viewAdapter != null)
                 {
-                    if (view.AddCommandFilter(commandFilter, out next) == VSConstants.S_OK)
+                    if (viewAdapter.AddCommandFilter(commandTarget, out next) == VSConstants.S_OK)
                     {
-                        // Needed for MouseProcessor
-                        textView.Properties.AddProperty(typeof(NextOccurrenceAdornment), commandFilter);
-
                         if (next != null)
-                            commandFilter.NextCommandTarget = next;
+                            commandTarget.NextCommandTarget = next;
                     }
                 }
             }

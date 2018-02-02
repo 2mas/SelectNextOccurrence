@@ -20,25 +20,27 @@ namespace NextOccurrence
 
     class NextOccurrenceMouseProcessor : IMouseProcessor
     {
-        private readonly IWpfTextView _wpfTextView;
-
-        public void PostprocessMouseLeftButtonUp(MouseButtonEventArgs e)
-        {
-            var commandFilter = _wpfTextView.Properties.GetProperty<NextOccurrenceAdornment>(
-                typeof(NextOccurrenceAdornment)
-            );
-
-            if (commandFilter != null)
-            {
-                commandFilter.HandleClick(
-                    Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt)
-                );
-            }
-        }
+        private readonly IWpfTextView textView;
 
         public NextOccurrenceMouseProcessor(IWpfTextView wpfTextView)
         {
-            _wpfTextView = wpfTextView;
+            textView = wpfTextView;
+        }
+
+        public void PostprocessMouseLeftButtonUp(MouseButtonEventArgs e)
+        {
+            var adornmentLayer = textView.Properties.GetProperty<NextOccurrenceAdornment>(
+                typeof(NextOccurrenceAdornment)
+            );
+
+            if (adornmentLayer != null)
+            {
+                adornmentLayer.Selector.HandleClick(
+                    Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt)
+                );
+
+                adornmentLayer.DrawAdornments();
+            }
         }
 
         public void PostprocessDragEnter(DragEventArgs e)

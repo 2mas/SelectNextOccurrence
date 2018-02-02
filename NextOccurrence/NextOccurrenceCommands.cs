@@ -9,20 +9,6 @@ namespace NextOccurrence
     /// </summary>
     internal sealed class NextOccurrenceCommands
     {
-        public const int SelectNextOccurrenceCommandId = 0x0100;
-
-        public const int SkipOccurrenceCommandId = 0x0110;
-
-        public const int UndoOccurrenceCommandId = 0x0120;
-
-        /// <summary>
-        /// Command menu group (command set GUID).
-        /// </summary>
-        public static readonly Guid CommandSet = new Guid("66543491-5596-4e6c-94d2-bb507832fd49");
-
-        /// <summary>
-        /// VS Package that provides this command, not null.
-        /// </summary>
         private readonly Package package;
 
         /// <summary>
@@ -44,24 +30,38 @@ namespace NextOccurrence
             {
                 var SelectNextOccurrenceCmd = new MenuCommand(
                     this.SelectNextOccurrenceCallback,
-                    new CommandID(CommandSet, SelectNextOccurrenceCommandId)
+                    new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectNextOccurrenceCommandId)
                 );
 
                 commandService.AddCommand(SelectNextOccurrenceCmd);
 
                 var SkipOccurrenceCmd = new MenuCommand(
                     this.SkipOccurrenceCallback,
-                    new CommandID(CommandSet, SkipOccurrenceCommandId)
+                    new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SkipOccurrenceCommandId)
                 );
 
                 commandService.AddCommand(SkipOccurrenceCmd);
 
                 var UndoOccurrenceCmd = new MenuCommand(
                     this.UndoOccurrenceCallback,
-                    new CommandID(CommandSet, UndoOccurrenceCommandId)
+                    new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.UndoOccurrenceCommandId)
                 );
 
                 commandService.AddCommand(UndoOccurrenceCmd);
+
+                var AddCaretAboveCmd = new MenuCommand(
+                    this.AddCaretAboveCallback,
+                    new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.AddCaretAboveCommandId)
+                );
+
+                commandService.AddCommand(AddCaretAboveCmd);
+
+                var AddCaretBelowCmd = new MenuCommand(
+                    this.AddCaretBelowCallback,
+                    new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.AddCaretBelowCommandId)
+                );
+
+                commandService.AddCommand(AddCaretBelowCmd);
             }
         }
 
@@ -110,11 +110,23 @@ namespace NextOccurrence
             OnUndoOccurrencePressed?.Invoke(this, e);
         }
 
+        private void AddCaretAboveCallback(object sender, EventArgs e)
+        {
+            OnAddCaretAbovePressed?.Invoke(this, e);
+        }
+
+        private void AddCaretBelowCallback(object sender, EventArgs e)
+        {
+            OnAddCaretBelowPressed?.Invoke(this, e);
+        }
+
         /// <summary>
         /// The events to be raised when commands are invoked
         /// </summary>
         internal static event EventHandler OnSelectNextOccurrencePressed;
         internal static event EventHandler OnSkipOccurrencePressed;
         internal static event EventHandler OnUndoOccurrencePressed;
+        internal static event EventHandler OnAddCaretAbovePressed;
+        internal static event EventHandler OnAddCaretBelowPressed;
     }
 }
