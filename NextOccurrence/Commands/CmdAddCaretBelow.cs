@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.Text.Editor;
 
 namespace NextOccurrence.Commands
@@ -16,6 +17,15 @@ namespace NextOccurrence.Commands
         {
             if (!view.HasAggregateFocus)
                 return;
+
+            if (!adornmentLayer.Selector.Selections.Any())
+            {
+                // Add current caret
+                adornmentLayer.Selector.AddCurrentCaretToSelections();
+            }
+
+            adornmentLayer.Selector.AddCaretBelow();
+            adornmentLayer.DrawAdornments();
         }
     }
 }

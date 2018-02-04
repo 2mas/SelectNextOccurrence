@@ -81,6 +81,18 @@ namespace NextOccurrence
             this.Selections = new List<NextOccurrenceSelection>();
         }
 
+        internal void AddCaretAbove()
+        {
+            editorOperations.MoveLineUp(false);
+            AddCurrentCaretToSelections();
+        }
+
+        internal void AddCaretBelow()
+        {
+            editorOperations.MoveLineDown(false);
+            AddCurrentCaretToSelections();
+        }
+
         /// <summary>
         /// Adds start and end position of current selected text. 
         /// Default caret-position is set to the end of the selection, 
@@ -200,9 +212,12 @@ namespace NextOccurrence
             IsReversing = false;
         }
 
-        internal void HandleClick(bool addCursor)
+        internal void AddCurrentCaretToSelections()
         {
-            if (addCursor)
+            if (!Selections.Any(
+                s => s.Caret.GetPoint(Snapshot).Position
+                == view.Caret.Position.BufferPosition.Position)
+            )
             {
                 Selections.Add(
                     new NextOccurrenceSelection
@@ -215,6 +230,14 @@ namespace NextOccurrence
                         )
                     }
                 );
+            }
+        }
+
+        internal void HandleClick(bool addCursor)
+        {
+            if (addCursor)
+            {
+                AddCurrentCaretToSelections();
             }
             else
             {
