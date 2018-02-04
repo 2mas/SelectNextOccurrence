@@ -47,7 +47,8 @@ namespace NextOccurrence.Commands
             bool modifySelections = false;
             bool clearSelections = false;
 
-            if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
+            if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID
+                || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
             {
                 if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
                 {
@@ -164,85 +165,100 @@ namespace NextOccurrence.Commands
                     }
                 }
 
-                Selector.Dte.UndoContext.Open("SelectNextOccurrence");
-
-                foreach (var selection in Selector.Selections)
+                if (Selector.Selections.Any())
                 {
-                    if (selection.IsSelection())
+                    Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+
+                    foreach (var selection in Selector.Selections)
                     {
-                        view.Selection.Select(
-                            new SnapshotSpan(
-                                selection.Start.GetPoint(Snapshot),
-                                selection.End.GetPoint(Snapshot)
-                            ),
-                            Selector.IsReversing
+                        if (selection.IsSelection())
+                        {
+                            view.Selection.Select(
+                                new SnapshotSpan(
+                                    selection.Start.GetPoint(Snapshot),
+                                    selection.End.GetPoint(Snapshot)
+                                ),
+                                Selector.IsReversing
+                            );
+                        }
+
+                        view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+
+                        result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+
+                        selection.Caret = Snapshot.CreateTrackingPoint(
+                            view.Caret.Position.BufferPosition.Position,
+                            PointTrackingMode.Positive
                         );
+
+                        if (view.Selection.IsEmpty)
+                        {
+                            selection.Start = null;
+                            selection.End = null;
+                            modifySelections = false;
+                        }
+
+                        if (modifySelections)
+                        {
+                            var newSpan = view.Selection.StreamSelectionSpan;
+
+                            selection.Start = Snapshot.CreateTrackingPoint(
+                                newSpan.Start.Position.Position > newSpan.End.Position.Position ?
+                                newSpan.End.Position.Position
+                                : newSpan.Start.Position.Position,
+                                PointTrackingMode.Positive
+                            );
+
+                            selection.End = Snapshot.CreateTrackingPoint(
+                                newSpan.Start.Position.Position > newSpan.End.Position.Position ?
+                                newSpan.Start.Position.Position
+                                : newSpan.End.Position.Position,
+                                PointTrackingMode.Positive
+                            );
+
+                            view.Selection.Clear();
+                        }
                     }
 
-                    view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+                    Selector.Dte.UndoContext.Close();
 
-                    result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-
-                    // Backspace, delete, paste etc
-                    if (view.Selection.IsEmpty)
-                    {
-                        selection.Start = null;
-                        selection.End = null;
-                        modifySelections = false;
-                    }
-
+                    // set new searchtext needed if selection is modified
                     if (modifySelections)
                     {
-                        var newSpan = view.Selection.StreamSelectionSpan;
+                        var startPosition = Selector.Selections.Last().Start.GetPosition(Snapshot);
+                        var endPosition = Selector.Selections.Last().End.GetPosition(Snapshot);
 
-                        selection.Start = Snapshot.CreateTrackingPoint(
-                            newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                            newSpan.End.Position.Position
-                            : newSpan.Start.Position.Position,
-                            PointTrackingMode.Positive
+                        Selector.SearchText = Snapshot.GetText(
+                            startPosition,
+                            endPosition - startPosition
                         );
-
-                        selection.End = Snapshot.CreateTrackingPoint(
-                            newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                            newSpan.Start.Position.Position
-                            : newSpan.End.Position.Position,
-                            PointTrackingMode.Positive
-                        );
-
-                        view.Selection.Clear();
                     }
 
-                    selection.Caret = Snapshot.CreateTrackingPoint(
-                        view.Caret.Position.BufferPosition.Position,
-                        PointTrackingMode.Positive
-                    );
-                }
-
-                Selector.Dte.UndoContext.Close();
-
-                // set new searchtext needed if selection is modified
-                if (modifySelections)
-                {
-                    var startPosition = Selector.Selections.Last().Start.GetPosition(Snapshot);
-                    var endPosition = Selector.Selections.Last().End.GetPosition(Snapshot);
-
-                    Selector.SearchText = Snapshot.GetText(
-                        startPosition,
-                        endPosition - startPosition
-                    );
-                }
-
-                if (clearSelections)
-                {
-                    Selector.Selections.ForEach(s =>
-                        {
-                            s.Start = null;
-                            s.End = null;
-                        }
-                    );
+                    if (clearSelections)
+                    {
+                        Selector.Selections.ForEach(s =>
+                            {
+                                s.Start = null;
+                                s.End = null;
+                            }
+                        );
+                    }
                 }
 
                 view.Selection.Clear();
+
+                // Duplicate carets to remove. Happens if multiple selection are on same line
+                // and hitting home/end
+                if (Selector.Selections
+                        .GroupBy(s => s.Caret.GetPoint(Snapshot).Position)
+                        .Where(s => s.Count() > 1).Any())
+                {
+                    var distinctSelections = Selector.Selections
+                        .GroupBy(s => s.Caret.GetPoint(Snapshot).Position)
+                        .Select(s => s.First()).ToList();
+
+                    Selector.Selections = distinctSelections;
+                }
             }
             else
             {
