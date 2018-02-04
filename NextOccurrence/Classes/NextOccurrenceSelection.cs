@@ -35,7 +35,7 @@ namespace NextOccurrence
 
         internal bool Reversing(ITextSnapshot snapshot)
         {
-            return Caret.GetPosition(snapshot) < End.GetPosition(snapshot);
+            return Caret.GetPosition(snapshot) < End?.GetPosition(snapshot);
         }
     }
 }
