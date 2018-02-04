@@ -46,6 +46,7 @@ namespace NextOccurrence.Commands
             int result = VSConstants.S_OK;
             bool modifySelections = false;
             bool clearSelections = false;
+            bool draw = false;
 
             if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID
                 || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
@@ -122,6 +123,14 @@ namespace NextOccurrence.Commands
                 {
                     switch (nCmdID)
                     {
+                        case ((uint)VSConstants.VSStd2KCmdID.TYPECHAR):
+                        case ((uint)VSConstants.VSStd2KCmdID.BACKSPACE):
+                        case ((uint)VSConstants.VSStd2KCmdID.BACKTAB):
+                        case ((uint)VSConstants.VSStd2KCmdID.RETURN):
+                        case ((uint)VSConstants.VSStd2KCmdID.BOL):
+                        case ((uint)VSConstants.VSStd2KCmdID.EOL):
+                            draw = true;
+                            break;
                         case ((uint)VSConstants.VSStd2KCmdID.LEFT):
                         case ((uint)VSConstants.VSStd2KCmdID.RIGHT):
                         case ((uint)VSConstants.VSStd2KCmdID.UP):
@@ -131,10 +140,12 @@ namespace NextOccurrence.Commands
                             // Remove selected spans but keep carets
                             clearSelections = true;
                             Selector.IsReversing = false;
+                            draw = true;
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.CANCEL):
                             Selector.IsReversing = false;
                             Selector.Selections.Clear();
+                            draw = true;
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.PAGEDN):
                         case ((uint)VSConstants.VSStd2KCmdID.PAGEUP):
@@ -145,6 +156,7 @@ namespace NextOccurrence.Commands
                             Selector.Selections.Clear();
                             Selector.IsReversing = false;
                             result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            draw = true;
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.WORDPREV_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.BOL_EXT):
@@ -154,6 +166,7 @@ namespace NextOccurrence.Commands
                                 || Selector.IsReversing
                                 || Selector.Selections.Last().Reversing(Snapshot);
                             modifySelections = true;
+                            draw = true;
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.WORDNEXT_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.EOL_EXT):
@@ -161,11 +174,12 @@ namespace NextOccurrence.Commands
                         case ((uint)VSConstants.VSStd2KCmdID.DOWN_EXT):
                             Selector.IsReversing = !(Selector.Selections.All(s => !s.IsSelection()) || !Selector.IsReversing);
                             modifySelections = true;
+                            draw = true;
                             break;
                     }
                 }
 
-                if (Selector.Selections.Any())
+                if (draw && Selector.Selections.Any())
                 {
                     Selector.Dte.UndoContext.Open("SelectNextOccurrence");
 
@@ -265,7 +279,9 @@ namespace NextOccurrence.Commands
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
             }
 
-            adornmentLayer.DrawAdornments();
+            if (draw)
+                adornmentLayer.DrawAdornments();
+
             return result;
         }
     }
