@@ -10,6 +10,7 @@ namespace NextOccurrence
         internal ITrackingPoint Start { get; set; }
         internal ITrackingPoint End { get; set; }
         internal ITrackingPoint Caret { get; set; }
+        internal string CopiedText { get; set; }
 
         internal bool OverlapsWith(SnapshotSpan span, ITextSnapshot snapshot)
         {

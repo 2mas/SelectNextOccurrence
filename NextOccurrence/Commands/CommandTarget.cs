@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Windows;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Text;
@@ -52,6 +53,62 @@ namespace NextOccurrence.Commands
                 {
                     switch (nCmdID)
                     {
+                        case ((uint)VSConstants.VSStd97CmdID.Copy):
+                        case ((uint)VSConstants.VSStd97CmdID.Cut):
+                            Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+
+                            foreach (var selection in Selector.Selections)
+                            {
+                                if (selection.IsSelection())
+                                {
+                                    view.Selection.Select(
+                                        new SnapshotSpan(
+                                            selection.Start.GetPoint(Snapshot),
+                                            selection.End.GetPoint(Snapshot)
+                                        ),
+                                        false
+                                    );
+
+                                    // Copies/cuts and saves the text on the selection
+                                    result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                                    selection.CopiedText = Clipboard.GetText();
+                                }
+                            }
+
+                            Selector.Dte.UndoContext.Close();
+                            return result;
+                        case ((uint)VSConstants.VSStd97CmdID.Paste):
+                            // Only multi-paste different texts if all our selections have been copied with 
+                            // this extension, otherwise paste as default.
+                            if (Selector.Selections.All(s => !String.IsNullOrEmpty(s.CopiedText)))
+                            {
+                                Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+                                foreach (var selection in Selector.Selections)
+                                {
+                                    if (!String.IsNullOrEmpty(selection.CopiedText))
+                                    {
+                                        if (selection.IsSelection())
+                                        {
+                                            view.Selection.Select(
+                                                new SnapshotSpan(
+                                                    selection.Start.GetPoint(Snapshot),
+                                                    selection.End.GetPoint(Snapshot)
+                                                ),
+                                                false
+                                            );
+                                        }
+
+                                        view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+
+                                        Clipboard.SetText(selection.CopiedText);
+                                        result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                                    }
+                                }
+
+                                Selector.Dte.UndoContext.Close();
+                                return result;
+                            }
+                            break;
                         case ((uint)VSConstants.VSStd97CmdID.Undo):
                         case ((uint)VSConstants.VSStd97CmdID.Redo):
                             result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
@@ -92,8 +149,8 @@ namespace NextOccurrence.Commands
                         case ((uint)VSConstants.VSStd2KCmdID.BOL_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.LEFT_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.UP_EXT):
-                            Selector.IsReversing = Selector.Selections.All(s => !s.IsSelection()) 
-                                || Selector.IsReversing 
+                            Selector.IsReversing = Selector.Selections.All(s => !s.IsSelection())
+                                || Selector.IsReversing
                                 || Selector.Selections.Last().Reversing(Snapshot);
                             modifySelections = true;
                             break;

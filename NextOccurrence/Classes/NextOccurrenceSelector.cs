@@ -103,6 +103,8 @@ namespace NextOccurrence
                 }
             );
 
+            Selections.ForEach(s => s.CopiedText = null);
+
             SearchText = editorOperations.SelectedText;
         }
 
