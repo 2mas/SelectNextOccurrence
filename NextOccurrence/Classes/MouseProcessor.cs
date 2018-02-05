@@ -21,18 +21,18 @@ namespace NextOccurrence
     class NextOccurrenceMouseProcessor : IMouseProcessor
     {
         private readonly IWpfTextView textView;
+        private NextOccurrenceAdornment adornmentLayer;
 
         public NextOccurrenceMouseProcessor(IWpfTextView wpfTextView)
         {
             textView = wpfTextView;
+            adornmentLayer = textView.Properties.GetProperty<NextOccurrenceAdornment>(
+                typeof(NextOccurrenceAdornment)
+            );
         }
 
         public void PostprocessMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            var adornmentLayer = textView.Properties.GetProperty<NextOccurrenceAdornment>(
-                typeof(NextOccurrenceAdornment)
-            );
-
             if (adornmentLayer != null)
             {
                 adornmentLayer.Selector.HandleClick(
