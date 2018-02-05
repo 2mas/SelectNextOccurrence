@@ -56,58 +56,14 @@ namespace NextOccurrence.Commands
                     {
                         case ((uint)VSConstants.VSStd97CmdID.Copy):
                         case ((uint)VSConstants.VSStd97CmdID.Cut):
-                            Selector.Dte.UndoContext.Open("SelectNextOccurrence");
-
-                            foreach (var selection in Selector.Selections)
-                            {
-                                if (selection.IsSelection())
-                                {
-                                    view.Selection.Select(
-                                        new SnapshotSpan(
-                                            selection.Start.GetPoint(Snapshot),
-                                            selection.End.GetPoint(Snapshot)
-                                        ),
-                                        false
-                                    );
-
-                                    // Copies/cuts and saves the text on the selection
-                                    result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                                    selection.CopiedText = Clipboard.GetText();
-                                }
-                            }
-
-                            Selector.Dte.UndoContext.Close();
-                            return result;
+                            return HandleCopyCut(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                         case ((uint)VSConstants.VSStd97CmdID.Paste):
                             // Only multi-paste different texts if all our selections have been copied with 
-                            // this extension, otherwise paste as default.
+                            // this extension, otherwise paste as default. 
+                            // Copied text get reset when new new selections are added
                             if (Selector.Selections.All(s => !String.IsNullOrEmpty(s.CopiedText)))
                             {
-                                Selector.Dte.UndoContext.Open("SelectNextOccurrence");
-                                foreach (var selection in Selector.Selections)
-                                {
-                                    if (!String.IsNullOrEmpty(selection.CopiedText))
-                                    {
-                                        if (selection.IsSelection())
-                                        {
-                                            view.Selection.Select(
-                                                new SnapshotSpan(
-                                                    selection.Start.GetPoint(Snapshot),
-                                                    selection.End.GetPoint(Snapshot)
-                                                ),
-                                                false
-                                            );
-                                        }
-
-                                        view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
-
-                                        Clipboard.SetText(selection.CopiedText);
-                                        result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                                    }
-                                }
-
-                                Selector.Dte.UndoContext.Close();
-                                return result;
+                                return HandlePaste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                             }
                             break;
                         case ((uint)VSConstants.VSStd97CmdID.Undo):
@@ -174,98 +130,11 @@ namespace NextOccurrence.Commands
 
                 if (Selector.Selections.Any())
                 {
-                    Selector.Dte.UndoContext.Open("SelectNextOccurrence");
-
-                    foreach (var selection in Selector.Selections)
-                    {
-                        if (selection.IsSelection())
-                        {
-                            view.Selection.Select(
-                                new SnapshotSpan(
-                                    selection.Start.GetPoint(Snapshot),
-                                    selection.End.GetPoint(Snapshot)
-                                ),
-                                Selector.IsReversing
-                            );
-                        }
-
-                        view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
-
-                        result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-
-                        selection.Caret = Snapshot.CreateTrackingPoint(
-                            view.Caret.Position.BufferPosition.Position,
-                            PointTrackingMode.Positive
-                        );
-
-                        if (view.Selection.IsEmpty)
-                        {
-                            selection.Start = null;
-                            selection.End = null;
-                            modifySelections = false;
-                        }
-
-                        if (modifySelections)
-                        {
-                            var newSpan = view.Selection.StreamSelectionSpan;
-
-                            selection.Start = Snapshot.CreateTrackingPoint(
-                                newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                                newSpan.End.Position.Position
-                                : newSpan.Start.Position.Position,
-                                PointTrackingMode.Positive
-                            );
-
-                            selection.End = Snapshot.CreateTrackingPoint(
-                                newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                                newSpan.Start.Position.Position
-                                : newSpan.End.Position.Position,
-                                PointTrackingMode.Positive
-                            );
-
-                            view.Selection.Clear();
-                        }
-                    }
-
-                    Selector.Dte.UndoContext.Close();
-
-                    // set new searchtext needed if selection is modified
-                    if (modifySelections)
-                    {
-                        var startPosition = Selector.Selections.Last().Start.GetPosition(Snapshot);
-                        var endPosition = Selector.Selections.Last().End.GetPosition(Snapshot);
-
-                        Selector.SearchText = Snapshot.GetText(
-                            startPosition,
-                            endPosition - startPosition
-                        );
-                    }
-
-                    if (clearSelections)
-                    {
-                        Selector.Selections.ForEach(s =>
-                            {
-                                s.Start = null;
-                                s.End = null;
-                            }
-                        );
-                    }
+                    result = ProcessSelections(modifySelections, clearSelections, ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                 }
 
                 view.Selection.Clear();
-
-                // Duplicate carets to remove. Happens if multiple selection are on same line
-                // and hitting home/end
-                if (Selector.Selections
-                        .GroupBy(s => s.Caret.GetPoint(Snapshot).Position)
-                        .Where(s => s.Count() > 1).Any())
-                {
-                    var distinctSelections = Selector.Selections
-                        .GroupBy(s => s.Caret.GetPoint(Snapshot).Position)
-                        .Select(s => s.First()).ToList();
-
-                    Selector.Selections = distinctSelections;
-                }
+                Selector.RemoveDuplicates();
             }
             else
             {
@@ -273,6 +142,168 @@ namespace NextOccurrence.Commands
             }
 
             adornmentLayer.DrawAdornments();
+
+            return result;
+        }
+
+        private int ProcessSelections(bool modifySelections, bool clearSelections, ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        {
+            int result = VSConstants.S_OK;
+            Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+
+            foreach (var selection in Selector.Selections)
+            {
+                if (selection.IsSelection())
+                {
+                    view.Selection.Select(
+                        new SnapshotSpan(
+                            selection.Start.GetPoint(Snapshot),
+                            selection.End.GetPoint(Snapshot)
+                        ),
+                        Selector.IsReversing
+                    );
+                }
+
+                view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+
+                result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+
+                selection.Caret = Snapshot.CreateTrackingPoint(
+                    view.Caret.Position.BufferPosition.Position,
+                    PointTrackingMode.Positive
+                );
+
+                if (view.Selection.IsEmpty)
+                {
+                    selection.Start = null;
+                    selection.End = null;
+                    modifySelections = false;
+                }
+
+                if (modifySelections)
+                {
+                    var newSpan = view.Selection.StreamSelectionSpan;
+
+                    selection.Start = Snapshot.CreateTrackingPoint(
+                        newSpan.Start.Position.Position > newSpan.End.Position.Position ?
+                        newSpan.End.Position.Position
+                        : newSpan.Start.Position.Position,
+                        PointTrackingMode.Positive
+                    );
+
+                    selection.End = Snapshot.CreateTrackingPoint(
+                        newSpan.Start.Position.Position > newSpan.End.Position.Position ?
+                        newSpan.Start.Position.Position
+                        : newSpan.End.Position.Position,
+                        PointTrackingMode.Positive
+                    );
+
+                    view.Selection.Clear();
+                }
+            }
+
+            Selector.Dte.UndoContext.Close();
+
+            // Set new searchtext needed if selection is modified
+            if (modifySelections)
+            {
+                var startPosition = Selector.Selections.Last().Start.GetPosition(Snapshot);
+                var endPosition = Selector.Selections.Last().End.GetPosition(Snapshot);
+
+                Selector.SearchText = Snapshot.GetText(
+                    startPosition,
+                    endPosition - startPosition
+                );
+            }
+
+            // Goes to caret-only mode
+            if (clearSelections)
+            {
+                Selector.Selections.ForEach(s =>
+                    {
+                        s.Start = null;
+                        s.End = null;
+                    }
+                );
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Copies/cuts each selection as normal, and saves the text into the selection-item
+        /// </summary>
+        /// <param name="pguidCmdGroup"></param>
+        /// <param name="nCmdID"></param>
+        /// <param name="nCmdexecopt"></param>
+        /// <param name="pvaIn"></param>
+        /// <param name="pvaOut"></param>
+        /// <returns></returns>
+        private int HandleCopyCut(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        {
+            int result = VSConstants.S_OK;
+            Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+
+            foreach (var selection in Selector.Selections)
+            {
+                if (selection.IsSelection())
+                {
+                    view.Selection.Select(
+                        new SnapshotSpan(
+                            selection.Start.GetPoint(Snapshot),
+                            selection.End.GetPoint(Snapshot)
+                        ),
+                        false
+                    );
+
+                    // Copies/cuts and saves the text on the selection
+                    result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                    selection.CopiedText = Clipboard.GetText();
+                }
+            }
+
+            Selector.Dte.UndoContext.Close();
+
+            return result;
+        }
+
+        /// <summary>
+        /// If a previous multi-copy/cut has been made, this pastes the saved text at cursor-positions
+        /// </summary>
+        /// <param name="pguidCmdGroup"></param>
+        /// <param name="nCmdID"></param>
+        /// <param name="nCmdexecopt"></param>
+        /// <param name="pvaIn"></param>
+        /// <param name="pvaOut"></param>
+        /// <returns></returns>
+        private int HandlePaste(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        {
+            int result = VSConstants.S_OK;
+            Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+
+            foreach (var selection in Selector.Selections)
+            {
+                if (!String.IsNullOrEmpty(selection.CopiedText))
+                {
+                    if (selection.IsSelection())
+                    {
+                        view.Selection.Select(
+                            new SnapshotSpan(
+                                selection.Start.GetPoint(Snapshot),
+                                selection.End.GetPoint(Snapshot)
+                            ),
+                            false
+                        );
+                    }
+
+                    view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+
+                    Clipboard.SetText(selection.CopiedText);
+                    result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                }
+            }
+
+            Selector.Dte.UndoContext.Close();
 
             return result;
         }

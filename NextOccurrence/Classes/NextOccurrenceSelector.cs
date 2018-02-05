@@ -231,6 +231,8 @@ namespace NextOccurrence
                     }
                 );
             }
+
+            Selections.ForEach(s => s.CopiedText = null);
         }
 
         internal void HandleClick(bool addCursor)
@@ -242,6 +244,24 @@ namespace NextOccurrence
             else
             {
                 Selections.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Duplicate carets to remove. Happens if multiple selection are on same line
+        /// and hitting home/end
+        /// </summary>
+        internal void RemoveDuplicates()
+        {
+            if (Selections
+                .GroupBy(s => s.Caret.GetPoint(Snapshot).Position)
+                .Where(s => s.Count() > 1).Any())
+            {
+                var distinctSelections = Selections
+                    .GroupBy(s => s.Caret.GetPoint(Snapshot).Position)
+                    .Select(s => s.First()).ToList();
+
+                Selections = distinctSelections;
             }
         }
     }
