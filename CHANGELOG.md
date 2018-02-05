@@ -1,6 +1,6 @@
 # Road map
 
-- [ ] Command to add caret above/below current caret (modifier(s) + Up/Down-key)
+- [x] Command to add caret above/below current caret (modifier(s) + Up/Down-key)
 - [ ] Command to convert a block-selection into carets
 - [ ] Command to select all occurrences
 - [x] Undo last selection
@@ -10,6 +10,15 @@
 
 These are the changes to each version that has been released
 on the official Visual Studio extension gallery.
+
+## 1.2
+- [x] Switching command-prefix from ```Edit.``` to ```SelectNextOccurrence.```
+- [x] Added command ```Add Caret Above```
+- [x] Added command ```Add Caret Below```
+- [x] Fixing multi copy/paste.
+- [x] Better support for selecting right to left and turning.
+- [x] Fixing removal of duplicate carets.
+- [x] Adding extension icon.
 
 ##### 1.1.1(.1)
 - [x] Fix for NullReference Exception when adding commandfilter
