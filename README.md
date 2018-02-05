@@ -1,7 +1,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/66dy10xgquyw3y7x?svg=true)](https://ci.appveyor.com/project/2mas/selectnextoccurrence)
 # Select Next Occurrence
 
-Download this extension from the [VS Gallery](https://marketplace.visualstudio.com/items?itemName=thomaswelen.SelectNextOccurrence).
+Download this extension from the [VS Gallery](https://marketplace.visualstudio.com/items?itemName=thomaswelen.SelectNextOccurrence) or get the latest [CI-build](http://vsixgallery.com/extension/NextOccurrence.b213c4e9-b96f-4f9d-b1d6-fa8bc7e9da21/).
 
 ---------------------------------------
 
@@ -16,6 +16,7 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 - Select next occurrence of current selection. 
 - Skip occurrence
 - Undo occurrence
+- Add caret above/below
 - Use multiple carets to edit
   - Alt-Click to add caret
 
@@ -27,9 +28,11 @@ Toggle case-sensitive search by using the "Match case" setting from the find-dia
 ### Key-bindings
 Go to Tools -> Options -> Keyboard and search for these command names to edit at your choice. Make sure the _Use new shortcut in_ is set to: ***Text Editor***
 
-- ```Edit.SelectNextOccurrence``` is bound to ***Ctrl+D*** by default.
-- ```Edit.SkipOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+K, Ctrl+D)*
-- ```Edit.UndoOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+U)*
+- ```SelectNextOccurrence.SelectNextOccurrence``` is bound to ***Ctrl+D*** by default.
+- ```SelectNextOccurrence.SkipOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+K, Ctrl+D)*
+- ```SelectNextOccurrence.UndoOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+U)*
+- ```SelectNextOccurrence.AddCaretAbove``` is ***not bound*** by default. *(Recommended Shift+Alt+Up)*
+- ```SelectNextOccurrence.AddCaretBelow``` is ***not bound*** by default. *(Recommended Shift+Alt+Down)*
 
 ![Select Next Occurrence Keyboard bindings](kbd_shortcuts.png)
 
