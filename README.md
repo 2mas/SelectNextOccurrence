@@ -31,8 +31,8 @@ Go to Tools -> Options -> Keyboard and search for these command names to edit at
 - ```SelectNextOccurrence.SelectNextOccurrence``` is bound to ***Ctrl+D*** by default.
 - ```SelectNextOccurrence.SkipOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+K, Ctrl+D)*
 - ```SelectNextOccurrence.UndoOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+U)*
-- ```SelectNextOccurrence.AddCaretAbove``` is ***not bound*** by default. *(Recommended Shift+Alt+Up)*
-- ```SelectNextOccurrence.AddCaretBelow``` is ***not bound*** by default. *(Recommended Shift+Alt+Down)*
+- ```SelectNextOccurrence.AddCaretAbove``` is ***not bound*** by default. *(Recommended Ctrl+Alt+Up)*
+- ```SelectNextOccurrence.AddCaretBelow``` is ***not bound*** by default. *(Recommended Ctrl+Alt+Down)*
 
 ![Select Next Occurrence Keyboard bindings](kbd_shortcuts.png)
 
