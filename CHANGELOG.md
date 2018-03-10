@@ -11,6 +11,9 @@
 These are the changes to each version that has been released
 on the official Visual Studio extension gallery.
 
+##### 1.2.9
+- [x] Added command ```SelectAllOccurrences```
+
 ## 1.2
 - [x] Switching command-prefix from ```Edit.``` to ```SelectNextOccurrence.```
 - [x] Added command ```Add Caret Above```

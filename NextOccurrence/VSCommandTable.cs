@@ -6,7 +6,7 @@
 namespace NextOccurrence
 {
     using System;
-
+    
     /// <summary>
     /// Helper class that exposes all GUIDs used across VS Package.
     /// </summary>
@@ -31,6 +31,7 @@ namespace NextOccurrence
         public const int UndoOccurrenceCommandId = 0x0120;
         public const int AddCaretAboveCommandId = 0x0130;
         public const int AddCaretBelowCommandId = 0x0131;
+        public const int SelectAllOccurrencesCommandId = 0x0140;
         public const int bmpIcon = 0x0001;
     }
 }

@@ -75,6 +75,7 @@ namespace NextOccurrence
             NextOccurrenceCommands.OnUndoOccurrencePressed += new CmdUndoOccurrence(view).OnCommandInvoked;
             NextOccurrenceCommands.OnAddCaretAbovePressed += new CmdAddCaretAbove(view).OnCommandInvoked;
             NextOccurrenceCommands.OnAddCaretBelowPressed += new CmdAddCaretBelow(view).OnCommandInvoked;
+            NextOccurrenceCommands.OnSelectAllOccurrencesPressed += new CmdSelectAllOccurrences(view).OnCommandInvoked;
         }
 
         /// <summary>

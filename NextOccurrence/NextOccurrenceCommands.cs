@@ -62,6 +62,13 @@ namespace NextOccurrence
                 );
 
                 commandService.AddCommand(AddCaretBelowCmd);
+
+                var SelectAllOccurrencesCmd = new MenuCommand(
+                    this.SelectAllOccurrencesCallback,
+                    new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectAllOccurrencesCommandId)
+                );
+
+                commandService.AddCommand(SelectAllOccurrencesCmd);
             }
         }
 
@@ -120,6 +127,11 @@ namespace NextOccurrence
             OnAddCaretBelowPressed?.Invoke(this, e);
         }
 
+        private void SelectAllOccurrencesCallback(object sender, EventArgs e)
+        {
+            OnSelectAllOccurrencesPressed?.Invoke(this, e);
+        }
+
         /// <summary>
         /// The events to be raised when commands are invoked
         /// </summary>
@@ -128,5 +140,6 @@ namespace NextOccurrence
         internal static event EventHandler OnUndoOccurrencePressed;
         internal static event EventHandler OnAddCaretAbovePressed;
         internal static event EventHandler OnAddCaretBelowPressed;
+        internal static event EventHandler OnSelectAllOccurrencesPressed;
     }
 }

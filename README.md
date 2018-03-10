@@ -29,6 +29,7 @@ Toggle case-sensitive search by using the "Match case" setting from the find-dia
 Go to Tools -> Options -> Keyboard and search for these command names to edit at your choice. Make sure the _Use new shortcut in_ is set to: ***Text Editor***
 
 - ```SelectNextOccurrence.SelectNextOccurrence``` is bound to ***Ctrl+D*** by default.
+- ```SelectNextOccurrence.SelectAllOccurrences``` is ***not bound*** by default.
 - ```SelectNextOccurrence.SkipOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+K, Ctrl+D)*
 - ```SelectNextOccurrence.UndoOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+U)*
 - ```SelectNextOccurrence.AddCaretAbove``` is ***not bound*** by default. *(Recommended Ctrl+Alt+Up)*
@@ -46,6 +47,10 @@ Check that the key-bindings are correct and that the _Use new shortcut in_ is se
 
 There is a possibility that other plugins use this functionality too, and a conflict occurs. Please check for other installed plugins with this feature and try to disable.
 
+- **Copy/cut multiple occurrences doesnt work as expected**
+
+There is a conflict with the extension Copy As Html, if you have this enabled, try to disable it and see if this helps.
+
 ### Contribute
 Check out the [contribution guidelines](CONTRIBUTING.md)
 if you want to contribute to this project.
@@ -54,7 +59,9 @@ For cloning and building this project yourself, make sure
 to install the
 [Extensibility Tools 2015](https://visualstudiogallery.msdn.microsoft.com/ab39a092-1343-46e2-b0f1-6a3f91155aa6)
 extension for Visual Studio which enables some features
-used by this project.
+used by this project. 
+
+As far as I know you must have a 2015-edition of VS installed (or previously installed) to get the generators working for Extensibility Tools in 2017.
 
 ### License
 [Apache 2.0](LICENSE)

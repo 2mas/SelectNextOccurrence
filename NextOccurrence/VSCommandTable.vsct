@@ -72,7 +72,7 @@
           <ButtonText>Select Next Occurrence</ButtonText>
           <CommandName>Select Next Occurrence</CommandName>
         </Strings>
-      </Button>
+      </Button>      
       <Button guid="guidNextOccurrenceCommandsPackageCmdSet" id="SkipOccurrenceCommandId" priority="0x0110" type="Button">
         <Parent guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectNextOccurrenceGroupId" />
         <CommandFlag>CommandWellOnly</CommandFlag>
@@ -103,6 +103,14 @@
         <Strings>
           <ButtonText>Add Caret Below</ButtonText>
           <CommandName>Add Caret Below</CommandName>
+        </Strings>
+      </Button>
+      <Button guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectAllOccurrencesCommandId" priority="0x0140" type="Button">
+        <Parent guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectNextOccurrenceGroupId" />
+        <CommandFlag>CommandWellOnly</CommandFlag>
+        <Strings>
+          <ButtonText>Select All Occurrences</ButtonText>
+          <CommandName>Select All Occurrences</CommandName>
         </Strings>
       </Button>
     </Buttons>
@@ -141,6 +149,7 @@
       <IDSymbol name="UndoOccurrenceCommandId" value="0x0120" />
       <IDSymbol name="AddCaretAboveCommandId" value="0x0130" />
       <IDSymbol name="AddCaretBelowCommandId" value="0x0131" />
+      <IDSymbol name="SelectAllOccurrencesCommandId" value="0x0140" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{e49d8c2f-b246-4f14-b0dd-ca956ca3046a}" >

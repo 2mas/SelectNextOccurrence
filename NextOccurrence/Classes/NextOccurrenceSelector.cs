@@ -120,6 +120,53 @@ namespace NextOccurrence
             SearchText = editorOperations.SelectedText;
         }
 
+        /// <summary>
+        /// The FindData to be used in search
+        /// If user has toggled match-case in their find-options we use this here too
+        /// </summary>
+        /// <returns></returns>
+        private FindData GetFindData()
+        {
+            return (textStructureNavigator != null && Dte.Find.MatchCase) ?
+                new FindData(
+                    SearchText,
+                    Snapshot,
+                    FindOptions.MatchCase,
+                    textStructureNavigator
+                )
+                : new FindData(SearchText, Snapshot);
+        }
+
+        private void ProcessFoundOccurrence(SnapshotSpan occurrence)
+        {
+            if (!Selections.Any(s => s.OverlapsWith(occurrence, Snapshot)))
+            {
+                var start = Snapshot.CreateTrackingPoint(occurrence.Start, PointTrackingMode.Positive);
+                var end = Snapshot.CreateTrackingPoint(occurrence.End, PointTrackingMode.Positive);
+
+                // If previous selection was reversed, set this caret to beginning of this selection
+                var caret = Selections.Last().Caret.GetPosition(Snapshot) == Selections.Last().Start.GetPosition(Snapshot) ?
+                    start : end;
+
+                Selections.Add(
+                    new NextOccurrenceSelection
+                    {
+                        Start = start,
+                        End = end,
+                        Caret = caret
+                    }
+                );
+
+                view.Caret.MoveTo(caret == start ? occurrence.Start : occurrence.End);
+                view.ViewScroller.EnsureSpanVisible(
+                    new SnapshotSpan(
+                        view.Caret.Position.BufferPosition,
+                        0
+                    )
+                );
+            }
+        }
+
 
         /// <summary>
         /// Handles finding occurrences, selecting and adding to current selections
@@ -162,54 +209,38 @@ namespace NextOccurrence
                 else
                 {
                     // Start the search from previous end-position if it exists, otherwise caret
-                    // If user has toggled match-case in their find-options we use this here too
-                    var next_occurrence = textSearchService.FindNext(
-                        Selections.Last().End != null ?
-                            Selections.Last().End.GetPosition(Snapshot)
-                            : Selections.Last().Caret.GetPosition(Snapshot),
+                    int startIndex = Selections.Last().End != null ?
+                        Selections.Last().End.GetPosition(Snapshot)
+                        : Selections.Last().Caret.GetPosition(Snapshot);
+
+                    var occurrence = textSearchService.FindNext(
+                        startIndex,
                         true,
-                        (textStructureNavigator != null && Dte.Find.MatchCase) ?
-                        new FindData(
-                            SearchText,
-                            Snapshot,
-                            FindOptions.MatchCase,
-                            textStructureNavigator
-                        )
-                        : new FindData(SearchText, Snapshot)
+                        GetFindData()
                     );
 
-                    if (next_occurrence.HasValue && !Selections.Any(s => s.OverlapsWith(next_occurrence.Value, Snapshot)))
-                    {
-                        var start = Snapshot.CreateTrackingPoint(next_occurrence.Value.Start, PointTrackingMode.Positive);
-                        var end = Snapshot.CreateTrackingPoint(next_occurrence.Value.End, PointTrackingMode.Positive);
+                    if (occurrence.HasValue)
+                        ProcessFoundOccurrence(occurrence.Value);
 
-                        // If previous selection was reversed, set this caret to beginning of this selection
-                        var caret = Selections.Last().Caret.GetPosition(Snapshot) == Selections.Last().Start.GetPosition(Snapshot) ?
-                            start : end;
-
-                        Selections.Add(
-                            new NextOccurrenceSelection
-                            {
-                                Start = start,
-                                End = end,
-                                Caret = caret
-                            }
-                        );
-
-                        view.Caret.MoveTo(caret == start ? next_occurrence.Value.Start : next_occurrence.Value.End);
-                        view.ViewScroller.EnsureSpanVisible(
-                            new SnapshotSpan(
-                                view.Caret.Position.BufferPosition,
-                                0
-                            )
-                        );
-                    }
                 }
 
                 view.Selection.Clear();
             }
 
             IsReversing = false;
+        }
+
+        /// <summary>
+        /// Handles finding all occurrences
+        /// </summary>
+        internal void SelectAllOccurrences()
+        {
+            // Get a valid first selection to begin with
+            SelectNextOccurrence();
+
+            var occurrences = textSearchService.FindAll(GetFindData());
+            foreach (var occurrence in occurrences)
+                ProcessFoundOccurrence(occurrence);
         }
 
         internal void AddCurrentCaretToSelections()
