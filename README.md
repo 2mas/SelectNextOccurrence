@@ -14,6 +14,7 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 ## Features
 
 - Select next occurrence of current selection. 
+- Select all occurrences.
 - Skip occurrence
 - Undo occurrence
 - Add caret above/below

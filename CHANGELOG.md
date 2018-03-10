@@ -2,7 +2,7 @@
 
 - [x] Command to add caret above/below current caret (modifier(s) + Up/Down-key)
 - [ ] Command to convert a block-selection into carets
-- [ ] Command to select all occurrences
+- [x] Command to select all occurrences
 - [x] Undo last selection
 - [x] Skip next occurrence (Sublime Ctrl+K, Ctrl+D)
 
