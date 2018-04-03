@@ -63,6 +63,7 @@
     <Compile Include="Commands\CmdBase.cs" />
     <Compile Include="Commands\CmdAddCaretAbove.cs" />
     <Compile Include="Commands\CmdSelectAllOccurrences.cs" />
+    <Compile Include="Commands\CmdConvertSelectionToMultipleCursors.cs" />
     <Compile Include="Commands\CmdUndoOccurrence.cs" />
     <Compile Include="Commands\CmdSkipOccurrence.cs" />
     <Compile Include="Commands\CmdSelectNextOccurrence.cs" />

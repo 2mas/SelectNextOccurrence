@@ -32,6 +32,7 @@ namespace NextOccurrence
         public const int AddCaretAboveCommandId = 0x0130;
         public const int AddCaretBelowCommandId = 0x0131;
         public const int SelectAllOccurrencesCommandId = 0x0140;
+        public const int ConvertSelectiontoMultipleCursorsCommandId = 0x0141;
         public const int bmpIcon = 0x0001;
     }
 }

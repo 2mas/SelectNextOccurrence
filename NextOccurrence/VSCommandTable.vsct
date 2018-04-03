@@ -113,6 +113,14 @@
           <CommandName>Select All Occurrences</CommandName>
         </Strings>
       </Button>
+      <Button guid="guidNextOccurrenceCommandsPackageCmdSet" id="ConvertSelectiontoMultipleCursorsCommandId" priority="0x0141" type="Button">
+        <Parent guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectNextOccurrenceGroupId" />
+        <CommandFlag>CommandWellOnly</CommandFlag>
+        <Strings>
+          <ButtonText>Convert Selection to Multiple Cursors</ButtonText>
+          <CommandName>Convert Selection to Multiple Cursors</CommandName>
+        </Strings>
+      </Button>
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -150,6 +158,7 @@
       <IDSymbol name="AddCaretAboveCommandId" value="0x0130" />
       <IDSymbol name="AddCaretBelowCommandId" value="0x0131" />
       <IDSymbol name="SelectAllOccurrencesCommandId" value="0x0140" />
+      <IDSymbol name="ConvertSelectiontoMultipleCursorsCommandId" value="0x0141" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{e49d8c2f-b246-4f14-b0dd-ca956ca3046a}" >

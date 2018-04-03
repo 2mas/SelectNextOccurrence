@@ -81,6 +81,45 @@ namespace NextOccurrence
             this.Selections = new List<NextOccurrenceSelection>();
         }
 
+        internal void ConvertSelectionToMultipleCursors()
+        {
+            var start = view.Selection.Start.Position.Position;
+            var end = view.Selection.End.Position.Position;
+
+            int beginLineNumber = Snapshot.GetLineFromPosition(start).LineNumber;
+            int endLineNumber = Snapshot.GetLineFromPosition(end).LineNumber;
+
+            if (beginLineNumber != endLineNumber)
+            {
+                for (int lineNumber = beginLineNumber; lineNumber < endLineNumber; lineNumber++)
+                {
+                    var line = Snapshot.GetLineFromLineNumber(lineNumber);
+                    Selections.Add(
+                        new NextOccurrenceSelection
+                        {
+                            Caret = Snapshot.CreateTrackingPoint(line.End.Position, PointTrackingMode.Positive)
+                        }
+                    );
+
+                }
+
+                Selections.Add(
+                    new NextOccurrenceSelection
+                    {
+                        Caret = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive)
+                    }
+                );
+
+                Selections.ForEach(s => s.CopiedText = null);
+
+                SearchText = editorOperations.SelectedText;
+            }
+            else
+            {
+                AddCurrentSelectionToSelections();
+            }
+        }
+
         internal void AddCaretAbove()
         {
             editorOperations.MoveLineUp(false);
