@@ -19,12 +19,13 @@ namespace NextOccurrence.Commands
 
         private NextOccurrenceSelector Selector { get { return this.adornmentLayer.Selector; } }
 
+        private readonly NextOccurrenceAdornment adornmentLayer;
+
         /// <summary>
         /// Next commandhandler
         /// </summary>
         public IOleCommandTarget NextCommandTarget { get; set; }
 
-        private NextOccurrenceAdornment adornmentLayer;
 
         public CommandTarget(IWpfTextView view)
         {

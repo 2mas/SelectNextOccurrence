@@ -21,7 +21,7 @@ namespace NextOccurrence
     class NextOccurrenceMouseProcessor : IMouseProcessor
     {
         private readonly IWpfTextView textView;
-        private NextOccurrenceAdornment adornmentLayer;
+        private readonly NextOccurrenceAdornment adornmentLayer;
 
         public NextOccurrenceMouseProcessor(IWpfTextView wpfTextView)
         {
@@ -33,7 +33,8 @@ namespace NextOccurrence
 
         public void PostprocessMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            if (adornmentLayer != null)
+            // Only act on single clicks, not selections
+            if (adornmentLayer != null && textView.Selection.IsEmpty)
             {
                 adornmentLayer.Selector.HandleClick(
                     Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt)
