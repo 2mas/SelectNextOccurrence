@@ -70,6 +70,7 @@ namespace NextOccurrence
             // events
             this.view.LayoutChanged += this.OnLayoutChanged;
 
+            NextOccurrenceCommands.OnConvertSelectionToMultipleCursorsPressed += new CmdConvertSelectionToMultipleCursors(view).OnCommandInvoked;
             NextOccurrenceCommands.OnSelectNextOccurrencePressed += new CmdSelectNextOccurrence(view).OnCommandInvoked;
             NextOccurrenceCommands.OnSkipOccurrencePressed += new CmdSkipOccurrence(view).OnCommandInvoked;
             NextOccurrenceCommands.OnUndoOccurrencePressed += new CmdUndoOccurrence(view).OnCommandInvoked;

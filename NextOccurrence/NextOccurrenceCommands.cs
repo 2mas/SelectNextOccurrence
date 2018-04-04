@@ -28,6 +28,13 @@ namespace NextOccurrence
             OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
+                var ConvertSelectionToMultipleCursorsCmd = new MenuCommand(
+                    this.ConvertSelectionToMultipleCursorsCallback,
+                    new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.ConvertSelectiontoMultipleCursorsCommandId)
+                );
+
+                commandService.AddCommand(ConvertSelectionToMultipleCursorsCmd);
+
                 var SelectNextOccurrenceCmd = new MenuCommand(
                     this.SelectNextOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectNextOccurrenceCommandId)
@@ -102,6 +109,11 @@ namespace NextOccurrence
             Instance = new NextOccurrenceCommands(package);
         }
 
+        private void ConvertSelectionToMultipleCursorsCallback(object sender, EventArgs e)
+        {
+            OnConvertSelectionToMultipleCursorsPressed?.Invoke(this, e);
+        }
+
         private void SelectNextOccurrenceCallback(object sender, EventArgs e)
         {
             OnSelectNextOccurrencePressed?.Invoke(this, e);
@@ -135,6 +147,7 @@ namespace NextOccurrence
         /// <summary>
         /// The events to be raised when commands are invoked
         /// </summary>
+        internal static event EventHandler OnConvertSelectionToMultipleCursorsPressed;
         internal static event EventHandler OnSelectNextOccurrencePressed;
         internal static event EventHandler OnSkipOccurrencePressed;
         internal static event EventHandler OnUndoOccurrencePressed;
