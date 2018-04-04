@@ -117,8 +117,8 @@
         <Parent guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectNextOccurrenceGroupId" />
         <CommandFlag>CommandWellOnly</CommandFlag>
         <Strings>
-          <ButtonText>Convert Selection to Multiple Cursors</ButtonText>
-          <CommandName>Convert Selection to Multiple Cursors</CommandName>
+          <ButtonText>Convert Selection To Multiple Cursors</ButtonText>
+          <CommandName>Convert Selection To Multiple Cursors</CommandName>
         </Strings>
       </Button>
     </Buttons>

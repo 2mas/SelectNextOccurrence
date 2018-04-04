@@ -9,13 +9,13 @@ namespace NextOccurrence.Commands
         public CmdConvertSelectionToMultipleCursors(IWpfTextView view) : base(view) { }
 
         /// <summary>
-        /// Menu-command handler, aka Ctrl+D
+        /// Menu-command handler, puts cursors at a selections line-ends
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         internal override void OnCommandInvoked(object sender, EventArgs e)
         {
-            if (!view.HasAggregateFocus)
+            if (!view.HasAggregateFocus || view.Selection.IsEmpty)
                 return;
 
             adornmentLayer.Selector.ConvertSelectionToMultipleCursors();

@@ -100,7 +100,6 @@ namespace NextOccurrence
                             Caret = Snapshot.CreateTrackingPoint(line.End.Position, PointTrackingMode.Positive)
                         }
                     );
-
                 }
 
                 Selections.Add(
@@ -111,8 +110,7 @@ namespace NextOccurrence
                 );
 
                 Selections.ForEach(s => s.CopiedText = null);
-
-                SearchText = editorOperations.SelectedText;
+                view.Selection.Clear();
             }
             else
             {
