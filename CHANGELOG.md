@@ -1,15 +1,16 @@
 # Road map
 
 - [x] Command to add caret above/below current caret (modifier(s) + Up/Down-key)
-- [ ] Command to convert a block-selection into carets
+- [x] Command to convert a block-selection into carets
 - [x] Command to select all occurrences
 - [x] Undo last selection
 - [x] Skip next occurrence (Sublime Ctrl+K, Ctrl+D)
+- [ ] Make statement completion working on multiple selections, see [issue](https://github.com/2mas/SelectNextOccurrence/issues/5)
 
 # Change log
 
-These are the changes to each version that has been released
-on the official Visual Studio extension gallery.
+##### 1.2.12
+- [x] Added command ```ConvertSelectionToMultipleCursors``` - thanks @ leachdaniel
 
 ##### 1.2.9
 - [x] Added command ```SelectAllOccurrences```

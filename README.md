@@ -15,6 +15,7 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 
 - Select next occurrence of current selection. 
 - Select all occurrences.
+- Convert a selection into multiple cursors.
 - Skip occurrence
 - Undo occurrence
 - Add caret above/below
@@ -35,6 +36,7 @@ Go to Tools -> Options -> Keyboard and search for these command names to edit at
 - ```SelectNextOccurrence.UndoOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+U)*
 - ```SelectNextOccurrence.AddCaretAbove``` is ***not bound*** by default. *(Recommended Ctrl+Alt+Up)*
 - ```SelectNextOccurrence.AddCaretBelow``` is ***not bound*** by default. *(Recommended Ctrl+Alt+Down)*
+- ```SelectNextOccurrence.ConvertSelectionToMultipleCursors``` is ***not bound*** by default. *(Recommended Ctrl+Shift+I or Alt+Shift+I (vscode))*
 
 ![Select Next Occurrence Keyboard bindings](kbd_shortcuts.png)
 
