@@ -9,6 +9,9 @@
 
 # Change log
 
+##### 1.2.14
+- [x] Fixed behaviour: Saving the initial caret when Alt-clicking to add a second caret
+
 ##### 1.2.12
 - [x] Added command ```ConvertSelectionToMultipleCursors``` - thanks @ leachdaniel
 
