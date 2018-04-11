@@ -36,14 +36,40 @@ namespace NextOccurrence
             // Only act on single clicks, not selections
             if (adornmentLayer != null && textView.Selection.IsEmpty)
             {
-                adornmentLayer.Selector.HandleClick(
-                    Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt)
-                );
+                if (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
+                {
+                    adornmentLayer.Selector.AddCurrentCaretToSelections();
+                }
+                else
+                {
+                    adornmentLayer.Selector.Selections.Clear();
+                }
 
                 adornmentLayer.DrawAdornments();
             }
         }
 
+        /// <summary>
+        /// Saves the first cursor if no previous selections has been made
+        /// </summary>
+        /// <param name="e"></param>
+        public void PreprocessMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            // Only act on single clicks, not selections
+            if (adornmentLayer != null && textView.Selection.IsEmpty && adornmentLayer.Selector.Selections.Count == 0)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
+                {
+                    adornmentLayer.Selector.AddCurrentCaretToSelections();
+                }
+                else
+                {
+                    adornmentLayer.Selector.Selections.Clear();
+                }
+            }
+        }
+
+#pragma warning disable S1186 // Methods should not be empty
         public void PostprocessDragEnter(DragEventArgs e)
         {
         }
@@ -136,10 +162,6 @@ namespace NextOccurrence
         {
         }
 
-        public void PreprocessMouseLeftButtonDown(MouseButtonEventArgs e)
-        {
-        }
-
         public void PreprocessMouseLeftButtonUp(MouseButtonEventArgs e)
         {
         }
@@ -167,5 +189,7 @@ namespace NextOccurrence
         public void PreprocessQueryContinueDrag(QueryContinueDragEventArgs e)
         {
         }
+#pragma warning restore S1186 // Methods should not be empty
+
     }
 }

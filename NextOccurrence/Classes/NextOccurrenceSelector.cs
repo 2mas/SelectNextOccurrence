@@ -303,18 +303,6 @@ namespace NextOccurrence
             Selections.ForEach(s => s.CopiedText = null);
         }
 
-        internal void HandleClick(bool addCursor)
-        {
-            if (addCursor)
-            {
-                AddCurrentCaretToSelections();
-            }
-            else
-            {
-                Selections.Clear();
-            }
-        }
-
         /// <summary>
         /// Duplicate carets to remove. Happens if multiple selection are on same line
         /// and hitting home/end
