@@ -150,7 +150,9 @@ namespace NextOccurrence.Commands
         private int ProcessSelections(bool modifySelections, bool clearSelections, ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             int result = VSConstants.S_OK;
-            Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+
+            if (!Selector.Dte.UndoContext.IsOpen)
+                Selector.Dte.UndoContext.Open("SelectNextOccurrence");
 
             foreach (var selection in Selector.Selections)
             {
@@ -203,7 +205,8 @@ namespace NextOccurrence.Commands
                 }
             }
 
-            Selector.Dte.UndoContext.Close();
+            if (Selector.Dte.UndoContext.IsOpen)
+                Selector.Dte.UndoContext.Close();
 
             // Set new searchtext needed if selection is modified
             if (modifySelections)
@@ -243,7 +246,9 @@ namespace NextOccurrence.Commands
         private int HandleCopyCut(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             int result = VSConstants.S_OK;
-            Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+
+            if (!Selector.Dte.UndoContext.IsOpen)
+                Selector.Dte.UndoContext.Open("SelectNextOccurrence");
 
             foreach (var selection in Selector.Selections)
             {
@@ -263,7 +268,8 @@ namespace NextOccurrence.Commands
                 }
             }
 
-            Selector.Dte.UndoContext.Close();
+            if (Selector.Dte.UndoContext.IsOpen)
+                Selector.Dte.UndoContext.Close();
 
             return result;
         }
