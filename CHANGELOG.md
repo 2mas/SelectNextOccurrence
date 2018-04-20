@@ -9,6 +9,10 @@
 
 # Change log
 
+##### 1.2.16
+- [x] Added options-dialog to disable adding carets by mouse-click
+- [x] Corrected interference with block-selection when Alt-dragging mouse
+- As of Visual Studio version 15.6 the Ctrl+D is no longer available per default and needs to be manually bound aswell
 ##### 1.2.14
 - [x] Fixed behaviour: Saving the initial caret when Alt-clicking to add a second caret
 

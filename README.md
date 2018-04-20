@@ -24,21 +24,32 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 
 ![Select Next Occurrence](select_next.gif)
 
-##### Options
-Toggle case-sensitive search by using the "Match case" setting from the find-dialog (Ctrl+F)
+---------------------------------------
+
+### Options
+- Toggle case-sensitive search by using the "Match case" setting from the find-dialog (Ctrl+F)
+- Deactivate Alt-Clicking to add carets in options-dialog
+
+![Select Next Occurrence Options dialog](settings.png)
+
+---------------------------------------
 
 ### Key-bindings
 Go to Tools -> Options -> Keyboard and search for these command names to edit at your choice. Make sure the _Use new shortcut in_ is set to: ***Text Editor***
 
-- ```SelectNextOccurrence.SelectNextOccurrence``` is bound to ***Ctrl+D*** by default.
-- ```SelectNextOccurrence.SelectAllOccurrences``` is ***not bound*** by default.
-- ```SelectNextOccurrence.SkipOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+K, Ctrl+D)*
-- ```SelectNextOccurrence.UndoOccurrence``` is ***not bound*** by default. *(Recommended Ctrl+U)*
-- ```SelectNextOccurrence.AddCaretAbove``` is ***not bound*** by default. *(Recommended Ctrl+Alt+Up)*
-- ```SelectNextOccurrence.AddCaretBelow``` is ***not bound*** by default. *(Recommended Ctrl+Alt+Down)*
-- ```SelectNextOccurrence.ConvertSelectionToMultipleCursors``` is ***not bound*** by default. *(Recommended Ctrl+Shift+I or Alt+Shift+I (vscode))*
+| Command (prefix ```SelectNextOccurrence.```) | Recommendation |
+| :--- | :--- |
+| ```SelectNextOccurrence``` | Ctrl+D |
+| ```SelectAllOccurrences``` | Ctrl+K, Ctrl+A |
+| ```SkipOccurrence``` | Ctrl+K, Ctrl+D |
+| ```UndoOccurrence``` | Ctrl+U |
+| ```AddCaretAbove``` | Ctrl+Alt+Up |
+| ```AddCaretBelow``` | Ctrl+Alt+Down |
+| ```ConvertSelectionToMultipleCursors``` | Ctrl+Shift+I or Alt+Shift+I (vscode)) |
 
 ![Select Next Occurrence Keyboard bindings](kbd_shortcuts.png)
+
+---------------------------------------
 
 ### Troubleshooting
 
@@ -53,6 +64,8 @@ There is a possibility that other plugins use this functionality too, and a conf
 - **Copy/cut multiple occurrences doesnt work as expected**
 
 There is a conflict with the extension Copy As Html, if you have this enabled, try to disable it and see if this helps.
+
+---------------------------------------
 
 ### Contribute
 Check out the [contribution guidelines](CONTRIBUTING.md)
