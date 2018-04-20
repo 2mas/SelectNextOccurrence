@@ -109,6 +109,7 @@ namespace NextOccurrence
             Instance = new NextOccurrenceCommands(package);
         }
 
+#pragma warning disable S4220 // Events should have proper arguments
         private void ConvertSelectionToMultipleCursorsCallback(object sender, EventArgs e)
         {
             OnConvertSelectionToMultipleCursorsPressed?.Invoke(this, e);
@@ -143,6 +144,7 @@ namespace NextOccurrence
         {
             OnSelectAllOccurrencesPressed?.Invoke(this, e);
         }
+#pragma warning restore S4220 // Events should have proper arguments
 
         /// <summary>
         /// The events to be raised when commands are invoked

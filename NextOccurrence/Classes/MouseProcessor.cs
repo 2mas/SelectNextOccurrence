@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
+using NextOccurrence.Options;
 
 namespace NextOccurrence
 {
@@ -21,23 +22,36 @@ namespace NextOccurrence
     class NextOccurrenceMouseProcessor : IMouseProcessor
     {
         private readonly IWpfTextView textView;
-        private readonly NextOccurrenceAdornment adornmentLayer;
+        private NextOccurrenceAdornment adornmentLayer
+        {
+            get
+            {
+                return this.textView.Properties.GetProperty<NextOccurrenceAdornment>(
+                  typeof(NextOccurrenceAdornment)
+              ); ;
+            }
+        }
 
         public NextOccurrenceMouseProcessor(IWpfTextView wpfTextView)
         {
             textView = wpfTextView;
-            adornmentLayer = textView.Properties.GetProperty<NextOccurrenceAdornment>(
-                typeof(NextOccurrenceAdornment)
-            );
+        }
+
+        private bool CheckModifiers()
+        {
+            return (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt));
         }
 
         public void PostprocessMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            // Only act on single clicks, not selections
+            // Only act on single clicks, not se§lections
             if (adornmentLayer != null && textView.Selection.IsEmpty)
             {
-                if (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
+                if (ExtensionOptions.Instance.AddMouseCursors && CheckModifiers())
                 {
+                    if (adornmentLayer.Selector.stashedCaretPosition != null)
+                        adornmentLayer.Selector.ApplyStashedCaretPosition();
+
                     adornmentLayer.Selector.AddCurrentCaretToSelections();
                 }
                 else
@@ -47,23 +61,32 @@ namespace NextOccurrence
 
                 adornmentLayer.DrawAdornments();
             }
+
+            adornmentLayer.Selector.ClearStashedCaretPosition();
         }
 
         /// <summary>
-        /// Saves the first cursor if no previous selections has been made
+        /// Stashes the first cursor if no previous selections has been made
+        /// Stash gets applied on mouse-up if conditions are met
         /// </summary>
         /// <param name="e"></param>
         public void PreprocessMouseLeftButtonDown(MouseButtonEventArgs e)
         {
+            if (!ExtensionOptions.Instance.AddMouseCursors)
+                return;
+
             // Only act on single clicks, not selections
-            if (adornmentLayer != null && textView.Selection.IsEmpty && adornmentLayer.Selector.Selections.Count == 0)
+            if (adornmentLayer != null
+                && textView.Selection.IsEmpty
+                && adornmentLayer.Selector.Selections.Count == 0)
             {
-                if (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
+                if (CheckModifiers())
                 {
-                    adornmentLayer.Selector.AddCurrentCaretToSelections();
+                    adornmentLayer.Selector.StashCurrentCaretPosition();
                 }
                 else
                 {
+                    adornmentLayer.Selector.ClearStashedCaretPosition();
                     adornmentLayer.Selector.Selections.Clear();
                 }
             }

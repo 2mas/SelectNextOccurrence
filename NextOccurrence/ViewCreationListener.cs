@@ -58,6 +58,7 @@ namespace NextOccurrence
         /// <param name="textView">The <see cref="IWpfTextView"/> upon which the adornment should be placed</param>
         public void TextViewCreated(IWpfTextView textView)
         {
+#pragma warning disable S1848 // Objects should not be created to be dropped immediately without being used
             new NextOccurrenceAdornment(
                     textView,
                     textSearchService,
@@ -65,6 +66,7 @@ namespace NextOccurrence
                     formatMapService,
                     navigatorSelector.GetTextStructureNavigator(textView.TextBuffer)
                 );
+#pragma warning restore S1848 // Objects should not be created to be dropped immediately without being used
 
             AddCommandFilter(
                 textView,
@@ -79,13 +81,11 @@ namespace NextOccurrence
             if (editorFactory != null)
             {
                 IVsTextView viewAdapter = editorFactory.GetViewAdapter(textView);
-                if (viewAdapter != null)
+                if (viewAdapter != null
+                    && viewAdapter.AddCommandFilter(commandTarget, out next) == VSConstants.S_OK
+                    && next != null)
                 {
-                    if (viewAdapter.AddCommandFilter(commandTarget, out next) == VSConstants.S_OK)
-                    {
-                        if (next != null)
-                            commandTarget.NextCommandTarget = next;
-                    }
+                    commandTarget.NextCommandTarget = next;
                 }
             }
         }

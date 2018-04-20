@@ -19,7 +19,7 @@ namespace NextOccurrence
         #region #services
         private readonly ITextSearchService textSearchService;
 
-        private IEditorOperations editorOperations;
+        private readonly IEditorOperations editorOperations;
 
         /// <summary>
         /// In case of case-sensitive search this is provided to FindData
@@ -53,6 +53,13 @@ namespace NextOccurrence
         /// when moving to the left while selecting
         /// </summary>
         internal bool IsReversing = false;
+
+        /// <summary>
+        /// Saves a caretposition to be added to selections at a later time
+        /// Usecase is when adding the first caret by mouse-clicking, checks needs to
+        /// made when releasing the cursor
+        /// </summary>
+        internal ITrackingPoint stashedCaretPosition { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NextOccurrenceSelector"/> class.
@@ -311,7 +318,7 @@ namespace NextOccurrence
         {
             if (Selections
                 .GroupBy(s => s.Caret.GetPoint(Snapshot).Position)
-                .Where(s => s.Count() > 1).Any())
+                .Any(s => s.Count() > 1))
             {
                 var distinctSelections = Selections
                     .GroupBy(s => s.Caret.GetPoint(Snapshot).Position)
@@ -320,5 +327,41 @@ namespace NextOccurrence
                 Selections = distinctSelections;
             }
         }
+
+        #region stashed cursors
+        internal void StashCurrentCaretPosition()
+        {
+            stashedCaretPosition = Snapshot.CreateTrackingPoint(
+                            view.Caret.Position.BufferPosition.Position,
+                            PointTrackingMode.Positive
+                        );
+        }
+
+        internal void ClearStashedCaretPosition()
+        {
+            stashedCaretPosition = null;
+        }
+
+        internal void ApplyStashedCaretPosition()
+        {
+            if (!Selections.Any(
+                s => s.Caret.GetPoint(Snapshot).Position
+                == stashedCaretPosition.GetPoint(Snapshot).Position)
+            )
+            {
+                Selections.Add(
+                    new NextOccurrenceSelection
+                    {
+                        Start = null,
+                        End = null,
+                        Caret = stashedCaretPosition
+                    }
+                );
+            }
+
+            stashedCaretPosition = null;
+        }
+        #endregion
+
     }
 }
