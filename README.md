@@ -13,9 +13,10 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 
 ## Features
 
-- Select next occurrence of current selection. 
-- Select all occurrences.
-- Convert a selection into multiple cursors.
+- Select next occurrence of current selection
+- Select previous occurrence
+- Select all occurrences
+- Convert a selection into multiple cursors
 - Skip occurrence
 - Undo occurrence
 - Add caret above/below
