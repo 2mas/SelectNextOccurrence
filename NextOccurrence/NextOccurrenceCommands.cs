@@ -42,6 +42,13 @@ namespace NextOccurrence
 
                 commandService.AddCommand(SelectNextOccurrenceCmd);
 
+                var SelectPreviousOccurrenceCmd = new MenuCommand(
+                    this.SelectPreviousOccurrenceCallback,
+                    new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectPreviousOccurrenceCommandId)
+                );
+
+                commandService.AddCommand(SelectPreviousOccurrenceCmd);
+
                 var SkipOccurrenceCmd = new MenuCommand(
                     this.SkipOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SkipOccurrenceCommandId)
@@ -120,6 +127,11 @@ namespace NextOccurrence
             OnSelectNextOccurrencePressed?.Invoke(this, e);
         }
 
+        private void SelectPreviousOccurrenceCallback(object sender, EventArgs e)
+        {
+            OnSelectPreviousOccurrencePressed?.Invoke(this, e);
+        }
+
         private void SkipOccurrenceCallback(object sender, EventArgs e)
         {
             OnSkipOccurrencePressed?.Invoke(this, e);
@@ -151,6 +163,7 @@ namespace NextOccurrence
         /// </summary>
         internal static event EventHandler OnConvertSelectionToMultipleCursorsPressed;
         internal static event EventHandler OnSelectNextOccurrencePressed;
+        internal static event EventHandler OnSelectPreviousOccurrencePressed;
         internal static event EventHandler OnSkipOccurrencePressed;
         internal static event EventHandler OnUndoOccurrencePressed;
         internal static event EventHandler OnAddCaretAbovePressed;

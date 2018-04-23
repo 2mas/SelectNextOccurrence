@@ -72,6 +72,7 @@ namespace NextOccurrence
 
             NextOccurrenceCommands.OnConvertSelectionToMultipleCursorsPressed += new CmdConvertSelectionToMultipleCursors(view).OnCommandInvoked;
             NextOccurrenceCommands.OnSelectNextOccurrencePressed += new CmdSelectNextOccurrence(view).OnCommandInvoked;
+            NextOccurrenceCommands.OnSelectPreviousOccurrencePressed += new CmdSelectPreviousOccurrence(view).OnCommandInvoked;
             NextOccurrenceCommands.OnSkipOccurrencePressed += new CmdSkipOccurrence(view).OnCommandInvoked;
             NextOccurrenceCommands.OnUndoOccurrencePressed += new CmdUndoOccurrence(view).OnCommandInvoked;
             NextOccurrenceCommands.OnAddCaretAbovePressed += new CmdAddCaretAbove(view).OnCommandInvoked;

@@ -88,6 +88,172 @@ namespace NextOccurrence
             this.Selections = new List<NextOccurrenceSelection>();
         }
 
+        /// <summary>
+        /// Adds start and end position of current selected text. 
+        /// Default caret-position is set to the end of the selection, 
+        /// caret-position will be moved by the command-filter when editing the text
+        /// </summary>
+        private void AddCurrentSelectionToSelections()
+        {
+            var start = view.Selection.Start.Position.Position;
+            var end = view.Selection.End.Position.Position;
+
+            var caret = !view.Selection.IsReversed ?
+                end : start;
+
+            Selections.Add(
+                new NextOccurrenceSelection
+                {
+                    Start = Snapshot.CreateTrackingPoint(start, PointTrackingMode.Positive),
+                    End = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive),
+                    Caret = Snapshot.CreateTrackingPoint(caret, PointTrackingMode.Positive)
+                }
+            );
+
+            Selections.ForEach(s => s.CopiedText = null);
+
+            SearchText = editorOperations.SelectedText;
+        }
+
+        /// <summary>
+        /// The FindData to be used in search
+        /// If user has toggled match-case in their find-options we use this here too
+        /// </summary>
+        /// <param name="reverse">Search in reverse direction</param>
+        /// <returns></returns>
+        private FindData GetFindData(bool reverse = false)
+        {
+            var findData = (textStructureNavigator != null && Dte.Find.MatchCase) ?
+                new FindData(
+                    SearchText,
+                    Snapshot,
+                    FindOptions.MatchCase,
+                    textStructureNavigator
+                )
+                : new FindData(SearchText, Snapshot);
+
+            if (reverse)
+                findData.FindOptions = findData.FindOptions | FindOptions.SearchReverse;
+
+            return findData;
+        }
+
+        private void ProcessFoundOccurrence(SnapshotSpan occurrence)
+        {
+            if (!Selections.Any(s => s.OverlapsWith(occurrence, Snapshot)))
+            {
+                var start = Snapshot.CreateTrackingPoint(occurrence.Start, PointTrackingMode.Positive);
+                var end = Snapshot.CreateTrackingPoint(occurrence.End, PointTrackingMode.Positive);
+
+                // If previous selection was reversed, set this caret to beginning of this selection
+                var caret = Selections.Last().Caret.GetPosition(Snapshot) == Selections.Last().Start.GetPosition(Snapshot) ?
+                    start : end;
+
+                Selections.Add(
+                    new NextOccurrenceSelection
+                    {
+                        Start = start,
+                        End = end,
+                        Caret = caret
+                    }
+                );
+
+                view.Caret.MoveTo(caret == start ? occurrence.Start : occurrence.End);
+                view.ViewScroller.EnsureSpanVisible(
+                    new SnapshotSpan(
+                        view.Caret.Position.BufferPosition,
+                        0
+                    )
+                );
+            }
+        }
+
+        /// <summary>
+        /// Handles finding occurrences, selecting and adding to current selections
+        /// </summary>
+        /// <param name="reverseDirection">Search document in reverse direction for an occurrence</param>
+        internal void SelectNextOccurrence(bool reverseDirection = false)
+        {
+            // Caret placed on a word, but nothing selected
+            if (!Selections.Any() && view.Selection.IsEmpty)
+            {
+                editorOperations.SelectCurrentWord();
+
+                if (!String.IsNullOrEmpty(editorOperations.SelectedText))
+                    AddCurrentSelectionToSelections();
+
+                IsReversing = false;
+
+                return;
+            }
+
+            // First selection is selected by user, future selections will be located and selected on command-invocation
+            if (!Selections.Any() && !view.Selection.IsEmpty)
+                AddCurrentSelectionToSelections();
+
+            // Multiple selections
+            if (Selections.Any())
+            {
+                // Select words at caret again, this is where we have abandoned selections and goes to carets
+                if (Selections.All(s => !s.IsSelection()))
+                {
+                    var oldSelections = Selections;
+                    Selections = new List<NextOccurrenceSelection>();
+
+                    foreach (var selection in oldSelections)
+                    {
+                        view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+                        editorOperations.SelectCurrentWord();
+                        AddCurrentSelectionToSelections();
+                    }
+                }
+                else
+                {
+                    // Start the search from previous end-position if it exists, otherwise caret
+                    int startIndex;
+
+                    if (reverseDirection)
+                    {
+                        startIndex = Selections.Last().Start != null ?
+                            Selections.Last().Start.GetPosition(Snapshot)
+                            : Selections.Last().Caret.GetPosition(Snapshot);
+                    }
+                    else
+                    {
+                        startIndex = Selections.Last().End != null ?
+                            Selections.Last().End.GetPosition(Snapshot)
+                            : Selections.Last().Caret.GetPosition(Snapshot);
+                    }
+
+                    var occurrence = textSearchService.FindNext(
+                        startIndex,
+                        true,
+                        GetFindData(reverse: reverseDirection)
+                    );
+
+                    if (occurrence.HasValue)
+                        ProcessFoundOccurrence(occurrence.Value);
+                }
+
+                view.Selection.Clear();
+            }
+
+            IsReversing = false;
+        }
+
+        /// <summary>
+        /// Handles finding all occurrences
+        /// </summary>
+        internal void SelectAllOccurrences()
+        {
+            // Get a valid first selection to begin with
+            SelectNextOccurrence();
+
+            var occurrences = textSearchService.FindAll(GetFindData());
+            foreach (var occurrence in occurrences)
+                ProcessFoundOccurrence(occurrence);
+        }
+
         internal void ConvertSelectionToMultipleCursors()
         {
             var start = view.Selection.Start.Position.Position;
@@ -135,156 +301,6 @@ namespace NextOccurrence
         {
             editorOperations.MoveLineDown(false);
             AddCurrentCaretToSelections();
-        }
-
-        /// <summary>
-        /// Adds start and end position of current selected text. 
-        /// Default caret-position is set to the end of the selection, 
-        /// caret-position will be moved by the command-filter when editing the text
-        /// </summary>
-        private void AddCurrentSelectionToSelections()
-        {
-            var start = view.Selection.Start.Position.Position;
-            var end = view.Selection.End.Position.Position;
-
-            var caret = !view.Selection.IsReversed ?
-                end : start;
-
-            Selections.Add(
-                new NextOccurrenceSelection
-                {
-                    Start = Snapshot.CreateTrackingPoint(start, PointTrackingMode.Positive),
-                    End = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive),
-                    Caret = Snapshot.CreateTrackingPoint(caret, PointTrackingMode.Positive)
-                }
-            );
-
-            Selections.ForEach(s => s.CopiedText = null);
-
-            SearchText = editorOperations.SelectedText;
-        }
-
-        /// <summary>
-        /// The FindData to be used in search
-        /// If user has toggled match-case in their find-options we use this here too
-        /// </summary>
-        /// <returns></returns>
-        private FindData GetFindData()
-        {
-            return (textStructureNavigator != null && Dte.Find.MatchCase) ?
-                new FindData(
-                    SearchText,
-                    Snapshot,
-                    FindOptions.MatchCase,
-                    textStructureNavigator
-                )
-                : new FindData(SearchText, Snapshot);
-        }
-
-        private void ProcessFoundOccurrence(SnapshotSpan occurrence)
-        {
-            if (!Selections.Any(s => s.OverlapsWith(occurrence, Snapshot)))
-            {
-                var start = Snapshot.CreateTrackingPoint(occurrence.Start, PointTrackingMode.Positive);
-                var end = Snapshot.CreateTrackingPoint(occurrence.End, PointTrackingMode.Positive);
-
-                // If previous selection was reversed, set this caret to beginning of this selection
-                var caret = Selections.Last().Caret.GetPosition(Snapshot) == Selections.Last().Start.GetPosition(Snapshot) ?
-                    start : end;
-
-                Selections.Add(
-                    new NextOccurrenceSelection
-                    {
-                        Start = start,
-                        End = end,
-                        Caret = caret
-                    }
-                );
-
-                view.Caret.MoveTo(caret == start ? occurrence.Start : occurrence.End);
-                view.ViewScroller.EnsureSpanVisible(
-                    new SnapshotSpan(
-                        view.Caret.Position.BufferPosition,
-                        0
-                    )
-                );
-            }
-        }
-
-
-        /// <summary>
-        /// Handles finding occurrences, selecting and adding to current selections
-        /// </summary>
-        internal void SelectNextOccurrence()
-        {
-            // Caret placed on a word, but nothing selected
-            if (!Selections.Any() && view.Selection.IsEmpty)
-            {
-                editorOperations.SelectCurrentWord();
-
-                if (!String.IsNullOrEmpty(editorOperations.SelectedText))
-                    AddCurrentSelectionToSelections();
-
-                IsReversing = false;
-
-                return;
-            }
-
-            // First selection is selected by user, future selections will be located and selected on command-invocation
-            if (!Selections.Any() && !view.Selection.IsEmpty)
-                AddCurrentSelectionToSelections();
-
-            // Multiple selections
-            if (Selections.Any())
-            {
-                // Select words at caret again, this is where we have abandoned selections and goes to carets
-                if (Selections.All(s => !s.IsSelection()))
-                {
-                    var oldSelections = Selections;
-                    Selections = new List<NextOccurrenceSelection>();
-
-                    foreach (var selection in oldSelections)
-                    {
-                        view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
-                        editorOperations.SelectCurrentWord();
-                        AddCurrentSelectionToSelections();
-                    }
-                }
-                else
-                {
-                    // Start the search from previous end-position if it exists, otherwise caret
-                    int startIndex = Selections.Last().End != null ?
-                        Selections.Last().End.GetPosition(Snapshot)
-                        : Selections.Last().Caret.GetPosition(Snapshot);
-
-                    var occurrence = textSearchService.FindNext(
-                        startIndex,
-                        true,
-                        GetFindData()
-                    );
-
-                    if (occurrence.HasValue)
-                        ProcessFoundOccurrence(occurrence.Value);
-
-                }
-
-                view.Selection.Clear();
-            }
-
-            IsReversing = false;
-        }
-
-        /// <summary>
-        /// Handles finding all occurrences
-        /// </summary>
-        internal void SelectAllOccurrences()
-        {
-            // Get a valid first selection to begin with
-            SelectNextOccurrence();
-
-            var occurrences = textSearchService.FindAll(GetFindData());
-            foreach (var occurrence in occurrences)
-                ProcessFoundOccurrence(occurrence);
         }
 
         internal void AddCurrentCaretToSelections()
