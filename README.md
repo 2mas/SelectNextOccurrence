@@ -40,6 +40,7 @@ Go to Tools -> Options -> Keyboard and search for these command names to edit at
 | Command (prefix ```SelectNextOccurrence.```) | Recommendation |
 | :--- | :--- |
 | ```SelectNextOccurrence``` | Ctrl+D |
+| ```SelectPreviousOccurrence``` | Ctrl+E |
 | ```SelectAllOccurrences``` | Ctrl+K, Ctrl+A |
 | ```SkipOccurrence``` | Ctrl+K, Ctrl+D |
 | ```UndoOccurrence``` | Ctrl+U |

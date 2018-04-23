@@ -9,6 +9,8 @@
 
 # Change log
 
+##### 1.2.17
+- [x] Added command SelectPreviousOccurrence
 ##### 1.2.16
 - [x] Added options-dialog to disable adding carets by mouse-click
 - [x] Corrected interference with block-selection when Alt-dragging mouse
