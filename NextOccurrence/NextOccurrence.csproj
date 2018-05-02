@@ -72,10 +72,12 @@
     <Compile Include="Commands\CommandTarget.cs" />
     <Compile Include="Classes\MouseProcessor.cs" />
     <Compile Include="Classes\NextOccurrenceAdornment.cs" />
+    <Compile Include="Undo\Undo.cs" />
     <Compile Include="Options\ExtensionOptions.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\ExtensionSettingAttribute.cs" />
+    <Compile Include="Undo\UndoCall.cs" />
     <Compile Include="ViewCreationListener.cs" />
     <Compile Include="NextOccurrenceCommands.cs" />
     <Compile Include="VSCommandTable.cs">

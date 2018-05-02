@@ -68,19 +68,21 @@ namespace NextOccurrence
                 );
 #pragma warning restore S1848 // Objects should not be created to be dropped immediately without being used
 
-            AddCommandFilter(
-                textView,
-                new CommandTarget(textView)
-            );
+            AddCommandFilter(textView);
         }
 
-        void AddCommandFilter(IWpfTextView textView, CommandTarget commandTarget)
+        void AddCommandFilter(IWpfTextView textView)
         {
-            IOleCommandTarget next;
-
             if (editorFactory != null)
             {
+                IOleUndoManager oleUndoManager;
+                var buffer = (editorFactory.GetBufferAdapter(textView.TextBuffer) as IVsTextLines);
+                buffer.GetUndoManager(out oleUndoManager);
+                var commandTarget = new CommandTarget(textView, oleUndoManager);
+
                 IVsTextView viewAdapter = editorFactory.GetViewAdapter(textView);
+                IOleCommandTarget next;
+
                 if (viewAdapter != null
                     && viewAdapter.AddCommandFilter(commandTarget, out next) == VSConstants.S_OK
                     && next != null)

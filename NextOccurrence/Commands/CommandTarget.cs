@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using NextOccurrence.Undo;
 
 namespace NextOccurrence.Commands
 {
@@ -21,17 +23,24 @@ namespace NextOccurrence.Commands
 
         private readonly NextOccurrenceAdornment adornmentLayer;
 
+        private readonly List<UndoCall> undoCalls;
+
+        private readonly IOleUndoManager undoManager;
+
         /// <summary>
         /// Next commandhandler
         /// </summary>
         public IOleCommandTarget NextCommandTarget { get; set; }
 
-
-        public CommandTarget(IWpfTextView view)
+        public CommandTarget(IWpfTextView view, IOleUndoManager oleUndoManager)
         {
+
             this.view = view;
             this.adornmentLayer = view.Properties
                 .GetProperty<NextOccurrenceAdornment>(typeof(NextOccurrenceAdornment));
+
+            this.undoManager = oleUndoManager;
+            this.undoCalls = new List<UndoCall>();
         }
 
         public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
@@ -42,7 +51,9 @@ namespace NextOccurrence.Commands
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             if (!Selector.Selections.Any())
+            {
                 return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+            }
 
             int result = VSConstants.S_OK;
             bool modifySelections = false;
@@ -68,6 +79,20 @@ namespace NextOccurrence.Commands
                             }
                             break;
                         case ((uint)VSConstants.VSStd97CmdID.Undo):
+                            // Handle our own undos
+                            if (undoCalls.Any())
+                            {
+                                var undo = undoCalls.Last();
+                                undoCalls.Remove(undo);
+                                undoManager.UndoTo(undo);
+                            }
+                            else
+                            {
+                                result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            }
+                            Selector.IsReversing = false;
+                            adornmentLayer.DrawAdornments();
+                            return result;
                         case ((uint)VSConstants.VSStd97CmdID.Redo):
                             result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                             Selector.IsReversing = false;
@@ -80,6 +105,24 @@ namespace NextOccurrence.Commands
                     switch (nCmdID)
                     {
                         case ((uint)VSConstants.VSStd2KCmdID.TYPECHAR):
+                            //char typedChar = char.MinValue;
+                            //typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
+                            //if (typedChar.Equals('.'))
+                            //{
+                            //    parentMultiUndos.Add(new Undo(this, (uint)VSConstants.VSStd2KCmdID.BACKSPACE));
+                            //}
+                            if (undoCalls.Count == 0)
+                            {
+                                undoCalls.Add(new UndoCall());
+                                undoManager.Add(undoCalls.Last());
+                            }
+
+                            // add this undo to the current batch
+                            undoCalls.Last().Add(
+                                new UndoUnit(this, (uint)VSConstants.VSStd2KCmdID.BACKSPACE)
+                                );
+
+                            break;
                         case ((uint)VSConstants.VSStd2KCmdID.BACKSPACE):
                         case ((uint)VSConstants.VSStd2KCmdID.BACKTAB):
                         case ((uint)VSConstants.VSStd2KCmdID.RETURN):
@@ -151,9 +194,6 @@ namespace NextOccurrence.Commands
         {
             int result = VSConstants.S_OK;
 
-            if (!Selector.Dte.UndoContext.IsOpen)
-                Selector.Dte.UndoContext.Open("SelectNextOccurrence");
-
             foreach (var selection in Selector.Selections)
             {
                 if (selection.IsSelection())
@@ -204,9 +244,6 @@ namespace NextOccurrence.Commands
                     view.Selection.Clear();
                 }
             }
-
-            if (Selector.Dte.UndoContext.IsOpen)
-                Selector.Dte.UndoContext.Close();
 
             // Set new searchtext needed if selection is modified
             if (modifySelections)
@@ -286,7 +323,9 @@ namespace NextOccurrence.Commands
         private int HandlePaste(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             int result = VSConstants.S_OK;
-            Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+
+            if (!Selector.Dte.UndoContext.IsOpen)
+                Selector.Dte.UndoContext.Open("SelectNextOccurrence");
 
             foreach (var selection in Selector.Selections)
             {
@@ -310,7 +349,8 @@ namespace NextOccurrence.Commands
                 }
             }
 
-            Selector.Dte.UndoContext.Close();
+            if (Selector.Dte.UndoContext.IsOpen)
+                Selector.Dte.UndoContext.Close();
 
             return result;
         }
