@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Settings;
 
-namespace NextOccurrence.Options
+namespace SelectNextOccurrence.Options
 {
     internal class ExtensionOptions : DialogPage
     {

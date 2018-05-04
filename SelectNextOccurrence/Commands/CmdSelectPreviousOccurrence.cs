@@ -2,14 +2,14 @@
 using System.Linq;
 using Microsoft.VisualStudio.Text.Editor;
 
-namespace NextOccurrence.Commands
+namespace SelectNextOccurrence.Commands
 {
-    internal class CmdSelectAllOccurrences : CmdBase
+    internal class CmdSelectPreviousOccurrence : CmdBase
     {
-        public CmdSelectAllOccurrences(IWpfTextView view) : base(view) { }
+        public CmdSelectPreviousOccurrence(IWpfTextView view) : base(view) { }
 
         /// <summary>
-        /// Menu-command handler, aka Ctrl+D
+        /// Menu-command handler, selects a previous occurrence
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -18,7 +18,7 @@ namespace NextOccurrence.Commands
             if (!view.HasAggregateFocus)
                 return;
 
-            adornmentLayer.Selector.SelectAllOccurrences();
+            adornmentLayer.Selector.SelectNextOccurrence(reverseDirection: true);
 
             if (adornmentLayer.Selector.Selections.Any())
                 adornmentLayer.DrawAdornments();

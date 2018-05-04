@@ -3,36 +3,36 @@ using System.Windows;
 using System.Windows.Input;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
-using NextOccurrence.Options;
+using SelectNextOccurrence.Options;
 
-namespace NextOccurrence
+namespace SelectNextOccurrence
 {
     [Export(typeof(IMouseProcessorProvider))]
     [ContentType("text")]
     [TextViewRole(PredefinedTextViewRoles.Editable)]
-    [Name("NextOccurrenceMouseProcessorProvider")]
+    [Name("SelectNextOccurrenceMouseProcessorProvider")]
     public class MouseProcessorProvider : IMouseProcessorProvider
     {
         public IMouseProcessor GetAssociatedProcessor(IWpfTextView wpfTextView)
         {
-            return new NextOccurrenceMouseProcessor(wpfTextView);
+            return new MouseProcessor(wpfTextView);
         }
     }
 
-    class NextOccurrenceMouseProcessor : IMouseProcessor
+    class MouseProcessor : IMouseProcessor
     {
         private readonly IWpfTextView textView;
-        private NextOccurrenceAdornment adornmentLayer
+        private AdornmentLayer adornmentLayer
         {
             get
             {
-                return this.textView.Properties.GetProperty<NextOccurrenceAdornment>(
-                  typeof(NextOccurrenceAdornment)
+                return this.textView.Properties.GetProperty<AdornmentLayer>(
+                  typeof(AdornmentLayer)
               ); ;
             }
         }
 
-        public NextOccurrenceMouseProcessor(IWpfTextView wpfTextView)
+        public MouseProcessor(IWpfTextView wpfTextView)
         {
             textView = wpfTextView;
         }

@@ -27,8 +27,8 @@
     <ProjectGuid>{8600DD97-5B8D-4CB1-91B7-3698365A7452}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NextOccurrence</RootNamespace>
-    <AssemblyName>NextOccurrence</AssemblyName>
+    <RootNamespace>SelectNextOccurrence</RootNamespace>
+    <AssemblyName>SelectNextOccurrence</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
@@ -59,7 +59,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commands\CmdSelectPreviousOccurrence.cs" />
-    <Compile Include="Classes\NextOccurrenceSelector.cs" />
+    <Compile Include="Classes\Selector.cs" />
     <Compile Include="Commands\CmdAddCaretBelow.cs" />
     <Compile Include="Commands\CmdBase.cs" />
     <Compile Include="Commands\CmdAddCaretAbove.cs" />
@@ -68,16 +68,16 @@
     <Compile Include="Commands\CmdUndoOccurrence.cs" />
     <Compile Include="Commands\CmdSkipOccurrence.cs" />
     <Compile Include="Commands\CmdSelectNextOccurrence.cs" />
-    <Compile Include="Classes\NextOccurrenceSelection.cs" />
+    <Compile Include="Classes\Selection.cs" />
     <Compile Include="Commands\CommandTarget.cs" />
     <Compile Include="Classes\MouseProcessor.cs" />
-    <Compile Include="Classes\NextOccurrenceAdornment.cs" />
+    <Compile Include="Classes\AdornmentLayer.cs" />
     <Compile Include="Options\ExtensionOptions.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\ExtensionSettingAttribute.cs" />
     <Compile Include="ViewCreationListener.cs" />
-    <Compile Include="NextOccurrenceCommands.cs" />
+    <Compile Include="MenuCommandRegistrations.cs" />
     <Compile Include="VSCommandTable.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -233,8 +233,8 @@
     <VSCTCompile Include="VSCommandTable.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <SubType>Designer</SubType>
-      <Generator>VsctGenerator</Generator>
       <LastGenOutput>VSCommandTable.cs</LastGenOutput>
+      <Generator>VsctGenerator</Generator>
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>

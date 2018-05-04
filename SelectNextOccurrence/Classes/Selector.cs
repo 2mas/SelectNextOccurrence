@@ -9,12 +9,12 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
 
-namespace NextOccurrence
+namespace SelectNextOccurrence
 {
     /// <summary>
     /// Class responsible of keeping and making the selections
     /// </summary>
-    internal class NextOccurrenceSelector
+    internal class Selector
     {
         #region #services
         private readonly ITextSearchService textSearchService;
@@ -41,7 +41,7 @@ namespace NextOccurrence
         /// Contains all tracking-points for selections and carets
         /// This is what is getting drawn in the adornment layer
         /// </summary>
-        internal List<NextOccurrenceSelection> Selections;
+        internal List<Selection> Selections;
 
         /// <summary>
         /// Stores copied texts from selections after they are abandoned for later pasting
@@ -68,14 +68,14 @@ namespace NextOccurrence
         internal ITrackingPoint stashedCaretPosition { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NextOccurrenceSelector"/> class.
+        /// Initializes a new instance of the <see cref="Selector"/> class.
         /// </summary>
         /// <param name="view"></param>
         /// <param name="textSearchService"></param>
         /// <param name="IEditorOperationsFactoryService"></param>
         /// <param name="IEditorFormatMapService"></param>
         /// <param name="ITextStructureNavigator"></param>
-        public NextOccurrenceSelector(
+        public Selector(
             IWpfTextView view,
             ITextSearchService textSearchService,
             IEditorOperationsFactoryService editorOperationsService,
@@ -91,7 +91,7 @@ namespace NextOccurrence
             this.textStructureNavigator = textStructureNavigator;
             this.Dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
 
-            this.Selections = new List<NextOccurrenceSelection>();
+            this.Selections = new List<Selection>();
             this.SavedClipboard = new List<String>();
         }
 
@@ -109,7 +109,7 @@ namespace NextOccurrence
                 end : start;
 
             Selections.Add(
-                new NextOccurrenceSelection
+                new Selection
                 {
                     Start = Snapshot.CreateTrackingPoint(start, PointTrackingMode.Positive),
                     End = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive),
@@ -157,7 +157,7 @@ namespace NextOccurrence
                     start : end;
 
                 Selections.Add(
-                    new NextOccurrenceSelection
+                    new Selection
                     {
                         Start = start,
                         End = end,
@@ -205,7 +205,7 @@ namespace NextOccurrence
                 if (Selections.All(s => !s.IsSelection()))
                 {
                     var oldSelections = Selections;
-                    Selections = new List<NextOccurrenceSelection>();
+                    Selections = new List<Selection>();
 
                     foreach (var selection in oldSelections)
                     {
@@ -275,7 +275,7 @@ namespace NextOccurrence
                 {
                     var line = Snapshot.GetLineFromLineNumber(lineNumber);
                     Selections.Add(
-                        new NextOccurrenceSelection
+                        new Selection
                         {
                             Caret = Snapshot.CreateTrackingPoint(line.End.Position, PointTrackingMode.Positive)
                         }
@@ -283,7 +283,7 @@ namespace NextOccurrence
                 }
 
                 Selections.Add(
-                    new NextOccurrenceSelection
+                    new Selection
                     {
                         Caret = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive)
                     }
@@ -318,7 +318,7 @@ namespace NextOccurrence
             )
             {
                 Selections.Add(
-                    new NextOccurrenceSelection
+                    new Selection
                     {
                         Start = null,
                         End = null,
@@ -373,7 +373,7 @@ namespace NextOccurrence
             )
             {
                 Selections.Add(
-                    new NextOccurrenceSelection
+                    new Selection
                     {
                         Start = null,
                         End = null,

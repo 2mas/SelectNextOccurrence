@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NextOccurrence.Options
+namespace SelectNextOccurrence.Options
 {
     class ExtensionSettingAttribute : Attribute
     {

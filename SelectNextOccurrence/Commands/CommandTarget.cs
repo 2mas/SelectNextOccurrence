@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 
-namespace NextOccurrence.Commands
+namespace SelectNextOccurrence.Commands
 {
     /// <summary>
     /// Handles keyboard, typing and combinations in text-editor
@@ -17,9 +17,9 @@ namespace NextOccurrence.Commands
 
         private ITextSnapshot Snapshot { get { return this.view.TextSnapshot; } }
 
-        private NextOccurrenceSelector Selector { get { return this.adornmentLayer.Selector; } }
+        private Selector Selector { get { return this.adornmentLayer.Selector; } }
 
-        private readonly NextOccurrenceAdornment adornmentLayer;
+        private readonly AdornmentLayer adornmentLayer;
 
         /// <summary>
         /// Next commandhandler
@@ -31,7 +31,7 @@ namespace NextOccurrence.Commands
         {
             this.view = view;
             this.adornmentLayer = view.Properties
-                .GetProperty<NextOccurrenceAdornment>(typeof(NextOccurrenceAdornment));
+                .GetProperty<AdornmentLayer>(typeof(AdornmentLayer));
         }
 
         public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)

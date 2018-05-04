@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 
-namespace NextOccurrence.Commands
+namespace SelectNextOccurrence.Commands
 {
     internal class CmdUndoOccurrence : CmdBase
     {

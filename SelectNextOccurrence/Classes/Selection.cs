@@ -1,11 +1,11 @@
 ﻿using Microsoft.VisualStudio.Text;
 
-namespace NextOccurrence
+namespace SelectNextOccurrence
 {
     /// <summary>
     /// Represents a selection or/and a caret-position
     /// </summary>
-    internal class NextOccurrenceSelection
+    internal class Selection
     {
         internal ITrackingPoint Start { get; set; }
         internal ITrackingPoint End { get; set; }

@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.VisualStudio.Text.Editor;
 
-namespace NextOccurrence.Commands
+namespace SelectNextOccurrence.Commands
 {
     internal class CmdSkipOccurrence : CmdBase
     {

@@ -84,7 +84,7 @@
       </Button>
     </Buttons>
     <Bitmaps>
-      <Bitmap guid="guidImages" href="Resources\NextOccurrenceCommands.png" usedList="bmpIcon"/>
+      <Bitmap guid="guidImages" href="..\Resources\NextOccurrenceCommands.png" usedList="bmpIcon"/>
     </Bitmaps>
   </Commands>
 

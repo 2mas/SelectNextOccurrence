@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.VisualStudio.Text.Editor;
 
-namespace NextOccurrence.Commands
+namespace SelectNextOccurrence.Commands
 {
     internal abstract class CmdBase
     {
-        internal NextOccurrenceAdornment adornmentLayer;
+        internal AdornmentLayer adornmentLayer;
 
         internal IWpfTextView view;
 
@@ -13,7 +13,7 @@ namespace NextOccurrence.Commands
         {
             this.view = view;
             this.adornmentLayer = view.Properties
-                .GetProperty<NextOccurrenceAdornment>(typeof(NextOccurrenceAdornment));
+                .GetProperty<AdornmentLayer>(typeof(AdornmentLayer));
         }
 
         internal abstract void OnCommandInvoked(object sender, EventArgs e);

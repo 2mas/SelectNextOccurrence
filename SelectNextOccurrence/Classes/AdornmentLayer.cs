@@ -6,15 +6,15 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
-using NextOccurrence.Commands;
+using SelectNextOccurrence.Commands;
 
-namespace NextOccurrence
+namespace SelectNextOccurrence
 {
     /// <summary>
     /// Class responsible of drawing selections and carets to the textView
     /// This is the main class for this extension
     /// </summary>
-    internal sealed class NextOccurrenceAdornment
+    internal sealed class AdornmentLayer
     {
         #region members
 
@@ -31,18 +31,19 @@ namespace NextOccurrence
 
         private Brush selectionBrush;
 
-        internal NextOccurrenceSelector Selector;
+        internal Selector Selector;
 
         #endregion
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NextOccurrenceAdornment"/> class.
+        /// Initializes a new instance of the <see cref="AdornmentLayer"/> class.
         /// </summary>
         /// <param name="view"></param>
         /// <param name="textSearchService"></param>
         /// <param name="IEditorOperationsFactoryService"></param>
         /// <param name="IEditorFormatMapService"></param>
-        public NextOccurrenceAdornment(
+        /// <param name="ITextStructureNavigator"></param>
+        public AdornmentLayer(
             IWpfTextView view,
             ITextSearchService textSearchService,
             IEditorOperationsFactoryService editorOperationsService,
@@ -51,13 +52,13 @@ namespace NextOccurrence
             )
         {
             view.Properties.GetOrCreateSingletonProperty(
-                typeof(NextOccurrenceAdornment), () => this
+                typeof(AdornmentLayer), () => this
             );
 
             this.view = view;
-            this.layer = view.GetAdornmentLayer("NextOccurrenceAdornment");
+            this.layer = view.GetAdornmentLayer(Vsix.Name);
 
-            this.Selector = new NextOccurrenceSelector(
+            this.Selector = new Selector(
                 view,
                 textSearchService,
                 editorOperationsService,
@@ -70,14 +71,14 @@ namespace NextOccurrence
             // events
             this.view.LayoutChanged += this.OnLayoutChanged;
 
-            NextOccurrenceCommands.OnConvertSelectionToMultipleCursorsPressed += new CmdConvertSelectionToMultipleCursors(view).OnCommandInvoked;
-            NextOccurrenceCommands.OnSelectNextOccurrencePressed += new CmdSelectNextOccurrence(view).OnCommandInvoked;
-            NextOccurrenceCommands.OnSelectPreviousOccurrencePressed += new CmdSelectPreviousOccurrence(view).OnCommandInvoked;
-            NextOccurrenceCommands.OnSkipOccurrencePressed += new CmdSkipOccurrence(view).OnCommandInvoked;
-            NextOccurrenceCommands.OnUndoOccurrencePressed += new CmdUndoOccurrence(view).OnCommandInvoked;
-            NextOccurrenceCommands.OnAddCaretAbovePressed += new CmdAddCaretAbove(view).OnCommandInvoked;
-            NextOccurrenceCommands.OnAddCaretBelowPressed += new CmdAddCaretBelow(view).OnCommandInvoked;
-            NextOccurrenceCommands.OnSelectAllOccurrencesPressed += new CmdSelectAllOccurrences(view).OnCommandInvoked;
+            MenuCommandRegistrations.OnConvertSelectionToMultipleCursorsPressed += new CmdConvertSelectionToMultipleCursors(view).OnCommandInvoked;
+            MenuCommandRegistrations.OnSelectNextOccurrencePressed += new CmdSelectNextOccurrence(view).OnCommandInvoked;
+            MenuCommandRegistrations.OnSelectPreviousOccurrencePressed += new CmdSelectPreviousOccurrence(view).OnCommandInvoked;
+            MenuCommandRegistrations.OnSkipOccurrencePressed += new CmdSkipOccurrence(view).OnCommandInvoked;
+            MenuCommandRegistrations.OnUndoOccurrencePressed += new CmdUndoOccurrence(view).OnCommandInvoked;
+            MenuCommandRegistrations.OnAddCaretAbovePressed += new CmdAddCaretAbove(view).OnCommandInvoked;
+            MenuCommandRegistrations.OnAddCaretBelowPressed += new CmdAddCaretBelow(view).OnCommandInvoked;
+            MenuCommandRegistrations.OnSelectAllOccurrencesPressed += new CmdSelectAllOccurrences(view).OnCommandInvoked;
         }
 
         /// <summary>
@@ -160,7 +161,7 @@ namespace NextOccurrence
             }
         }
 
-        private void DrawSelection(NextOccurrenceSelection selection)
+        private void DrawSelection(Selection selection)
         {
             Geometry geometry = view.TextViewLines.GetMarkerGeometry(
                     new SnapshotSpan(

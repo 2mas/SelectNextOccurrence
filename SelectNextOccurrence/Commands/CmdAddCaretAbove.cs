@@ -2,14 +2,14 @@
 using System.Linq;
 using Microsoft.VisualStudio.Text.Editor;
 
-namespace NextOccurrence.Commands
+namespace SelectNextOccurrence.Commands
 {
-    internal class CmdAddCaretBelow : CmdBase
+    internal class CmdAddCaretAbove : CmdBase
     {
-        public CmdAddCaretBelow(IWpfTextView view) : base(view) { }
+        public CmdAddCaretAbove(IWpfTextView view) : base(view) { }
 
         /// <summary>
-        /// Menu-command handler, adds a new caret one line below the active caret
+        /// Menu-command handler, adds a new caret one line above the active caret
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -24,7 +24,7 @@ namespace NextOccurrence.Commands
                 adornmentLayer.Selector.AddCurrentCaretToSelections();
             }
 
-            adornmentLayer.Selector.AddCaretBelow();
+            adornmentLayer.Selector.AddCaretAbove();
             adornmentLayer.DrawAdornments();
         }
     }

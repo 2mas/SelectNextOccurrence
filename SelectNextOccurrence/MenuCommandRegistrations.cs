@@ -2,21 +2,20 @@
 using System.ComponentModel.Design;
 using Microsoft.VisualStudio.Shell;
 
-namespace NextOccurrence
+namespace SelectNextOccurrence
 {
     /// <summary>
-    /// Command handler
+    /// Command handler registrations for commands defined in .vsct
     /// </summary>
-    internal sealed class NextOccurrenceCommands
+    internal sealed class MenuCommandRegistrations
     {
         private readonly Package package;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NextOccurrenceCommands"/> class.
-        /// Adds our command handlers for menu (commands must exist in the command table file)
+        /// Registers command handlers for commands defined in .vsct
         /// </summary>
-        /// <param name="package">Owner package, not null.</param>
-        private NextOccurrenceCommands(Package package)
+        /// <param name="package"></param>
+        private MenuCommandRegistrations(Package package)
         {
             if (package == null)
             {
@@ -89,7 +88,7 @@ namespace NextOccurrence
         /// <summary>
         /// Gets the instance of the command.
         /// </summary>
-        public static NextOccurrenceCommands Instance
+        public static MenuCommandRegistrations Instance
         {
             get;
             private set;
@@ -113,7 +112,7 @@ namespace NextOccurrence
         /// <param name="package">Owner package, not null.</param>
         public static void Initialize(Package package)
         {
-            Instance = new NextOccurrenceCommands(package);
+            Instance = new MenuCommandRegistrations(package);
         }
 
 #pragma warning disable S4220 // Events should have proper arguments

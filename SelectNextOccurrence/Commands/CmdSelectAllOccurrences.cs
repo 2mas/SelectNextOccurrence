@@ -2,11 +2,11 @@
 using System.Linq;
 using Microsoft.VisualStudio.Text.Editor;
 
-namespace NextOccurrence.Commands
+namespace SelectNextOccurrence.Commands
 {
-    internal class CmdSelectNextOccurrence : CmdBase
+    internal class CmdSelectAllOccurrences : CmdBase
     {
-        public CmdSelectNextOccurrence(IWpfTextView view) : base(view) { }
+        public CmdSelectAllOccurrences(IWpfTextView view) : base(view) { }
 
         /// <summary>
         /// Menu-command handler, aka Ctrl+D
@@ -18,7 +18,7 @@ namespace NextOccurrence.Commands
             if (!view.HasAggregateFocus)
                 return;
 
-            adornmentLayer.Selector.SelectNextOccurrence();
+            adornmentLayer.Selector.SelectAllOccurrences();
 
             if (adornmentLayer.Selector.Selections.Any())
                 adornmentLayer.DrawAdornments();

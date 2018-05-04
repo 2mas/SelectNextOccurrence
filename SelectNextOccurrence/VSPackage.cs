@@ -2,9 +2,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
-using NextOccurrence.Options;
+using SelectNextOccurrence.Options;
 
-namespace NextOccurrence
+namespace SelectNextOccurrence
 {
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", Vsix.Version, IconResourceID = 400)] // Info on this package for Help/About
@@ -16,7 +16,7 @@ namespace NextOccurrence
     {
         protected override void Initialize()
         {
-            NextOccurrenceCommands.Initialize(this);
+            MenuCommandRegistrations.Initialize(this);
             base.Initialize();
         }
     }

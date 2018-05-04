@@ -7,9 +7,9 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
-using NextOccurrence.Commands;
+using SelectNextOccurrence.Commands;
 
-namespace NextOccurrence
+namespace SelectNextOccurrence
 {
     /// <summary>
     /// Establishes an <see cref="IAdornmentLayer"/> to place the adornment on and exports the <see cref="IWpfTextViewCreationListener"/>
@@ -28,7 +28,7 @@ namespace NextOccurrence
         /// after the selection layer in the Z-order
         /// </summary>
         [Export(typeof(AdornmentLayerDefinition))]
-        [Name("NextOccurrenceAdornment")]
+        [Name(Vsix.Name)]
         [Order(After = PredefinedAdornmentLayers.Selection, Before = PredefinedAdornmentLayers.Text)]
         private AdornmentLayerDefinition editorAdornmentLayer;
 
@@ -59,7 +59,7 @@ namespace NextOccurrence
         public void TextViewCreated(IWpfTextView textView)
         {
 #pragma warning disable S1848 // Objects should not be created to be dropped immediately without being used
-            new NextOccurrenceAdornment(
+            new AdornmentLayer(
                     textView,
                     textSearchService,
                     editorOperations,
