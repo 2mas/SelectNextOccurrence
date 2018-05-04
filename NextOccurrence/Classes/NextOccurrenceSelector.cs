@@ -19,7 +19,7 @@ namespace NextOccurrence
         #region #services
         private readonly ITextSearchService textSearchService;
 
-        private readonly IEditorOperations editorOperations;
+        internal readonly IEditorOperations editorOperations;
 
         /// <summary>
         /// In case of case-sensitive search this is provided to FindData
@@ -42,6 +42,12 @@ namespace NextOccurrence
         /// This is what is getting drawn in the adornment layer
         /// </summary>
         internal List<NextOccurrenceSelection> Selections;
+
+        /// <summary>
+        /// Stores copied texts from selections after they are abandoned for later pasting
+        /// when back to one caret
+        /// </summary>
+        internal IEnumerable<string> SavedClipboard;
 
         /// <summary>
         /// The last search-term
@@ -86,6 +92,7 @@ namespace NextOccurrence
             this.Dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
 
             this.Selections = new List<NextOccurrenceSelection>();
+            this.SavedClipboard = new List<String>();
         }
 
         /// <summary>
@@ -379,5 +386,25 @@ namespace NextOccurrence
         }
         #endregion
 
+        /// <summary>
+        /// Clears all selections and saves copied text in case of later paste at single-caret
+        /// </summary>
+        internal void DiscardSelections()
+        {
+            if (Selections.Any() && Selections.All(s => !String.IsNullOrEmpty(s.CopiedText)))
+            {
+                SavedClipboard = Selections
+                    .Where(s => !String.IsNullOrEmpty(s.CopiedText))
+                    .Select(s => s.CopiedText)
+                    .ToArray();
+            }
+
+            Selections.Clear();
+        }
+
+        internal void ClearSavedClipboard()
+        {
+            this.SavedClipboard = new List<String>();
+        }
     }
 }

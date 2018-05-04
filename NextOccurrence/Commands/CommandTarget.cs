@@ -41,10 +41,11 @@ namespace NextOccurrence.Commands
 
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            if (!Selector.Selections.Any())
-                return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-
             int result = VSConstants.S_OK;
+
+            if (!Selector.Selections.Any())
+                return ProcessSingleCursor(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut, ref result);
+
             bool modifySelections = false;
             bool clearSelections = false;
 
@@ -98,7 +99,7 @@ namespace NextOccurrence.Commands
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.CANCEL):
                             Selector.IsReversing = false;
-                            Selector.Selections.Clear();
+                            Selector.DiscardSelections();
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.PAGEDN):
                         case ((uint)VSConstants.VSStd2KCmdID.PAGEUP):
@@ -106,7 +107,7 @@ namespace NextOccurrence.Commands
                         case ((uint)VSConstants.VSStd2KCmdID.HOME):
                         case ((uint)VSConstants.VSStd2KCmdID.END_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.HOME_EXT):
-                            Selector.Selections.Clear();
+                            Selector.DiscardSelections();
                             Selector.IsReversing = false;
                             result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                             break;
@@ -145,6 +146,75 @@ namespace NextOccurrence.Commands
             adornmentLayer.DrawAdornments();
 
             return result;
+        }
+
+        /// <summary>
+        /// When no multiple selections are active, perform checks for multi-paste.
+        /// Multi-paste gets active if its previously stored on selections that are now discarded
+        /// and the current clipboards content equals the last stored clipboard-item
+        /// </summary>
+        /// <param name="pguidCmdGroup"></param>
+        /// <param name="nCmdID"></param>
+        /// <param name="nCmdexecopt"></param>
+        /// <param name="pvaIn"></param>
+        /// <param name="pvaOut"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        private int ProcessSingleCursor(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut, ref int result)
+        {
+            // if paste, see if we have a saved clipboard to apply
+            if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
+                    && nCmdID == (uint)VSConstants.VSStd97CmdID.Paste
+                    && Selector.SavedClipboard.Any())
+            {
+                // Clipboard saved, paste these on new lines if current clipboard does match the last item
+                // If they dont match, a copy/cut has been made from somewhere else
+                if (Clipboard.GetText() != Selector.SavedClipboard.Last())
+                    Selector.ClearSavedClipboard();
+
+                if (Selector.SavedClipboard.Count() > 1)
+                {
+                    int count = 1;
+                    int clipboardCount = Selector.SavedClipboard.Count();
+
+                    if (!Selector.Dte.UndoContext.IsOpen)
+                        Selector.Dte.UndoContext.Open(Vsix.Name);
+
+                    foreach (var clipboardText in Selector.SavedClipboard)
+                    {
+                        Clipboard.SetText(clipboardText);
+                        result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+
+                        if (count < clipboardCount)
+                        {
+                            Selector.editorOperations.InsertNewLine();
+                            count++;
+                        }
+                    }
+
+                    if (Selector.Dte.UndoContext.IsOpen)
+                        Selector.Dte.UndoContext.Close();
+
+                    return result;
+                }
+                else
+                {
+                    return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                }
+            }
+            else
+            {
+                // if copy/cut, clear saved clipboard
+                if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
+                            && (nCmdID == (uint)VSConstants.VSStd97CmdID.Copy
+                                || (nCmdID == (uint)VSConstants.VSStd97CmdID.Cut)
+                                )
+                            )
+                    Selector.ClearSavedClipboard();
+
+                // continue normal processing
+                return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+            }
         }
 
         private int ProcessSelections(bool modifySelections, bool clearSelections, ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
@@ -286,7 +356,9 @@ namespace NextOccurrence.Commands
         private int HandlePaste(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             int result = VSConstants.S_OK;
-            Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+
+            if (!Selector.Dte.UndoContext.IsOpen)
+                Selector.Dte.UndoContext.Open("SelectNextOccurrence");
 
             foreach (var selection in Selector.Selections)
             {
@@ -310,7 +382,8 @@ namespace NextOccurrence.Commands
                 }
             }
 
-            Selector.Dte.UndoContext.Close();
+            if (Selector.Dte.UndoContext.IsOpen)
+                Selector.Dte.UndoContext.Close();
 
             return result;
         }

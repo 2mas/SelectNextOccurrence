@@ -44,7 +44,7 @@ namespace NextOccurrence
 
         public void PostprocessMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            // Only act on single clicks, not se§lections
+            // Only act on single clicks, not selections
             if (adornmentLayer != null && textView.Selection.IsEmpty)
             {
                 if (ExtensionOptions.Instance.AddMouseCursors && CheckModifiers())
@@ -56,7 +56,7 @@ namespace NextOccurrence
                 }
                 else
                 {
-                    adornmentLayer.Selector.Selections.Clear();
+                    adornmentLayer.Selector.DiscardSelections();
                 }
 
                 adornmentLayer.DrawAdornments();
@@ -87,7 +87,7 @@ namespace NextOccurrence
                 else
                 {
                     adornmentLayer.Selector.ClearStashedCaretPosition();
-                    adornmentLayer.Selector.Selections.Clear();
+                    adornmentLayer.Selector.DiscardSelections();
                 }
             }
         }

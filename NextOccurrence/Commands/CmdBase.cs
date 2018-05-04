@@ -9,7 +9,7 @@ namespace NextOccurrence.Commands
 
         internal IWpfTextView view;
 
-        public CmdBase(IWpfTextView view)
+        protected CmdBase(IWpfTextView view)
         {
             this.view = view;
             this.adornmentLayer = view.Properties
