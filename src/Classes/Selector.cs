@@ -124,23 +124,22 @@ namespace SelectNextOccurrence
 
         /// <summary>
         /// The FindData to be used in search
-        /// If user has toggled match-case in their find-options we use this here too
+        /// If user has toggled match-case/match whole word in their find-options we use this here too
         /// </summary>
         /// <param name="reverse">Search in reverse direction</param>
         /// <returns></returns>
         private FindData GetFindData(bool reverse = false)
         {
-            var findData = (textStructureNavigator != null && Dte.Find.MatchCase) ?
-                new FindData(
-                    SearchText,
-                    Snapshot,
-                    FindOptions.MatchCase,
-                    textStructureNavigator
-                )
-                : new FindData(SearchText, Snapshot);
+            var findData = new FindData(SearchText, Snapshot);
+
+            if (Dte.Find.MatchCase)
+                findData.FindOptions |= FindOptions.MatchCase;
+
+            if (Dte.Find.MatchWholeWord)
+                findData.FindOptions |= FindOptions.WholeWord;
 
             if (reverse)
-                findData.FindOptions = findData.FindOptions | FindOptions.SearchReverse;
+                findData.FindOptions |= FindOptions.SearchReverse;
 
             return findData;
         }
