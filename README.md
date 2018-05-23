@@ -29,6 +29,7 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 
 ### Options
 - Toggle case-sensitive search by using the "Match case" setting from the find-dialog (Ctrl+F)
+- Toggle match-whole word search by using the "Match whole word" setting from the find-dialog (Ctrl+F)
 - Deactivate Alt-Clicking to add carets in options-dialog
 
 ![Select Next Occurrence Options dialog](settings.png)

@@ -9,6 +9,9 @@
 
 # Change log
 
+##### 1.2.25
+- [x] Toggle match-whole-word search by using the "Match whole word" setting from the find-dialog (Ctrl+F)
+
 ##### 1.2.22
 - [x] Fixed copying of multiple occurrences and pasting into a single caret
 
