@@ -6,6 +6,7 @@
 - [x] Undo last selection
 - [x] Skip next occurrence (Sublime Ctrl+K, Ctrl+D)
 - [ ] Make statement completion working on multiple selections, see [issue](https://github.com/2mas/SelectNextOccurrence/issues/5)
+- [ ] Add support for Visual Studio 2015
 
 # Change log
 
