@@ -10,6 +10,9 @@
 
 # Change log
 
+#### 1.3.32
+- [x] Fixing caret-marker height when placing carets on method-declarations etc with CodeLens active
+
 ### 1.3.31
 - [x] Added support for Visual Studio 2015
 - [x] Switched to async package loading
