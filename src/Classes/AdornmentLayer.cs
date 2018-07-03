@@ -136,7 +136,7 @@ namespace SelectNextOccurrence
             }
 
             var span = new SnapshotSpan(caretPoint.GetPoint(Snapshot), 1);
-            Geometry geometry = view.TextViewLines.GetLineMarkerGeometry(span);
+            Geometry geometry = view.TextViewLines.GetTextMarkerGeometry(span);
 
             if (geometry != null)
             {
