@@ -43,6 +43,26 @@ namespace SelectNextOccurrence.Commands
         {
             int result = VSConstants.S_OK;
 
+            if (pguidCmdGroup == VSConstants.VSStd2K)
+            {
+                switch ((VSConstants.VSStd2KCmdID) nCmdID)
+                {
+                    case VSConstants.VSStd2KCmdID.SolutionPlatform:
+                        return result;
+                }
+            }
+
+            if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
+            {
+                switch ((VSConstants.VSStd97CmdID) nCmdID)
+                {
+                    case VSConstants.VSStd97CmdID.SolutionCfg:
+                        return result;
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine("grp: {0}, id: {1}", pguidCmdGroup.ToString(), nCmdID.ToString());
+
             if (!Selector.Selections.Any())
                 return ProcessSingleCursor(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut, ref result);
 
@@ -140,7 +160,13 @@ namespace SelectNextOccurrence.Commands
             }
             else
             {
-                result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                if (Selector.Selections.Any())
+                {
+                    result = ProcessSelections(modifySelections, clearSelections, ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                }
+
+                view.Selection.Clear();
+                Selector.RemoveDuplicates();
             }
 
             adornmentLayer.DrawAdornments();
