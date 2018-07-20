@@ -11,10 +11,6 @@ using SelectNextOccurrence.Commands;
 
 namespace SelectNextOccurrence
 {
-    /// <summary>
-    /// Establishes an <see cref="IAdornmentLayer"/> to place the adornment on and exports the <see cref="IWpfTextViewCreationListener"/>
-    /// that instantiates the adornment on the event of a <see cref="IWpfTextView"/>'s creation
-    /// </summary>
     [Export(typeof(IVsTextViewCreationListener))]
     [ContentType("text")]
     [TextViewRole(PredefinedTextViewRoles.Editable)]
@@ -22,11 +18,6 @@ namespace SelectNextOccurrence
     {
         // Disable "Field is never assigned to..." and "Field is never used" compiler's warnings. Justification: the field is used by MEF.
 #pragma warning disable 649, 169
-
-        /// <summary>
-        /// Defines the adornment layer for the adornment. This layer is ordered
-        /// after the selection layer in the Z-order
-        /// </summary>
         [Export(typeof(AdornmentLayerDefinition))]
         [Name(Vsix.Name)]
         [Order(After = PredefinedAdornmentLayers.Selection, Before = PredefinedAdornmentLayers.Text)]
@@ -51,11 +42,6 @@ namespace SelectNextOccurrence
 
         #region IWpfTextViewCreationListener
 
-        /// <summary>
-        /// Called when a text view having matching roles is created over a text data model having a matching content type.
-        /// Instantiates a NextOccurrenceAdornment manager when the textView is created.
-        /// </summary>
-        /// <param name="textView">The <see cref="IWpfTextView"/> upon which the adornment should be placed</param>
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {
 #pragma warning disable S1848 // Objects should not be created to be dropped immediately without being used

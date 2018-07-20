@@ -21,11 +21,7 @@ namespace SelectNextOccurrence.Commands
 
         private readonly AdornmentLayer adornmentLayer;
 
-        /// <summary>
-        /// Next commandhandler
-        /// </summary>
         public IOleCommandTarget NextCommandTarget { get; set; }
-
 
         public CommandTarget(IWpfTextView view)
         {
@@ -100,13 +96,6 @@ namespace SelectNextOccurrence.Commands
                 {
                     switch (nCmdID)
                     {
-                        case ((uint)VSConstants.VSStd2KCmdID.TYPECHAR):
-                        case ((uint)VSConstants.VSStd2KCmdID.BACKSPACE):
-                        case ((uint)VSConstants.VSStd2KCmdID.BACKTAB):
-                        case ((uint)VSConstants.VSStd2KCmdID.RETURN):
-                        case ((uint)VSConstants.VSStd2KCmdID.BOL):
-                        case ((uint)VSConstants.VSStd2KCmdID.EOL):
-                            break;
                         case ((uint)VSConstants.VSStd2KCmdID.LEFT):
                         case ((uint)VSConstants.VSStd2KCmdID.RIGHT):
                         case ((uint)VSConstants.VSStd2KCmdID.UP):
@@ -248,7 +237,7 @@ namespace SelectNextOccurrence.Commands
             int result = VSConstants.S_OK;
 
             if (!Selector.Dte.UndoContext.IsOpen)
-                Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+                Selector.Dte.UndoContext.Open(Vsix.Name);
 
             foreach (var selection in Selector.Selections)
             {
@@ -344,7 +333,7 @@ namespace SelectNextOccurrence.Commands
             int result = VSConstants.S_OK;
 
             if (!Selector.Dte.UndoContext.IsOpen)
-                Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+                Selector.Dte.UndoContext.Open(Vsix.Name);
 
             foreach (var selection in Selector.Selections)
             {
@@ -384,7 +373,7 @@ namespace SelectNextOccurrence.Commands
             int result = VSConstants.S_OK;
 
             if (!Selector.Dte.UndoContext.IsOpen)
-                Selector.Dte.UndoContext.Open("SelectNextOccurrence");
+                Selector.Dte.UndoContext.Open(Vsix.Name);
 
             foreach (var selection in Selector.Selections)
             {
