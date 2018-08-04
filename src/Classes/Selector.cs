@@ -128,14 +128,14 @@ namespace SelectNextOccurrence
         /// </summary>
         /// <param name="reverse">Search in reverse direction</param>
         /// <returns></returns>
-        private FindData GetFindData(bool exact, bool reverse)
+        private FindData GetFindData(bool reverse = false)
         {
             var findData = new FindData(SearchText, Snapshot);
 
-            if (exact || Dte.Find.MatchCase)
+            if (Dte.Find.MatchCase)
                 findData.FindOptions |= FindOptions.MatchCase;
 
-            if (exact || Dte.Find.MatchWholeWord)
+            if (Dte.Find.MatchWholeWord)
                 findData.FindOptions |= FindOptions.WholeWord;
 
             if (reverse)
@@ -234,7 +234,7 @@ namespace SelectNextOccurrence
                     var occurrence = textSearchService.FindNext(
                         startIndex,
                         true,
-                        GetFindData(false, reverse: reverseDirection)
+                        GetFindData(reverse: reverseDirection)
                     );
 
                     if (occurrence.HasValue)
@@ -304,10 +304,13 @@ namespace SelectNextOccurrence
                             : Selections.Last().Caret.GetPosition(Snapshot);
                     }
 
+                    var findData = GetFindData(reverse: reverseDirection);
+                    findData.FindOptions |= FindOptions.MatchCase | FindOptions.WholeWord;
+
                     var occurrence = textSearchService.FindNext(
                         startIndex,
                         true,
-                        GetFindData(true, reverse: reverseDirection)
+                        findData
                     );
 
                     if (occurrence.HasValue)
@@ -328,7 +331,7 @@ namespace SelectNextOccurrence
             // Get a valid first selection to begin with
             SelectNextOccurrence();
 
-            var occurrences = textSearchService.FindAll(GetFindData(false, false));
+            var occurrences = textSearchService.FindAll(GetFindData());
             foreach (var occurrence in occurrences)
                 ProcessFoundOccurrence(occurrence);
         }
