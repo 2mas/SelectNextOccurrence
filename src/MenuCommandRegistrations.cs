@@ -31,54 +31,63 @@ namespace SelectNextOccurrence
                     this.ConvertSelectionToMultipleCursorsCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.ConvertSelectiontoMultipleCursorsCommandId)
                 );
+
                 commandService.AddCommand(ConvertSelectionToMultipleCursorsCmd);
 
                 var SelectNextOccurrenceCmd = new MenuCommand(
                     this.SelectNextOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectNextOccurrenceCommandId)
                 );
+
                 commandService.AddCommand(SelectNextOccurrenceCmd);
 
                 var SelectNextExactOccurrenceCmd = new MenuCommand(
                     this.SelectNextExactOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectNextExactOccurrenceCommandId)
                 );
+
                 commandService.AddCommand(SelectNextExactOccurrenceCmd);
 
                 var SelectPreviousOccurrenceCmd = new MenuCommand(
                     this.SelectPreviousOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectPreviousOccurrenceCommandId)
                 );
+
                 commandService.AddCommand(SelectPreviousOccurrenceCmd);
 
                 var SkipOccurrenceCmd = new MenuCommand(
                     this.SkipOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SkipOccurrenceCommandId)
                 );
+
                 commandService.AddCommand(SkipOccurrenceCmd);
 
                 var UndoOccurrenceCmd = new MenuCommand(
                     this.UndoOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.UndoOccurrenceCommandId)
                 );
+
                 commandService.AddCommand(UndoOccurrenceCmd);
 
                 var AddCaretAboveCmd = new MenuCommand(
                     this.AddCaretAboveCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.AddCaretAboveCommandId)
                 );
+
                 commandService.AddCommand(AddCaretAboveCmd);
 
                 var AddCaretBelowCmd = new MenuCommand(
                     this.AddCaretBelowCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.AddCaretBelowCommandId)
                 );
+
                 commandService.AddCommand(AddCaretBelowCmd);
 
                 var SelectAllOccurrencesCmd = new MenuCommand(
                     this.SelectAllOccurrencesCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectAllOccurrencesCommandId)
                 );
+
                 commandService.AddCommand(SelectAllOccurrencesCmd);
             }
         }
