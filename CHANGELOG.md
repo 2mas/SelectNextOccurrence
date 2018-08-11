@@ -10,6 +10,9 @@
 
 # Change log
 
+#### 1.3.40
+- [x] Adding commands ```SelectNextExactOccurrence``` and ```SelectPreviousExactOccurrence``` - thanks @ ngzaharias
+
 #### 1.3.32
 - [x] Fixing caret-marker height when placing carets on method-declarations etc with CodeLens active
 

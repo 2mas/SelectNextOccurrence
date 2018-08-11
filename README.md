@@ -14,7 +14,9 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 ## Features
 
 - Select next occurrence of current selection
+- Select next exact occurrence (overrides Find-dialog)
 - Select previous occurrence
+- Select previous exact occurrence (overrides Find-dialog)
 - Select all occurrences
 - Convert a selection into multiple cursors
 - Skip occurrence
@@ -29,7 +31,9 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 
 ### Options
 - Toggle case-sensitive search by using the "Match case" setting from the find-dialog (Ctrl+F)
+
 - Toggle match-whole word search by using the "Match whole word" setting from the find-dialog (Ctrl+F)
+
 - Deactivate Alt-Clicking to add carets in options-dialog
 
 ![Select Next Occurrence Options dialog](settings.png)
@@ -42,7 +46,9 @@ Go to Tools -> Options -> Keyboard and search for these command names to edit at
 | Command (prefix ```SelectNextOccurrence.```) | Recommendation |
 | :--- | :--- |
 | ```SelectNextOccurrence``` | Ctrl+D |
+| ```SelectNextExactOccurrence``` | |
 | ```SelectPreviousOccurrence``` | Ctrl+E |
+| ```SelectPreviousExactOccurrence``` | |
 | ```SelectAllOccurrences``` | Ctrl+K, Ctrl+A |
 | ```SkipOccurrence``` | Ctrl+K, Ctrl+D |
 | ```UndoOccurrence``` | Ctrl+U |

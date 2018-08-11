@@ -59,6 +59,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\CmdSelectPreviousExactOccurrence.cs" />
+    <Compile Include="Commands\CmdSelectNextExactOccurrence.cs" />
     <Compile Include="Commands\CmdSelectPreviousOccurrence.cs" />
     <Compile Include="Classes\Selector.cs" />
     <Compile Include="Commands\CmdAddCaretBelow.cs" />
@@ -77,6 +79,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\ExtensionSettingAttribute.cs" />
+    <Compile Include="SelectNextOccurrencePackage.cs" />
     <Compile Include="ViewCreationListener.cs" />
     <Compile Include="MenuCommandRegistrations.cs" />
     <Compile Include="VSCommandTable.cs">
@@ -84,7 +87,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>VSCommandTable.vsct</DependentUpon>
     </Compile>
-    <Compile Include="VSPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="source.extension.cs">
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>

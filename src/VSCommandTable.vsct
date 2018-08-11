@@ -34,6 +34,22 @@
           <CommandName>Select Previous Occurrence</CommandName>
         </Strings>
       </Button>
+      <Button guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectNextExactOccurrenceCommandId" priority="0x0102" type="Button">
+        <Parent guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectNextOccurrenceGroupId" />
+        <CommandFlag>CommandWellOnly</CommandFlag>
+        <Strings>
+          <ButtonText>Select Next Exact Occurrence</ButtonText>
+          <CommandName>Select Next Exact Occurrence</CommandName>
+        </Strings>
+      </Button>
+      <Button guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectPreviousExactOccurrenceCommandId" priority="0x0103" type="Button">
+        <Parent guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectNextOccurrenceGroupId" />
+        <CommandFlag>CommandWellOnly</CommandFlag>
+        <Strings>
+          <ButtonText>Select Previous Exact Occurrence</ButtonText>
+          <CommandName>Select Previous Exact Occurrence</CommandName>
+        </Strings>
+      </Button>
       <Button guid="guidNextOccurrenceCommandsPackageCmdSet" id="SkipOccurrenceCommandId" priority="0x0110" type="Button">
         <Parent guid="guidNextOccurrenceCommandsPackageCmdSet" id="SelectNextOccurrenceGroupId" />
         <CommandFlag>CommandWellOnly</CommandFlag>
@@ -100,6 +116,8 @@
       <IDSymbol name="SelectNextOccurrenceGroupId" value="0x0050" />
       <IDSymbol name="SelectNextOccurrenceCommandId" value="0x0100" />
       <IDSymbol name="SelectPreviousOccurrenceCommandId" value="0x0101" />
+      <IDSymbol name="SelectNextExactOccurrenceCommandId" value="0x0102" />
+      <IDSymbol name="SelectPreviousExactOccurrenceCommandId" value="0x0103" />
       <IDSymbol name="SkipOccurrenceCommandId" value="0x0110" />
       <IDSymbol name="UndoOccurrenceCommandId" value="0x0120" />
       <IDSymbol name="AddCaretAboveCommandId" value="0x0130" />
