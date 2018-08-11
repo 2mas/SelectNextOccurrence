@@ -40,8 +40,6 @@ namespace SelectNextOccurrence
 
 #pragma warning restore 649, 169
 
-        #region IWpfTextViewCreationListener
-
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {
 #pragma warning disable S1848 // Objects should not be created to be dropped immediately without being used
@@ -76,7 +74,5 @@ namespace SelectNextOccurrence
                 }
             }
         }
-
-        #endregion
     }
 }

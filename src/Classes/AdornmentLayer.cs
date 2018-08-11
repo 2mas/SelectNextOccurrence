@@ -70,6 +70,7 @@ namespace SelectNextOccurrence
             MenuCommandRegistrations.OnConvertSelectionToMultipleCursorsPressed += new CmdConvertSelectionToMultipleCursors(view).OnCommandInvoked;
             MenuCommandRegistrations.OnSelectNextOccurrencePressed += new CmdSelectNextOccurrence(view).OnCommandInvoked;
             MenuCommandRegistrations.OnSelectNextExactOccurrencePressed += new CmdSelectNextExactOccurrence(view).OnCommandInvoked;
+            MenuCommandRegistrations.OnSelectPreviousExactOccurrencePressed += new CmdSelectPreviousExactOccurrence(view).OnCommandInvoked;
             MenuCommandRegistrations.OnSelectPreviousOccurrencePressed += new CmdSelectPreviousOccurrence(view).OnCommandInvoked;
             MenuCommandRegistrations.OnSkipOccurrencePressed += new CmdSkipOccurrence(view).OnCommandInvoked;
             MenuCommandRegistrations.OnUndoOccurrencePressed += new CmdUndoOccurrence(view).OnCommandInvoked;

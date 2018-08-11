@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.Text.Editor;
 
 namespace SelectNextOccurrence.Commands
 {
-    internal class CmdSelectNextExactOccurrence : CmdBase
+    internal class CmdSelectPreviousExactOccurrence : CmdBase
     {
-        public CmdSelectNextExactOccurrence(IWpfTextView view) : base(view) { }
+        public CmdSelectPreviousExactOccurrence(IWpfTextView view) : base(view) { }
 
         /// <summary>
-        /// Menu-command handler, selects exact occurrence
+        /// Menu-command handler, selects previous exact occurrence
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -18,7 +18,7 @@ namespace SelectNextOccurrence.Commands
             if (!view.HasAggregateFocus)
                 return;
 
-            adornmentLayer.Selector.SelectNextOccurrence(reverseDirection: false, exactMatch: true);
+            adornmentLayer.Selector.SelectNextOccurrence(reverseDirection: true, exactMatch: true);
 
             if (adornmentLayer.Selector.Selections.Any())
                 adornmentLayer.DrawAdornments();

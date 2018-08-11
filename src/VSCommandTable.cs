@@ -29,6 +29,7 @@ namespace SelectNextOccurrence
         public const int SelectNextOccurrenceCommandId = 0x0100;
         public const int SelectPreviousOccurrenceCommandId = 0x0101;
         public const int SelectNextExactOccurrenceCommandId = 0x0102;
+        public const int SelectPreviousExactOccurrenceCommandId = 0x0103;
         public const int SkipOccurrenceCommandId = 0x0110;
         public const int UndoOccurrenceCommandId = 0x0120;
         public const int AddCaretAboveCommandId = 0x0130;

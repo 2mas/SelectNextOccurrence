@@ -48,6 +48,13 @@ namespace SelectNextOccurrence
 
                 commandService.AddCommand(SelectNextExactOccurrenceCmd);
 
+                var SelectPreviousExactOccurrenceCmd = new MenuCommand(
+                    this.SelectPreviousExactOccurrenceCallback,
+                    new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectPreviousExactOccurrenceCommandId)
+                );
+
+                commandService.AddCommand(SelectPreviousExactOccurrenceCmd);
+
                 var SelectPreviousOccurrenceCmd = new MenuCommand(
                     this.SelectPreviousOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectPreviousOccurrenceCommandId)
@@ -138,6 +145,11 @@ namespace SelectNextOccurrence
             OnSelectNextExactOccurrencePressed?.Invoke(this, e);
         }
 
+        private void SelectPreviousExactOccurrenceCallback(object sender, EventArgs e)
+        {
+            OnSelectPreviousExactOccurrencePressed?.Invoke(this, e);
+        }
+
         private void SelectPreviousOccurrenceCallback(object sender, EventArgs e)
         {
             OnSelectPreviousOccurrencePressed?.Invoke(this, e);
@@ -175,6 +187,7 @@ namespace SelectNextOccurrence
         internal static event EventHandler OnConvertSelectionToMultipleCursorsPressed;
         internal static event EventHandler OnSelectNextOccurrencePressed;
         internal static event EventHandler OnSelectNextExactOccurrencePressed;
+        internal static event EventHandler OnSelectPreviousExactOccurrencePressed;
         internal static event EventHandler OnSelectPreviousOccurrencePressed;
         internal static event EventHandler OnSkipOccurrencePressed;
         internal static event EventHandler OnUndoOccurrencePressed;

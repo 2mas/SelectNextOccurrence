@@ -124,19 +124,28 @@ namespace SelectNextOccurrence
 
         /// <summary>
         /// The FindData to be used in search
-        /// If user has toggled match-case/match whole word in their find-options we use this here too
+        /// If user has toggled match-case/match whole word in their find-options we use this here too,
+        /// if not overriden by exact-parameter
         /// </summary>
         /// <param name="reverse">Search in reverse direction</param>
+        /// <param name="exact">Override find-dialog and searches for an exact match</param>
         /// <returns></returns>
-        private FindData GetFindData(bool reverse = false)
+        private FindData GetFindData(bool reverse = false, bool exact = false)
         {
             var findData = new FindData(SearchText, Snapshot);
 
-            if (Dte.Find.MatchCase)
-                findData.FindOptions |= FindOptions.MatchCase;
+            if (exact)
+            {
+                findData.FindOptions |= FindOptions.MatchCase | FindOptions.WholeWord;
+            }
+            else
+            {
+                if (Dte.Find.MatchCase)
+                    findData.FindOptions |= FindOptions.MatchCase;
 
-            if (Dte.Find.MatchWholeWord)
-                findData.FindOptions |= FindOptions.WholeWord;
+                if (Dte.Find.MatchWholeWord)
+                    findData.FindOptions |= FindOptions.WholeWord;
+            }
 
             if (reverse)
                 findData.FindOptions |= FindOptions.SearchReverse;
@@ -178,7 +187,8 @@ namespace SelectNextOccurrence
         /// Handles finding occurrences, selecting and adding to current selections
         /// </summary>
         /// <param name="reverseDirection">Search document in reverse direction for an occurrence</param>
-        internal void SelectNextOccurrence(bool reverseDirection = false)
+        /// <param name="exactMatch">Search document for an exact match, overrides find-dialog settings</param>
+        internal void SelectNextOccurrence(bool reverseDirection = false, bool exactMatch = false)
         {
             // Caret placed on a word, but nothing selected
             if (!Selections.Any() && view.Selection.IsEmpty)
@@ -234,83 +244,7 @@ namespace SelectNextOccurrence
                     var occurrence = textSearchService.FindNext(
                         startIndex,
                         true,
-                        GetFindData(reverse: reverseDirection)
-                    );
-
-                    if (occurrence.HasValue)
-                        ProcessFoundOccurrence(occurrence.Value);
-                }
-
-                view.Selection.Clear();
-            }
-
-            IsReversing = false;
-        }
-
-        /// <summary>
-        /// Handles finding occurrences, selecting and adding to current selections
-        /// </summary>
-        /// <param name="reverseDirection">Search document in reverse direction for an occurrence</param>
-        internal void SelectNextExactOccurrence(bool reverseDirection = false)
-        {
-            // Caret placed on a word, but nothing selected
-            if (!Selections.Any() && view.Selection.IsEmpty)
-            {
-                editorOperations.SelectCurrentWord();
-
-                if (!String.IsNullOrEmpty(editorOperations.SelectedText))
-                    AddCurrentSelectionToSelections();
-
-                IsReversing = false;
-
-                return;
-            }
-
-            // First selection is selected by user, future selections will be located and selected on command-invocation
-            if (!Selections.Any() && !view.Selection.IsEmpty)
-                AddCurrentSelectionToSelections();
-
-            // Multiple selections
-            if (Selections.Any())
-            {
-                // Select words at caret again, this is where we have abandoned selections and goes to carets
-                if (Selections.All(s => !s.IsSelection()))
-                {
-                    var oldSelections = Selections;
-                    Selections = new List<Selection>();
-
-                    foreach (var selection in oldSelections)
-                    {
-                        view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
-                        editorOperations.SelectCurrentWord();
-                        AddCurrentSelectionToSelections();
-                    }
-                }
-                else
-                {
-                    // Start the search from previous end-position if it exists, otherwise caret
-                    int startIndex;
-
-                    if (reverseDirection)
-                    {
-                        startIndex = Selections.Last().Start != null ?
-                            Selections.Last().Start.GetPosition(Snapshot)
-                            : Selections.Last().Caret.GetPosition(Snapshot);
-                    }
-                    else
-                    {
-                        startIndex = Selections.Last().End != null ?
-                            Selections.Last().End.GetPosition(Snapshot)
-                            : Selections.Last().Caret.GetPosition(Snapshot);
-                    }
-
-                    var findData = GetFindData(reverse: reverseDirection);
-                    findData.FindOptions |= FindOptions.MatchCase | FindOptions.WholeWord;
-
-                    var occurrence = textSearchService.FindNext(
-                        startIndex,
-                        true,
-                        findData
+                        GetFindData(reverseDirection, exactMatch)
                     );
 
                     if (occurrence.HasValue)
