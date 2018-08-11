@@ -69,6 +69,7 @@ namespace SelectNextOccurrence
 
             MenuCommandRegistrations.OnConvertSelectionToMultipleCursorsPressed += new CmdConvertSelectionToMultipleCursors(view).OnCommandInvoked;
             MenuCommandRegistrations.OnSelectNextOccurrencePressed += new CmdSelectNextOccurrence(view).OnCommandInvoked;
+            MenuCommandRegistrations.OnSelectNextExactOccurrencePressed += new CmdSelectNextExactOccurrence(view).OnCommandInvoked;
             MenuCommandRegistrations.OnSelectPreviousOccurrencePressed += new CmdSelectPreviousOccurrence(view).OnCommandInvoked;
             MenuCommandRegistrations.OnSkipOccurrencePressed += new CmdSkipOccurrence(view).OnCommandInvoked;
             MenuCommandRegistrations.OnUndoOccurrencePressed += new CmdUndoOccurrence(view).OnCommandInvoked;
@@ -79,7 +80,7 @@ namespace SelectNextOccurrence
 
         /// <summary>
         /// Gets the colors from Options/Environment/Fonts and colors.
-        /// Default values provided in case the service doesnt exist
+        /// Default values provided in case the service doesn't exist
         /// </summary>
         /// <param name="formatMapService"></param>
         private void SetupBrushes(IEditorFormatMapService formatMapService = null)

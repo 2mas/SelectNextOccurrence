@@ -248,6 +248,82 @@ namespace SelectNextOccurrence
         }
 
         /// <summary>
+        /// Handles finding occurrences, selecting and adding to current selections
+        /// </summary>
+        /// <param name="reverseDirection">Search document in reverse direction for an occurrence</param>
+        internal void SelectNextExactOccurrence(bool reverseDirection = false)
+        {
+            // Caret placed on a word, but nothing selected
+            if (!Selections.Any() && view.Selection.IsEmpty)
+            {
+                editorOperations.SelectCurrentWord();
+
+                if (!String.IsNullOrEmpty(editorOperations.SelectedText))
+                    AddCurrentSelectionToSelections();
+
+                IsReversing = false;
+
+                return;
+            }
+
+            // First selection is selected by user, future selections will be located and selected on command-invocation
+            if (!Selections.Any() && !view.Selection.IsEmpty)
+                AddCurrentSelectionToSelections();
+
+            // Multiple selections
+            if (Selections.Any())
+            {
+                // Select words at caret again, this is where we have abandoned selections and goes to carets
+                if (Selections.All(s => !s.IsSelection()))
+                {
+                    var oldSelections = Selections;
+                    Selections = new List<Selection>();
+
+                    foreach (var selection in oldSelections)
+                    {
+                        view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+                        editorOperations.SelectCurrentWord();
+                        AddCurrentSelectionToSelections();
+                    }
+                }
+                else
+                {
+                    // Start the search from previous end-position if it exists, otherwise caret
+                    int startIndex;
+
+                    if (reverseDirection)
+                    {
+                        startIndex = Selections.Last().Start != null ?
+                            Selections.Last().Start.GetPosition(Snapshot)
+                            : Selections.Last().Caret.GetPosition(Snapshot);
+                    }
+                    else
+                    {
+                        startIndex = Selections.Last().End != null ?
+                            Selections.Last().End.GetPosition(Snapshot)
+                            : Selections.Last().Caret.GetPosition(Snapshot);
+                    }
+
+                    var findData = GetFindData(reverse: reverseDirection);
+                    findData.FindOptions |= FindOptions.MatchCase | FindOptions.WholeWord;
+
+                    var occurrence = textSearchService.FindNext(
+                        startIndex,
+                        true,
+                        findData
+                    );
+
+                    if (occurrence.HasValue)
+                        ProcessFoundOccurrence(occurrence.Value);
+                }
+
+                view.Selection.Clear();
+            }
+
+            IsReversing = false;
+        }
+
+        /// <summary>
         /// Handles finding all occurrences
         /// </summary>
         internal void SelectAllOccurrences()
