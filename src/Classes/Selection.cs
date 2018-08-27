@@ -10,6 +10,11 @@ namespace SelectNextOccurrence
         internal ITrackingPoint Start { get; set; }
         internal ITrackingPoint End { get; set; }
         internal ITrackingPoint Caret { get; set; }
+
+        /// <summary>
+        /// Contains the copied/cut text of the current selection for use in the same document when pasting into the same active cursors.
+        /// When pasting across documents the static <see cref="Selector.SavedClipboard"/> is used
+        /// </summary>
         internal string CopiedText { get; set; }
 
         internal bool OverlapsWith(SnapshotSpan span, ITextSnapshot snapshot)

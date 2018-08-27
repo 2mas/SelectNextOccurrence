@@ -74,14 +74,14 @@ namespace SelectNextOccurrence.Commands
                     {
                         case ((uint)VSConstants.VSStd97CmdID.Copy):
                         case ((uint)VSConstants.VSStd97CmdID.Cut):
-                            return HandleCopyCut(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            return HandleMultiCopyCut(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                         case ((uint)VSConstants.VSStd97CmdID.Paste):
                             // Only multi-paste different texts if all our selections have been copied with 
                             // this extension, otherwise paste as default. 
                             // Copied text get reset when new new selections are added
                             if (Selector.Selections.All(s => !String.IsNullOrEmpty(s.CopiedText)))
                             {
-                                return HandlePaste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                                return HandleMultiPaste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                             }
                             break;
                         case ((uint)VSConstants.VSStd97CmdID.Undo):
@@ -328,7 +328,7 @@ namespace SelectNextOccurrence.Commands
         /// <param name="pvaIn"></param>
         /// <param name="pvaOut"></param>
         /// <returns></returns>
-        private int HandleCopyCut(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        private int HandleMultiCopyCut(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             int result = VSConstants.S_OK;
 
@@ -353,6 +353,9 @@ namespace SelectNextOccurrence.Commands
                 }
             }
 
+            Selector.SavedClipboard = Selector.Selections.Where(s => !String.IsNullOrEmpty(s.CopiedText))
+                .Select(s => s.CopiedText);
+
             if (Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Close();
 
@@ -368,7 +371,7 @@ namespace SelectNextOccurrence.Commands
         /// <param name="pvaIn"></param>
         /// <param name="pvaOut"></param>
         /// <returns></returns>
-        private int HandlePaste(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        private int HandleMultiPaste(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             int result = VSConstants.S_OK;
 

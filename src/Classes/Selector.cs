@@ -45,9 +45,9 @@ namespace SelectNextOccurrence
 
         /// <summary>
         /// Stores copied texts from selections after they are abandoned for later pasting
-        /// when back to one caret
+        /// when back to one caret or across multiple documents
         /// </summary>
-        internal IEnumerable<string> SavedClipboard;
+        internal static IEnumerable<string> SavedClipboard = new List<String>();
 
         /// <summary>
         /// The last search-term
@@ -92,7 +92,6 @@ namespace SelectNextOccurrence
             this.Dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
 
             this.Selections = new List<Selection>();
-            this.SavedClipboard = new List<String>();
         }
 
         /// <summary>
@@ -404,8 +403,7 @@ namespace SelectNextOccurrence
             {
                 SavedClipboard = Selections
                     .Where(s => !String.IsNullOrEmpty(s.CopiedText))
-                    .Select(s => s.CopiedText)
-                    .ToArray();
+                    .Select(s => s.CopiedText);
             }
 
             Selections.Clear();
@@ -413,7 +411,7 @@ namespace SelectNextOccurrence
 
         internal void ClearSavedClipboard()
         {
-            this.SavedClipboard = new List<String>();
+            SavedClipboard = new List<String>();
         }
     }
 }
