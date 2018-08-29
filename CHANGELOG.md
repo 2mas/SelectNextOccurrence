@@ -10,6 +10,9 @@
 
 # Change log
 
+#### 1.3.44
+- [x] Fix of issue [18](https://github.com/2mas/SelectNextOccurrence/issues/18): enabling copy/paste of multiple selections across documents
+
 #### 1.3.40
 - [x] Adding commands ```SelectNextExactOccurrence``` and ```SelectPreviousExactOccurrence``` - thanks @ ngzaharias
 
