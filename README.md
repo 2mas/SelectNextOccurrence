@@ -41,7 +41,7 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 ---------------------------------------
 
 ### Key-bindings
-Go to Tools -> Options -> Keyboard and search for these command names to edit at your choice. Make sure the _Use new shortcut in_ is set to: ***Text Editor***
+Go to Tools -> Options -> Environment -> Keyboard and search for these command names to edit at your choice. Make sure the _Use new shortcut in_ is set to: ***Text Editor***
 
 | Command (prefix ```SelectNextOccurrence.```) | Recommendation |
 | :--- | :--- |
