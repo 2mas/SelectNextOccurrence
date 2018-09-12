@@ -37,13 +37,17 @@ namespace SelectNextOccurrence.Commands
 
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            int result = VSConstants.S_OK;
+            // based on ankh should return not supported when the command does nothing
+            // https://ctf.open.collab.net/integration/viewvc/viewvc.cgi/trunk/src/Ankh.VS/Dialogs/VSCommandRouting.cs?view=markup&root=ankhsvn&system=exsy1005&pathrev=11527
+            // https://ctf.open.collab.net/integration/viewvc/viewvc.cgi/trunk/src/Ankh.Services/VSErr.cs?view=markup&root=ankhsvn&system=exsy1005&pathrev=12510
+            int result = unchecked((int)Constants.OLECMDERR_E_NOTSUPPORTED);
 
             if (pguidCmdGroup == VSConstants.VSStd2K)
             {
                 switch ((VSConstants.VSStd2KCmdID) nCmdID)
                 {
                     case VSConstants.VSStd2KCmdID.SolutionPlatform:
+                        
                         return result;
                 }
             }
@@ -57,6 +61,7 @@ namespace SelectNextOccurrence.Commands
                 }
             }
 
+            result = VSConstants.S_OK;
             System.Diagnostics.Debug.WriteLine("grp: {0}, id: {1}", pguidCmdGroup.ToString(), nCmdID.ToString());
 
             if (!Selector.Selections.Any())
