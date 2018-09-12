@@ -403,7 +403,7 @@ namespace SelectNextOccurrence
             {
                 SavedClipboard = Selections
                     .Where(s => !String.IsNullOrEmpty(s.CopiedText))
-                    .Select(s => s.CopiedText);
+                    .Select(s => s.CopiedText).ToList();
             }
 
             Selections.Clear();

@@ -26,9 +26,7 @@ namespace SelectNextOccurrence
         {
             get
             {
-                return this.textView.Properties.GetProperty<AdornmentLayer>(
-                  typeof(AdornmentLayer)
-              ); ;
+                return this.textView.Properties.GetProperty<AdornmentLayer>(typeof(AdornmentLayer));
             }
         }
 
