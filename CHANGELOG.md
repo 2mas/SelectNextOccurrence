@@ -10,6 +10,10 @@
 
 # Change log
 
+#### 1.3.46
+- [x] Fixed bug about Build Configuration dropdown not showing when selecting a file. - thanks @ leachdaniel
+- [x] Fixed bug causing multiple copied texts not being copied to static variable when discaring multiple selections.
+
 #### 1.3.44
 - [x] Fix of issue [18](https://github.com/2mas/SelectNextOccurrence/issues/18): enabling copy/paste of multiple selections across documents
 
