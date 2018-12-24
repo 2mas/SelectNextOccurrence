@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
+using Microsoft.VisualStudio.Text.Outlining;
 
 namespace SelectNextOccurrence
 {
@@ -25,6 +26,11 @@ namespace SelectNextOccurrence
         /// In case of case-sensitive search this is provided to FindData
         /// </summary>
         private readonly ITextStructureNavigator textStructureNavigator;
+
+        /// <summary>
+        /// Expands regions if selected text is in this region
+        /// </summary>
+        private readonly IOutliningManager outliningManager;
 
         /// <summary>
         /// The top level in the Visual Studio automation object model.
@@ -75,12 +81,14 @@ namespace SelectNextOccurrence
         /// <param name="IEditorOperationsFactoryService"></param>
         /// <param name="IEditorFormatMapService"></param>
         /// <param name="ITextStructureNavigator"></param>
+        /// <param name="IOutliningManagerService"></param>
         public Selector(
             IWpfTextView view,
             ITextSearchService textSearchService,
             IEditorOperationsFactoryService editorOperationsService,
             IEditorFormatMapService formatMapService = null,
-            ITextStructureNavigator textStructureNavigator = null
+            ITextStructureNavigator textStructureNavigator = null,
+            IOutliningManagerService outliningManagerService = null
             )
         {
             this.view = view;
@@ -89,6 +97,7 @@ namespace SelectNextOccurrence
             this.textSearchService = textSearchService ?? throw new ArgumentNullException("textSearchService");
             this.editorOperations = editorOperationsService.GetEditorOperations(this.view);
             this.textStructureNavigator = textStructureNavigator;
+            this.outliningManager = outliningManagerService?.GetOutliningManager(this.view);
             this.Dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
 
             this.Selections = new List<Selection>();
@@ -106,6 +115,8 @@ namespace SelectNextOccurrence
 
             var caret = !view.Selection.IsReversed ?
                 end : start;
+
+
 
             Selections.Add(
                 new Selection
@@ -172,7 +183,10 @@ namespace SelectNextOccurrence
                     }
                 );
 
+                outliningManager.ExpandAll(occurrence, r => r.IsCollapsed);
+
                 view.Caret.MoveTo(caret == start ? occurrence.Start : occurrence.End);
+
                 view.ViewScroller.EnsureSpanVisible(
                     new SnapshotSpan(
                         view.Caret.Position.BufferPosition,

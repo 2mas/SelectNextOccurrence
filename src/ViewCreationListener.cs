@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
+using Microsoft.VisualStudio.Text.Outlining;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
 using SelectNextOccurrence.Commands;
@@ -38,6 +39,9 @@ namespace SelectNextOccurrence
         [Import]
         internal ITextStructureNavigatorSelectorService navigatorSelector = null;
 
+        [Import]
+        internal IOutliningManagerService outliningManagerService = null;
+
 #pragma warning restore 649, 169
 
         public void VsTextViewCreated(IVsTextView textViewAdapter)
@@ -49,7 +53,8 @@ namespace SelectNextOccurrence
                     textSearchService,
                     editorOperations,
                     formatMapService,
-                    navigatorSelector.GetTextStructureNavigator(textView.TextBuffer)
+                    navigatorSelector.GetTextStructureNavigator(textView.TextBuffer),
+                    outliningManagerService
                 );
 #pragma warning restore S1848 // Objects should not be created to be dropped immediately without being used
 

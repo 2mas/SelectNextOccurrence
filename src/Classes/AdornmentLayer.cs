@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
+using Microsoft.VisualStudio.Text.Outlining;
 using SelectNextOccurrence.Commands;
 
 namespace SelectNextOccurrence
@@ -39,12 +40,14 @@ namespace SelectNextOccurrence
         /// <param name="IEditorOperationsFactoryService"></param>
         /// <param name="IEditorFormatMapService"></param>
         /// <param name="ITextStructureNavigator"></param>
+        /// <param name="IOutliningManagerService"></param>
         public AdornmentLayer(
             IWpfTextView view,
             ITextSearchService textSearchService,
             IEditorOperationsFactoryService editorOperationsService,
             IEditorFormatMapService formatMapService = null,
-            ITextStructureNavigator textStructureNavigator = null
+            ITextStructureNavigator textStructureNavigator = null,
+            IOutliningManagerService outliningManagerService = null
             )
         {
             view.Properties.GetOrCreateSingletonProperty(
@@ -59,7 +62,8 @@ namespace SelectNextOccurrence
                 textSearchService,
                 editorOperationsService,
                 formatMapService,
-                textStructureNavigator
+                textStructureNavigator,
+                outliningManagerService
             );
 
             this.SetupBrushes(formatMapService);
