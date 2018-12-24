@@ -10,6 +10,9 @@
 
 # Change log
 
+#### 1.3.49
+- [x] Automatically expand regions if selected text is in this region (caused exception before)
+
 #### 1.3.46
 - [x] Fixed bug issue [19](https://github.com/2mas/SelectNextOccurrence/issues/19) about Build Configuration dropdown not showing when selecting a file. - thanks @ leachdaniel
 - [x] Fixed bug causing multiple copied texts not being copied to static variable when discaring multiple selections.
