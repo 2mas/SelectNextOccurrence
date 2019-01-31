@@ -138,6 +138,11 @@ namespace SelectNextOccurrence.Commands
                             Selector.IsReversing = !(Selector.Selections.All(s => !s.IsSelection()) || !Selector.IsReversing);
                             modifySelections = true;
                             break;
+                        case ((uint)VSConstants.VSStd2KCmdID.SELLOWCASE):
+                        case ((uint)VSConstants.VSStd2KCmdID.SELUPCASE):
+                            modifySelections = true;
+                            break;
+
                     }
                 }
 
