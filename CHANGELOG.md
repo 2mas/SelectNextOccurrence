@@ -10,6 +10,9 @@
 
 # Change log
 
+#### 1.3.52
+- [x] Keeping selections when invoking Edit.MakeUppercase and Edit.MakeLowercase - thanks @ Mr-Badger
+
 #### 1.3.49
 - [x] Automatically expand regions if selected text is in this region (caused exception before)
 
