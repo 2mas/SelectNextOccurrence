@@ -66,6 +66,7 @@ namespace SelectNextOccurrence.Commands
 
             bool modifySelections = false;
             bool clearSelections = false;
+            bool verticalMove = false;
 
             if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID
                 || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
@@ -98,10 +99,14 @@ namespace SelectNextOccurrence.Commands
                 {
                     switch (nCmdID)
                     {
-                        case ((uint)VSConstants.VSStd2KCmdID.LEFT):
-                        case ((uint)VSConstants.VSStd2KCmdID.RIGHT):
                         case ((uint)VSConstants.VSStd2KCmdID.UP):
                         case ((uint)VSConstants.VSStd2KCmdID.DOWN):
+                            verticalMove = true;
+                            clearSelections = true;
+                            Selector.IsReversing = false;
+                            break;
+                        case ((uint)VSConstants.VSStd2KCmdID.LEFT):
+                        case ((uint)VSConstants.VSStd2KCmdID.RIGHT):
                         case ((uint)VSConstants.VSStd2KCmdID.WORDPREV):
                         case ((uint)VSConstants.VSStd2KCmdID.WORDNEXT):
                             // Remove selected spans but keep carets
@@ -122,19 +127,29 @@ namespace SelectNextOccurrence.Commands
                             Selector.IsReversing = false;
                             result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                             break;
-                        case ((uint)VSConstants.VSStd2KCmdID.WORDPREV_EXT):
-                        case ((uint)VSConstants.VSStd2KCmdID.BOL_EXT):
-                        case ((uint)VSConstants.VSStd2KCmdID.LEFT_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.UP_EXT):
+                            verticalMove = true;
                             Selector.IsReversing = Selector.Selections.All(s => !s.IsSelection())
                                 || Selector.IsReversing
                                 || Selector.Selections.Last().Reversing(Snapshot);
                             modifySelections = true;
                             break;
+                        case ((uint)VSConstants.VSStd2KCmdID.WORDPREV_EXT):
+                        case ((uint)VSConstants.VSStd2KCmdID.BOL_EXT):
+                        case ((uint)VSConstants.VSStd2KCmdID.LEFT_EXT):
+                            Selector.IsReversing = Selector.Selections.All(s => !s.IsSelection())
+                                || Selector.IsReversing
+                                || Selector.Selections.Last().Reversing(Snapshot);
+                            modifySelections = true;
+                            break;
+                        case ((uint)VSConstants.VSStd2KCmdID.DOWN_EXT):
+                            verticalMove = true;
+                            Selector.IsReversing = !(Selector.Selections.All(s => !s.IsSelection()) || !Selector.IsReversing);
+                            modifySelections = true;
+                            break;
                         case ((uint)VSConstants.VSStd2KCmdID.WORDNEXT_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.EOL_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.RIGHT_EXT):
-                        case ((uint)VSConstants.VSStd2KCmdID.DOWN_EXT):
                             Selector.IsReversing = !(Selector.Selections.All(s => !s.IsSelection()) || !Selector.IsReversing);
                             modifySelections = true;
                             break;
@@ -142,13 +157,12 @@ namespace SelectNextOccurrence.Commands
                         case ((uint)VSConstants.VSStd2KCmdID.SELUPCASE):
                             modifySelections = true;
                             break;
-
                     }
                 }
 
                 if (Selector.Selections.Any())
                 {
-                    result = ProcessSelections(modifySelections, clearSelections, ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                    result = ProcessSelections(modifySelections, clearSelections, verticalMove, ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                 }
 
                 view.Selection.Clear();
@@ -158,7 +172,7 @@ namespace SelectNextOccurrence.Commands
             {
                 if (Selector.Selections.Any())
                 {
-                    result = ProcessSelections(modifySelections, clearSelections, ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                    result = ProcessSelections(modifySelections, clearSelections, verticalMove, ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                 }
 
                 view.Selection.Clear();
@@ -239,7 +253,7 @@ namespace SelectNextOccurrence.Commands
             }
         }
 
-        private int ProcessSelections(bool modifySelections, bool clearSelections, ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        private int ProcessSelections(bool modifySelections, bool clearSelections, bool verticalMove, ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             int result = VSConstants.S_OK;
 
@@ -261,12 +275,24 @@ namespace SelectNextOccurrence.Commands
 
                 view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
 
+                var previousLineNumber = Snapshot.GetLineNumberFromPosition(view.Caret.Position.BufferPosition.Position);
+
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
-                selection.Caret = Snapshot.CreateTrackingPoint(
-                    view.Caret.Position.BufferPosition.Position,
-                    PointTrackingMode.Positive
-                );
+                var position = 0;
+                if (verticalMove)
+                {
+                    position = GetCorrectedCaretPosition(selection.PreservedColumnPosition, previousLineNumber);
+                }
+                else
+                {
+                    position = view.Caret.Position.BufferPosition.Position;
+                    var caretLine = Snapshot.GetLineFromPosition(position);
+                    selection.PreservedColumnPosition = position - caretLine.Start.Position;
+                }
+
+                selection.Caret = Snapshot.CreateTrackingPoint(position, PointTrackingMode.Positive);
+                view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
 
                 if (view.Selection.IsEmpty)
                 {
@@ -324,6 +350,43 @@ namespace SelectNextOccurrence.Commands
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Gets the corrected caret position when moving caret vertically.
+        /// If the Caret is already on first or last line the caret is set
+        /// to the start of file or to the end of the file, respectively.
+        /// If the Caret is positioned left off the preserved column position
+        /// the caret is set to the preserved column position or the end of 
+        /// line.
+        /// </summary>
+        /// <param name="preservedColumnPosition"></param>
+        /// <param name="previousLineNumber"></param>
+        /// <returns></returns>
+        private int GetCorrectedCaretPosition(int preservedColumnPosition, int previousLineNumber)
+        {
+            var caretPosition = view.Caret.Position.BufferPosition.Position;
+            var caretLine = Snapshot.GetLineFromPosition(caretPosition);
+            var lineNumber = caretLine.LineNumber;
+            if (lineNumber == previousLineNumber && lineNumber == 0)
+            {
+                return 0;
+            }
+            else if (lineNumber == previousLineNumber && lineNumber == Snapshot.LineCount - 1)
+            {
+                return Snapshot.Length;
+            }
+            else if (preservedColumnPosition > (caretPosition - caretLine.Start.Position))
+            {
+                var correctColumnPosition = (preservedColumnPosition > caretLine.Length) ?
+                    caretLine.Length
+                    : preservedColumnPosition;
+                return caretLine.Start.Position + correctColumnPosition;
+            }
+            else
+            {
+                return caretPosition;
+            }
         }
 
         /// <summary>

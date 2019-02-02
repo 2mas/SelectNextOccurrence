@@ -123,7 +123,8 @@ namespace SelectNextOccurrence
                 {
                     Start = Snapshot.CreateTrackingPoint(start, PointTrackingMode.Positive),
                     End = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive),
-                    Caret = Snapshot.CreateTrackingPoint(caret, PointTrackingMode.Positive)
+                    Caret = Snapshot.CreateTrackingPoint(caret, PointTrackingMode.Positive),
+                    PreservedColumnPosition = GetColumnPosition()
                 }
             );
 
@@ -179,7 +180,8 @@ namespace SelectNextOccurrence
                     {
                         Start = start,
                         End = end,
-                        Caret = caret
+                        Caret = caret,
+                        PreservedColumnPosition = GetColumnPosition()
                     }
                 );
 
@@ -299,7 +301,8 @@ namespace SelectNextOccurrence
                     Selections.Add(
                         new Selection
                         {
-                            Caret = Snapshot.CreateTrackingPoint(line.End.Position, PointTrackingMode.Positive)
+                            Caret = Snapshot.CreateTrackingPoint(line.End.Position, PointTrackingMode.Positive),
+                            PreservedColumnPosition = GetColumnPosition()
                         }
                     );
                 }
@@ -307,7 +310,8 @@ namespace SelectNextOccurrence
                 Selections.Add(
                     new Selection
                     {
-                        Caret = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive)
+                        Caret = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive),
+                        PreservedColumnPosition = GetColumnPosition()
                     }
                 );
 
@@ -355,7 +359,8 @@ namespace SelectNextOccurrence
                         Caret = Snapshot.CreateTrackingPoint(
                             view.Caret.Position.BufferPosition.Position,
                             PointTrackingMode.Positive
-                        )
+                        ),
+                        PreservedColumnPosition = GetColumnPosition()
                     }
                 );
             }
@@ -407,7 +412,8 @@ namespace SelectNextOccurrence
                     {
                         Start = null,
                         End = null,
-                        Caret = stashedCaretPosition
+                        Caret = stashedCaretPosition,
+                        PreservedColumnPosition = GetColumnPosition()
                     }
                 );
             }
@@ -434,6 +440,12 @@ namespace SelectNextOccurrence
         internal void ClearSavedClipboard()
         {
             SavedClipboard = new List<String>();
+        }
+
+        private int GetColumnPosition()
+        {
+            var snapshotLine = Snapshot.GetLineFromPosition(view.Caret.Position.BufferPosition.Position);
+            return view.Caret.Position.BufferPosition.Position - snapshotLine.Start.Position;
         }
     }
 }

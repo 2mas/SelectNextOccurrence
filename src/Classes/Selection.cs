@@ -11,6 +11,8 @@ namespace SelectNextOccurrence
         internal ITrackingPoint End { get; set; }
         internal ITrackingPoint Caret { get; set; }
 
+        internal int PreservedColumnPosition { get; set; }
+
         /// <summary>
         /// Contains the copied/cut text of the current selection for use in the same document when pasting into the same active cursors.
         /// When pasting across documents the static <see cref="Selector.SavedClipboard"/> is used
