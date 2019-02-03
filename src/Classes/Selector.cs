@@ -322,14 +322,22 @@ namespace SelectNextOccurrence
 
         internal void AddCaretAbove()
         {
-            editorOperations.MoveLineUp(false);
-            AddCurrentCaretToSelections();
+            foreach (var selecton in Selections.ToList())
+            {
+                view.Caret.MoveTo(selecton.Caret.GetPoint(Snapshot));
+                editorOperations.MoveLineUp(false);
+                AddCurrentCaretToSelections();
+            }
         }
 
         internal void AddCaretBelow()
         {
-            editorOperations.MoveLineDown(false);
-            AddCurrentCaretToSelections();
+            foreach (var selecton in Selections.ToList())
+            {
+                view.Caret.MoveTo(selecton.Caret.GetPoint(Snapshot));
+                editorOperations.MoveLineDown(false);
+                AddCurrentCaretToSelections();
+            }
         }
 
         internal void AddCurrentCaretToSelections()
