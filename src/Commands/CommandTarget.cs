@@ -275,23 +275,21 @@ namespace SelectNextOccurrence.Commands
 
                 view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
 
-                var previousLineNumber = Snapshot.GetLineNumberFromPosition(view.Caret.Position.BufferPosition.Position);
-
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
-                var position = 0;
+                var position = view.Caret.Position.BufferPosition.Position;
                 if (verticalMove)
                 {
-                    position = GetCorrectedCaretPosition(selection.PreservedColumnPosition, previousLineNumber);
+                    position = selection.GetCaretColumnPosition(position, Snapshot);
                 }
                 else
                 {
-                    position = view.Caret.Position.BufferPosition.Position;
                     var caretLine = Snapshot.GetLineFromPosition(position);
-                    selection.PreservedColumnPosition = position - caretLine.Start.Position;
+                    selection.ColumnPosition = position - caretLine.Start.Position;
                 }
 
                 selection.Caret = Snapshot.CreateTrackingPoint(position, PointTrackingMode.Positive);
+
                 view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
 
                 if (view.Selection.IsEmpty)
@@ -350,43 +348,6 @@ namespace SelectNextOccurrence.Commands
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Gets the corrected caret position when moving caret vertically.
-        /// If the Caret is already on first or last line the caret is set
-        /// to the start of file or to the end of the file, respectively.
-        /// If the Caret is positioned left off the preserved column position
-        /// the caret is set to the preserved column position or the end of 
-        /// line.
-        /// </summary>
-        /// <param name="preservedColumnPosition"></param>
-        /// <param name="previousLineNumber"></param>
-        /// <returns></returns>
-        private int GetCorrectedCaretPosition(int preservedColumnPosition, int previousLineNumber)
-        {
-            var caretPosition = view.Caret.Position.BufferPosition.Position;
-            var caretLine = Snapshot.GetLineFromPosition(caretPosition);
-            var lineNumber = caretLine.LineNumber;
-            if (lineNumber == previousLineNumber && lineNumber == 0)
-            {
-                return 0;
-            }
-            else if (lineNumber == previousLineNumber && lineNumber == Snapshot.LineCount - 1)
-            {
-                return Snapshot.Length;
-            }
-            else if (preservedColumnPosition > (caretPosition - caretLine.Start.Position))
-            {
-                var correctColumnPosition = (preservedColumnPosition > caretLine.Length) ?
-                    caretLine.Length
-                    : preservedColumnPosition;
-                return caretLine.Start.Position + correctColumnPosition;
-            }
-            else
-            {
-                return caretPosition;
-            }
         }
 
         /// <summary>

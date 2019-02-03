@@ -11,7 +11,7 @@ namespace SelectNextOccurrence
         internal ITrackingPoint End { get; set; }
         internal ITrackingPoint Caret { get; set; }
 
-        internal int PreservedColumnPosition { get; set; }
+        internal int ColumnPosition { get; set; }
 
         /// <summary>
         /// Contains the copied/cut text of the current selection for use in the same document when pasting into the same active cursors.
@@ -43,6 +43,42 @@ namespace SelectNextOccurrence
         internal bool Reversing(ITextSnapshot snapshot)
         {
             return Caret.GetPosition(snapshot) < End?.GetPosition(snapshot);
+        }
+
+        /// <summary>
+        /// Gets the caret column position when moving caret vertically.
+        /// If the Caret is already on first or last line the caret is set
+        /// to the start of file or to the end of the file, respectively.
+        /// If the Caret is positioned left off the stored column position
+        /// the caret is set to the stored column position or the end of line.
+        /// </summary>
+        /// <param name="caretPosition"></param>
+        /// <param name="snapshot"></param>
+        /// <returns></returns>
+        internal int GetCaretColumnPosition(int caretPosition, ITextSnapshot snapshot)
+        {
+            var previousLineNumber = snapshot.GetLineNumberFromPosition(Caret.GetPosition(snapshot));
+            var caretLine = snapshot.GetLineFromPosition(caretPosition);
+
+            if (caretLine.LineNumber == previousLineNumber && caretLine.LineNumber == 0)
+            {
+                return 0;
+            }
+            else if (caretLine.LineNumber == previousLineNumber && caretLine.LineNumber == snapshot.LineCount - 1)
+            {
+                return snapshot.Length;
+            }
+            else if (ColumnPosition > (caretPosition - caretLine.Start.Position))
+            {
+                var correctColumnPosition = (ColumnPosition > caretLine.Length) ?
+                    caretLine.Length
+                    : ColumnPosition;
+                return caretLine.Start.Position + correctColumnPosition;
+            }
+            else
+            {
+                return caretPosition;
+            }
         }
     }
 }
