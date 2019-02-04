@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Windows;
 using Microsoft.VisualStudio;
@@ -339,6 +339,11 @@ namespace SelectNextOccurrence.Commands
 
                     view.Selection.Clear();
                 }
+            }
+
+            if (modifySelections)
+            {
+                Selector.CombineOverlappingSelections();
             }
 
             if (processReverseOrder) Selector.Selections.Reverse();
