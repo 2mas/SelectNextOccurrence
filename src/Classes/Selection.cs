@@ -42,5 +42,45 @@ namespace SelectNextOccurrence
         {
             return Caret.GetPosition(snapshot) < End?.GetPosition(snapshot);
         }
+
+        internal void SetNewSelection(int previousCaretPosition, ITextSnapshot Snapshot)
+        {
+            var caretPosition = Caret.GetPosition(Snapshot);
+            if (IsSelection())
+            {
+                var startPos = Start.GetPosition(Snapshot);
+                var endPos = End.GetPosition(Snapshot);
+                if (caretPosition < startPos && startPos < previousCaretPosition)
+                {
+                    End = Start;
+                    Start = Snapshot.CreateTrackingPoint(caretPosition, PointTrackingMode.Positive);
+                }
+                else if (previousCaretPosition < endPos && endPos < caretPosition)
+                {
+                    Start = End;
+                    End = Snapshot.CreateTrackingPoint(caretPosition, PointTrackingMode.Positive);
+                }
+                else if (caretPosition > startPos && startPos != previousCaretPosition)
+                {
+                    End = Snapshot.CreateTrackingPoint(caretPosition, PointTrackingMode.Positive);
+                }
+                else
+                {
+                    Start = Snapshot.CreateTrackingPoint(caretPosition, PointTrackingMode.Positive);
+                }
+            }
+            else
+            {
+                Start = Snapshot.CreateTrackingPoint(
+                    caretPosition > previousCaretPosition ? previousCaretPosition : caretPosition,
+                    PointTrackingMode.Positive
+                );
+
+                End = Snapshot.CreateTrackingPoint(
+                    caretPosition > previousCaretPosition ? caretPosition : previousCaretPosition,
+                    PointTrackingMode.Positive
+                );
+            }
+        }
     }
 }

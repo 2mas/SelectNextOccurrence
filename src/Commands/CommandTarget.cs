@@ -259,6 +259,8 @@ namespace SelectNextOccurrence.Commands
                     );
                 }
 
+                var previousCaretPosition = selection.Caret.GetPosition(Snapshot);
+
                 view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
 
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
@@ -277,22 +279,7 @@ namespace SelectNextOccurrence.Commands
 
                 if (modifySelections)
                 {
-                    var newSpan = view.Selection.StreamSelectionSpan;
-
-                    selection.Start = Snapshot.CreateTrackingPoint(
-                        newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                        newSpan.End.Position.Position
-                        : newSpan.Start.Position.Position,
-                        PointTrackingMode.Positive
-                    );
-
-                    selection.End = Snapshot.CreateTrackingPoint(
-                        newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                        newSpan.Start.Position.Position
-                        : newSpan.End.Position.Position,
-                        PointTrackingMode.Positive
-                    );
-
+                    selection.SetNewSelection(previousCaretPosition, Snapshot);
                     view.Selection.Clear();
                 }
             }
