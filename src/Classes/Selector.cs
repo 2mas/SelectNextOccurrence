@@ -397,27 +397,17 @@ namespace SelectNextOccurrence
             {
                 var selection = selections[index].selection;
                 var nextSelection = selections[index + 1].selection;
-                if (IsReversing)
+                if (selection.End.GetPoint(Snapshot) > nextSelection.Start.GetPoint(Snapshot))
                 {
-                    if (nextSelection.End.GetPoint(Snapshot) > selection.Start.GetPoint(Snapshot))
+                    nextSelection.Start = Snapshot.CreateTrackingPoint(
+                        selection.Start.GetPosition(Snapshot),
+                        PointTrackingMode.Positive
+                    );
+                    if (IsReversing)
                     {
-                        nextSelection.End = Snapshot.CreateTrackingPoint(
-                            selection.End.GetPosition(Snapshot),
-                            PointTrackingMode.Positive
-                        );
-                        overlappingSelections.Add(selections[index].index);
+                        nextSelection.Caret = selection.Caret;
                     }
-                }
-                else
-                {
-                    if (selection.End.GetPoint(Snapshot) > nextSelection.Start.GetPoint(Snapshot))
-                    {
-                        nextSelection.Start = Snapshot.CreateTrackingPoint(
-                            selection.Start.GetPosition(Snapshot),
-                            PointTrackingMode.Positive
-                        );
-                        overlappingSelections.Add(selections[index].index);
-                    }
+                    overlappingSelections.Add(selections[index].index);
                 }
             }
             foreach (var index in overlappingSelections.OrderByDescending(n => n))
