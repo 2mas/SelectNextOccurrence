@@ -71,7 +71,7 @@ namespace SelectNextOccurrence
         /// Usecase is when adding the first caret by mouse-clicking, checks needs to
         /// made when releasing the cursor
         /// </summary>
-        internal ITrackingPoint stashedCaretPosition { get; private set; }
+        internal ITrackingPoint stashedCaret { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Selector"/> class.
@@ -124,7 +124,7 @@ namespace SelectNextOccurrence
                     Start = Snapshot.CreateTrackingPoint(start, PointTrackingMode.Positive),
                     End = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive),
                     Caret = Snapshot.CreateTrackingPoint(caret, PointTrackingMode.Positive),
-                    ColumnPosition = GetCurrentColumnPosition()
+                    ColumnPosition = GetCurrentColumnPosition(caret)
                 }
             );
 
@@ -181,7 +181,7 @@ namespace SelectNextOccurrence
                         Start = start,
                         End = end,
                         Caret = caret,
-                        ColumnPosition = GetCurrentColumnPosition()
+                        ColumnPosition = GetCurrentColumnPosition(caret.GetPoint(Snapshot))
                     }
                 );
 
@@ -302,7 +302,7 @@ namespace SelectNextOccurrence
                         new Selection
                         {
                             Caret = Snapshot.CreateTrackingPoint(line.End.Position, PointTrackingMode.Positive),
-                            ColumnPosition = GetCurrentColumnPosition()
+                            ColumnPosition = GetCurrentColumnPosition(line.End.Position)
                         }
                     );
                 }
@@ -311,7 +311,7 @@ namespace SelectNextOccurrence
                     new Selection
                     {
                         Caret = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive),
-                        ColumnPosition = GetCurrentColumnPosition()
+                        ColumnPosition = GetCurrentColumnPosition(end)
                     }
                 );
 
@@ -346,9 +346,8 @@ namespace SelectNextOccurrence
 
         internal void AddCurrentCaretToSelections()
         {
-            if (!Selections.Any(
-                s => s.Caret.GetPoint(Snapshot).Position
-                == view.Caret.Position.BufferPosition.Position)
+            var caretPosition = view.Caret.Position.BufferPosition.Position;
+            if (!Selections.Any(s => s.Caret.GetPoint(Snapshot).Position == caretPosition)
             )
             {
                 Selections.Add(
@@ -357,10 +356,10 @@ namespace SelectNextOccurrence
                         Start = null,
                         End = null,
                         Caret = Snapshot.CreateTrackingPoint(
-                            view.Caret.Position.BufferPosition.Position,
+                            caretPosition,
                             PointTrackingMode.Positive
                         ),
-                        ColumnPosition = GetCurrentColumnPosition()
+                        ColumnPosition = GetCurrentColumnPosition(caretPosition)
                     }
                 );
             }
@@ -389,7 +388,7 @@ namespace SelectNextOccurrence
         #region stashed cursors
         internal void StashCurrentCaretPosition()
         {
-            stashedCaretPosition = Snapshot.CreateTrackingPoint(
+            stashedCaret = Snapshot.CreateTrackingPoint(
                             view.Caret.Position.BufferPosition.Position,
                             PointTrackingMode.Positive
                         );
@@ -397,28 +396,26 @@ namespace SelectNextOccurrence
 
         internal void ClearStashedCaretPosition()
         {
-            stashedCaretPosition = null;
+            stashedCaret = null;
         }
 
         internal void ApplyStashedCaretPosition()
         {
-            if (!Selections.Any(
-                s => s.Caret.GetPoint(Snapshot).Position
-                == stashedCaretPosition.GetPoint(Snapshot).Position)
-            )
+            var stashedCaretPosition = stashedCaret.GetPoint(Snapshot).Position;
+            if (!Selections.Any(s => s.Caret.GetPoint(Snapshot).Position == stashedCaretPosition))
             {
                 Selections.Add(
                     new Selection
                     {
                         Start = null,
                         End = null,
-                        Caret = stashedCaretPosition,
-                        ColumnPosition = GetCurrentColumnPosition()
+                        Caret = stashedCaret,
+                        ColumnPosition = GetCurrentColumnPosition(stashedCaretPosition)
                     }
                 );
             }
 
-            stashedCaretPosition = null;
+            stashedCaret = null;
         }
         #endregion
 
@@ -442,10 +439,10 @@ namespace SelectNextOccurrence
             SavedClipboard = new List<String>();
         }
 
-        private int GetCurrentColumnPosition()
+        private int GetCurrentColumnPosition(int caretPosition)
         {
-            var snapshotLine = Snapshot.GetLineFromPosition(view.Caret.Position.BufferPosition.Position);
-            return view.Caret.Position.BufferPosition.Position - snapshotLine.Start.Position;
+            var snapshotLine = Snapshot.GetLineFromPosition(caretPosition);
+            return caretPosition - snapshotLine.Start.Position;
         }
     }
 }

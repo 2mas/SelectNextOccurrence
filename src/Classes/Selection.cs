@@ -64,7 +64,8 @@ namespace SelectNextOccurrence
             {
                 return 0;
             }
-            else if (caretLine.LineNumber == previousLineNumber && caretLine.LineNumber == snapshot.LineCount - 1)
+            else if (caretLine.LineNumber == previousLineNumber
+                && caretLine.LineNumber == snapshot.LineCount - 1)
             {
                 return snapshot.Length;
             }
