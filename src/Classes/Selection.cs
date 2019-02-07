@@ -43,30 +43,32 @@ namespace SelectNextOccurrence
             return Caret.GetPosition(snapshot) < End?.GetPosition(snapshot);
         }
 
-        internal void SetNewSelection(int previousCaretPosition, ITextSnapshot Snapshot)
+        internal void SetSelection(int previousCaretPosition, ITextSnapshot Snapshot)
         {
             var caretPosition = Caret.GetPosition(Snapshot);
+
             if (IsSelection())
             {
-                var startPos = Start.GetPosition(Snapshot);
-                var endPos = End.GetPosition(Snapshot);
-                if (caretPosition < startPos && startPos < previousCaretPosition)
+                var startPosition = Start.GetPosition(Snapshot);
+                var endPosition = End.GetPosition(Snapshot);
+
+                if (caretPosition < startPosition && startPosition < previousCaretPosition)
                 {
                     End = Start;
-                    Start = Snapshot.CreateTrackingPoint(caretPosition, PointTrackingMode.Positive);
+                    Start = Caret;
                 }
-                else if (previousCaretPosition < endPos && endPos < caretPosition)
+                else if (previousCaretPosition < endPosition && endPosition < caretPosition)
                 {
                     Start = End;
-                    End = Snapshot.CreateTrackingPoint(caretPosition, PointTrackingMode.Positive);
+                    End = Caret;
                 }
-                else if (caretPosition > startPos && startPos != previousCaretPosition)
+                else if (caretPosition > startPosition && startPosition != previousCaretPosition)
                 {
-                    End = Snapshot.CreateTrackingPoint(caretPosition, PointTrackingMode.Positive);
+                    End = Caret;
                 }
                 else
                 {
-                    Start = Snapshot.CreateTrackingPoint(caretPosition, PointTrackingMode.Positive);
+                    Start = Caret;
                 }
             }
             else

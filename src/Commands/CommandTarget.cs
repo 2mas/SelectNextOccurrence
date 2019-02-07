@@ -279,7 +279,7 @@ namespace SelectNextOccurrence.Commands
 
                 if (modifySelections)
                 {
-                    selection.SetNewSelection(previousCaretPosition, Snapshot);
+                    selection.SetSelection(previousCaretPosition, Snapshot);
                     view.Selection.Clear();
                 }
             }
