@@ -38,6 +38,11 @@ namespace SelectNextOccurrence
             return (Start != null && End != null);
         }
 
+        internal bool IsReversed()
+        {
+            return IsSelection() && Start == Caret;
+        }
+
         internal bool Reversing(ITextSnapshot snapshot)
         {
             return Caret.GetPosition(snapshot) < End?.GetPosition(snapshot);
@@ -73,15 +78,13 @@ namespace SelectNextOccurrence
             }
             else
             {
-                Start = Snapshot.CreateTrackingPoint(
-                    caretPosition > previousCaretPosition ? previousCaretPosition : caretPosition,
-                    PointTrackingMode.Positive
-                );
+                Start = caretPosition > previousCaretPosition ?
+                    Snapshot.CreateTrackingPoint(previousCaretPosition, PointTrackingMode.Positive)
+                    : Caret;
 
-                End = Snapshot.CreateTrackingPoint(
-                    caretPosition > previousCaretPosition ? caretPosition : previousCaretPosition,
-                    PointTrackingMode.Positive
-                );
+                End = caretPosition > previousCaretPosition ?
+                    Caret
+                    : Snapshot.CreateTrackingPoint(previousCaretPosition, PointTrackingMode.Positive);
             }
         }
     }

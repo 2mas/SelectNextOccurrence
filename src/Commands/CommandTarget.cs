@@ -255,7 +255,7 @@ namespace SelectNextOccurrence.Commands
                             selection.Start.GetPoint(Snapshot),
                             selection.End.GetPoint(Snapshot)
                         ),
-                        Selector.IsReversing
+                        selection.IsReversed()
                     );
                 }
 
