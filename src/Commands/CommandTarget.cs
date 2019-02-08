@@ -157,6 +157,8 @@ namespace SelectNextOccurrence.Commands
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.SELLOWCASE):
                         case ((uint)VSConstants.VSStd2KCmdID.SELUPCASE):
+                        case ((uint)VSConstants.VSStd2KCmdID.COMMENT_BLOCK):
+                        case ((uint)VSConstants.VSStd2KCmdID.UNCOMMENT_BLOCK):
                             modifySelections = true;
                             break;
                     }
