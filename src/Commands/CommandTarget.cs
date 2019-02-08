@@ -67,9 +67,11 @@ namespace SelectNextOccurrence.Commands
             bool modifySelections = false;
             bool clearSelections = false;
             bool verticalMove = false;
+            bool processReverseOrder = false;
 
             if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID
-                || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
+                || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
+                || pguidCmdGroup == typeof(VSConstants.VSStd12CmdID).GUID)
             {
                 if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
                 {
@@ -160,24 +162,38 @@ namespace SelectNextOccurrence.Commands
                     }
                 }
 
-                if (Selector.Selections.Any())
+                if (pguidCmdGroup == typeof(VSConstants.VSStd12CmdID).GUID)
                 {
-                    result = ProcessSelections(modifySelections, clearSelections, verticalMove, ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                    switch (nCmdID)
+                    {
+                        case ((uint)VSConstants.VSStd12CmdID.MoveSelLinesUp):
+                            modifySelections = true;
+                            break;
+                        case ((uint)VSConstants.VSStd12CmdID.MoveSelLinesDown):
+                            modifySelections = true;
+                            processReverseOrder = true;
+                            break;
+                    }
                 }
-
-                view.Selection.Clear();
-                Selector.RemoveDuplicates();
             }
-            else
+
+            if (Selector.Selections.Any())
             {
-                if (Selector.Selections.Any())
-                {
-                    result = ProcessSelections(modifySelections, clearSelections, verticalMove, ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                }
-
-                view.Selection.Clear();
-                Selector.RemoveDuplicates();
+                result = ProcessSelections(
+                    modifySelections,
+                    clearSelections,
+                    verticalMove,
+                    processReverseOrder,
+                    ref pguidCmdGroup,
+                    nCmdID,
+                    nCmdexecopt,
+                    pvaIn,
+                    pvaOut
+                );
             }
+
+            Selector.RemoveDuplicates();
+            view.Selection.Clear();
 
             adornmentLayer.DrawAdornments();
 
@@ -253,12 +269,14 @@ namespace SelectNextOccurrence.Commands
             }
         }
 
-        private int ProcessSelections(bool modifySelections, bool clearSelections, bool verticalMove, ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        private int ProcessSelections(bool modifySelections, bool clearSelections, bool verticalMove, bool processReverseOrder, ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             int result = VSConstants.S_OK;
 
             if (!Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Open(Vsix.Name);
+
+            if (processReverseOrder) Selector.Selections.Reverse();
 
             foreach (var selection in Selector.Selections)
             {
@@ -320,6 +338,8 @@ namespace SelectNextOccurrence.Commands
                     view.Selection.Clear();
                 }
             }
+
+            if (processReverseOrder) Selector.Selections.Reverse();
 
             if (Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Close();
