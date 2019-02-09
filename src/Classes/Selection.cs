@@ -40,6 +40,11 @@ namespace SelectNextOccurrence
             return (Start != null && End != null);
         }
 
+        internal bool IsReversed(ITextSnapshot snapshot)
+        {
+            return Caret.GetPosition(snapshot) == Start?.GetPosition(snapshot);
+        }
+
         internal bool Reversing(ITextSnapshot snapshot)
         {
             return Caret.GetPosition(snapshot) < End?.GetPosition(snapshot);
