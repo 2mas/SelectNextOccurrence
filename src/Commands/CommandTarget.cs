@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Windows;
 using Microsoft.VisualStudio;
@@ -68,6 +68,7 @@ namespace SelectNextOccurrence.Commands
             bool clearSelections = false;
             bool verticalMove = false;
             bool processReverseOrder = false;
+            bool invokeCommand = false;
 
             if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID
                 || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
@@ -141,7 +142,7 @@ namespace SelectNextOccurrence.Commands
                         case ((uint)VSConstants.VSStd2KCmdID.SELUPCASE):
                         case ((uint)VSConstants.VSStd2KCmdID.COMMENT_BLOCK):
                         case ((uint)VSConstants.VSStd2KCmdID.UNCOMMENT_BLOCK):
-                            modifySelections = true;
+                            invokeCommand = true;
                             break;
                     }
                 }
@@ -151,10 +152,10 @@ namespace SelectNextOccurrence.Commands
                     switch (nCmdID)
                     {
                         case ((uint)VSConstants.VSStd12CmdID.MoveSelLinesUp):
-                            modifySelections = true;
+                            invokeCommand = true;
                             break;
                         case ((uint)VSConstants.VSStd12CmdID.MoveSelLinesDown):
-                            modifySelections = true;
+                            invokeCommand = true;
                             processReverseOrder = true;
                             break;
                     }
@@ -168,6 +169,7 @@ namespace SelectNextOccurrence.Commands
                     clearSelections,
                     verticalMove,
                     processReverseOrder,
+                    invokeCommand,
                     ref pguidCmdGroup,
                     nCmdID,
                     nCmdexecopt,
@@ -253,7 +255,17 @@ namespace SelectNextOccurrence.Commands
             }
         }
 
-        private int ProcessSelections(bool modifySelections, bool clearSelections, bool verticalMove, bool processReverseOrder, ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        private int ProcessSelections(
+            bool modifySelections,
+            bool clearSelections,
+            bool verticalMove,
+            bool processReverseOrder,
+            bool invokeCommand,
+            ref Guid pguidCmdGroup,
+            uint nCmdID,
+            uint nCmdexecopt,
+            IntPtr pvaIn,
+            IntPtr pvaOut)
         {
             int result = VSConstants.S_OK;
 
@@ -294,7 +306,7 @@ namespace SelectNextOccurrence.Commands
 
                 selection.Caret = Snapshot.CreateTrackingPoint(position, PointTrackingMode.Positive);
 
-                //view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+                view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
 
                 if (view.Selection.IsEmpty)
                 {
@@ -305,29 +317,19 @@ namespace SelectNextOccurrence.Commands
 
                 if (modifySelections)
                 {
+                    selection.SetSelection(previousCaretPosition, Snapshot);
+                    view.Selection.Clear();
+                }
+
+                if (invokeCommand)
+                {
                     var newSpan = view.Selection.StreamSelectionSpan;
 
-                    if (view.Selection.IsReversed)
+                    if (!view.Selection.IsEmpty)
                     {
                         selection.Start = Snapshot.CreateTrackingPoint(
                             newSpan.Start.Position.Position > newSpan.End.Position.Position ?
                             newSpan.End.Position.Position
-                            : selection.Caret.GetPosition(Snapshot),
-                            PointTrackingMode.Positive
-                        );
-
-                        selection.End = Snapshot.CreateTrackingPoint(
-                            newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                            selection.Caret.GetPosition(Snapshot)
-                            : newSpan.End.Position.Position,
-                            PointTrackingMode.Positive
-                        );
-                    }
-                    else
-                    {
-                        selection.Start = Snapshot.CreateTrackingPoint(
-                            newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                            selection.Caret.GetPosition(Snapshot)
                             : newSpan.Start.Position.Position,
                             PointTrackingMode.Positive
                         );
@@ -335,11 +337,10 @@ namespace SelectNextOccurrence.Commands
                         selection.End = Snapshot.CreateTrackingPoint(
                             newSpan.Start.Position.Position > newSpan.End.Position.Position ?
                             newSpan.Start.Position.Position
-                            : selection.Caret.GetPosition(Snapshot),
+                            : newSpan.End.Position.Position,
                             PointTrackingMode.Positive
                         );
                     }
-
 
                     view.Selection.Clear();
                 }

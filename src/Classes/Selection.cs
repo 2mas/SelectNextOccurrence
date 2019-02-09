@@ -50,6 +50,51 @@ namespace SelectNextOccurrence
             return Caret.GetPosition(snapshot) < End?.GetPosition(snapshot);
         }
 
+
+        internal void SetSelection(int previousCaretPosition, ITextSnapshot Snapshot)
+        {
+            var caretPosition = Caret.GetPosition(Snapshot);
+
+            if (IsSelection())
+            {
+                var startPosition = Start.GetPosition(Snapshot);
+                var endPosition = End.GetPosition(Snapshot);
+                if (caretPosition < startPosition && startPosition < previousCaretPosition)
+                {
+                    End = Start;
+                    Start = Caret;
+                }
+                else if (previousCaretPosition < endPosition && endPosition < caretPosition)
+                {
+                    Start = End;
+                    End = Caret;
+                }
+                else if (caretPosition > startPosition && startPosition != previousCaretPosition)
+                {
+                    End = Caret;
+                }
+                else
+                {
+                    Start = Caret;
+                }
+            }
+            else
+            {
+                Start = caretPosition > previousCaretPosition ?
+                    Snapshot.CreateTrackingPoint(previousCaretPosition, PointTrackingMode.Positive)
+                    : Caret;
+
+                End = caretPosition > previousCaretPosition ?
+                    Caret
+                    : Snapshot.CreateTrackingPoint(previousCaretPosition, PointTrackingMode.Positive);
+            }
+            if (Start.GetPosition(Snapshot) == End.GetPosition(Snapshot))
+            {
+                Start = null;
+                End = null;
+            }
+        }
+
         /// <summary>
         /// Gets the caret column position when moving caret vertically.
         /// If the Caret is already on first or last line the caret is set
