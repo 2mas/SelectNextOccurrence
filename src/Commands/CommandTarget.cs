@@ -346,6 +346,11 @@ namespace SelectNextOccurrence.Commands
                 }
             }
 
+            if (modifySelections)
+            {
+                Selector.CombineOverlappingSelections();
+            }
+
             if (processReverseOrder) Selector.Selections.Reverse();
 
             if (Selector.Dte.UndoContext.IsOpen)
