@@ -45,12 +45,6 @@ namespace SelectNextOccurrence
             return Caret.GetPosition(snapshot) == Start?.GetPosition(snapshot);
         }
 
-        internal bool Reversing(ITextSnapshot snapshot)
-        {
-            return Caret.GetPosition(snapshot) < End?.GetPosition(snapshot);
-        }
-
-
         internal void SetSelection(int previousCaretPosition, ITextSnapshot Snapshot)
         {
             var caretPosition = Caret.GetPosition(Snapshot);

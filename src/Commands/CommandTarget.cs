@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows;
 using Microsoft.VisualStudio;
@@ -306,8 +306,6 @@ namespace SelectNextOccurrence.Commands
 
                 selection.Caret = Snapshot.CreateTrackingPoint(position, PointTrackingMode.Positive);
 
-                view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
-
                 if (view.Selection.IsEmpty)
                 {
                     selection.Start = null;
@@ -367,6 +365,8 @@ namespace SelectNextOccurrence.Commands
                     endPosition - startPosition
                 );
             }
+
+            view.Caret.MoveTo(Selector.Selections.Last().Caret.GetPoint(Snapshot));
 
             // Goes to caret-only mode
             if (clearSelections)

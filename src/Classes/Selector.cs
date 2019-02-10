@@ -393,7 +393,7 @@ namespace SelectNextOccurrence
                         selection.Start.GetPosition(Snapshot),
                         PointTrackingMode.Positive
                     );
-                    if (IsReversing)
+                    if (selection.IsReversed(Snapshot))
                     {
                         nextSelection.Caret = selection.Caret;
                     }
