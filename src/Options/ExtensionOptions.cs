@@ -28,10 +28,7 @@ namespace SelectNextOccurrence.Options
             {
                 ThreadHelper.ThrowIfNotOnUIThread();
 
-                if (instance == null)
-                {
-                    instance = new ExtensionOptions();
-                }
+                if (instance == null) instance = new ExtensionOptions();
 
                 instance.LoadSettingsFromStorage();
                 return instance;
@@ -48,16 +45,16 @@ namespace SelectNextOccurrence.Options
         public override void SaveSettingsToStorage()
         {
             SettingsManager settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
-            WritableSettingsStore settingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
+            var settingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
 
             if (!settingsStore.CollectionExists(CollectionName))
             {
                 settingsStore.CreateCollection(CollectionName);
             }
 
-            foreach (PropertyInfo property in GetOptionProperties())
+            foreach (var property in GetOptionProperties())
             {
-                string output = SerializeValue(property.GetValue(this));
+                var output = SerializeValue(property.GetValue(this));
                 settingsStore.SetString(CollectionName, property.Name, output);
             }
 
@@ -67,19 +64,19 @@ namespace SelectNextOccurrence.Options
         public override void LoadSettingsFromStorage()
         {
             SettingsManager settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
-            SettingsStore settingsStore = settingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
+            var settingsStore = settingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
 
             if (!settingsStore.CollectionExists(CollectionName))
             {
                 return;
             }
 
-            foreach (PropertyInfo property in GetOptionProperties())
+            foreach (var property in GetOptionProperties())
             {
                 try
                 {
-                    string serializedProp = settingsStore.GetString(CollectionName, property.Name);
-                    object value = DeserializeValue(serializedProp, property.PropertyType);
+                    var serializedProp = settingsStore.GetString(CollectionName, property.Name);
+                    var value = DeserializeValue(serializedProp, property.PropertyType);
                     property.SetValue(this, value);
                 }
                 catch (Exception ex)
@@ -121,7 +118,7 @@ namespace SelectNextOccurrence.Options
         /// </summary>
         protected virtual object DeserializeValue(string value, Type type)
         {
-            byte[] b = Convert.FromBase64String(value);
+            var b = Convert.FromBase64String(value);
 
             using (var stream = new MemoryStream(b))
             {

@@ -21,75 +21,75 @@ namespace SelectNextOccurrence
 
             if (this.ServiceProvider.GetService(typeof(IMenuCommandService)) is OleMenuCommandService commandService)
             {
-                var ConvertSelectionToMultipleCursorsCmd = new MenuCommand(
+                var convertSelectionToMultipleCursorsCmd = new MenuCommand(
                     this.ConvertSelectionToMultipleCursorsCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.ConvertSelectiontoMultipleCursorsCommandId)
                 );
 
-                commandService.AddCommand(ConvertSelectionToMultipleCursorsCmd);
+                commandService.AddCommand(convertSelectionToMultipleCursorsCmd);
 
-                var SelectNextOccurrenceCmd = new MenuCommand(
+                var selectNextOccurrenceCmd = new MenuCommand(
                     this.SelectNextOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectNextOccurrenceCommandId)
                 );
 
-                commandService.AddCommand(SelectNextOccurrenceCmd);
+                commandService.AddCommand(selectNextOccurrenceCmd);
 
-                var SelectNextExactOccurrenceCmd = new MenuCommand(
+                var selectNextExactOccurrenceCmd = new MenuCommand(
                     this.SelectNextExactOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectNextExactOccurrenceCommandId)
                 );
 
-                commandService.AddCommand(SelectNextExactOccurrenceCmd);
+                commandService.AddCommand(selectNextExactOccurrenceCmd);
 
-                var SelectPreviousExactOccurrenceCmd = new MenuCommand(
+                var selectPreviousExactOccurrenceCmd = new MenuCommand(
                     this.SelectPreviousExactOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectPreviousExactOccurrenceCommandId)
                 );
 
-                commandService.AddCommand(SelectPreviousExactOccurrenceCmd);
+                commandService.AddCommand(selectPreviousExactOccurrenceCmd);
 
-                var SelectPreviousOccurrenceCmd = new MenuCommand(
+                var selectPreviousOccurrenceCmd = new MenuCommand(
                     this.SelectPreviousOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectPreviousOccurrenceCommandId)
                 );
 
-                commandService.AddCommand(SelectPreviousOccurrenceCmd);
+                commandService.AddCommand(selectPreviousOccurrenceCmd);
 
-                var SkipOccurrenceCmd = new MenuCommand(
+                var skipOccurrenceCmd = new MenuCommand(
                     this.SkipOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SkipOccurrenceCommandId)
                 );
 
-                commandService.AddCommand(SkipOccurrenceCmd);
+                commandService.AddCommand(skipOccurrenceCmd);
 
-                var UndoOccurrenceCmd = new MenuCommand(
+                var undoOccurrenceCmd = new MenuCommand(
                     this.UndoOccurrenceCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.UndoOccurrenceCommandId)
                 );
 
-                commandService.AddCommand(UndoOccurrenceCmd);
+                commandService.AddCommand(undoOccurrenceCmd);
 
-                var AddCaretAboveCmd = new MenuCommand(
+                var addCaretAboveCmd = new MenuCommand(
                     this.AddCaretAboveCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.AddCaretAboveCommandId)
                 );
 
-                commandService.AddCommand(AddCaretAboveCmd);
+                commandService.AddCommand(addCaretAboveCmd);
 
-                var AddCaretBelowCmd = new MenuCommand(
+                var addCaretBelowCmd = new MenuCommand(
                     this.AddCaretBelowCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.AddCaretBelowCommandId)
                 );
 
-                commandService.AddCommand(AddCaretBelowCmd);
+                commandService.AddCommand(addCaretBelowCmd);
 
-                var SelectAllOccurrencesCmd = new MenuCommand(
+                var selectAllOccurrencesCmd = new MenuCommand(
                     this.SelectAllOccurrencesCallback,
                     new CommandID(PackageGuids.guidNextOccurrenceCommandsPackageCmdSet, PackageIds.SelectAllOccurrencesCommandId)
                 );
 
-                commandService.AddCommand(SelectAllOccurrencesCmd);
+                commandService.AddCommand(selectAllOccurrencesCmd);
             }
         }
 
@@ -106,13 +106,7 @@ namespace SelectNextOccurrence
         /// <summary>
         /// Gets the service provider from the owner package.
         /// </summary>
-        private IServiceProvider ServiceProvider
-        {
-            get
-            {
-                return this.package;
-            }
-        }
+        private IServiceProvider ServiceProvider => this.package;
 
         /// <summary>
         /// Initializes the singleton instance of the command.

@@ -279,8 +279,8 @@ namespace SelectNextOccurrence
             var start = View.Selection.Start.Position.Position;
             var end = View.Selection.End.Position.Position;
 
-            int beginLineNumber = Snapshot.GetLineFromPosition(start).LineNumber;
-            int endLineNumber = Snapshot.GetLineFromPosition(end).LineNumber;
+            var beginLineNumber = Snapshot.GetLineFromPosition(start).LineNumber;
+            var endLineNumber = Snapshot.GetLineFromPosition(end).LineNumber;
 
             if (beginLineNumber != endLineNumber)
             {

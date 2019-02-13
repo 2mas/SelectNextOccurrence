@@ -45,14 +45,14 @@ namespace SelectNextOccurrence
             return Caret.GetPosition(snapshot) == Start?.GetPosition(snapshot);
         }
 
-        internal void SetSelection(int previousCaretPosition, ITextSnapshot Snapshot)
+        internal void SetSelection(int previousCaretPosition, ITextSnapshot snapshot)
         {
-            var caretPosition = Caret.GetPosition(Snapshot);
+            var caretPosition = Caret.GetPosition(snapshot);
 
             if (IsSelection())
             {
-                var startPosition = Start.GetPosition(Snapshot);
-                var endPosition = End.GetPosition(Snapshot);
+                var startPosition = Start.GetPosition(snapshot);
+                var endPosition = End.GetPosition(snapshot);
                 if (caretPosition < startPosition && startPosition < previousCaretPosition)
                 {
                     End = Start;
@@ -75,14 +75,14 @@ namespace SelectNextOccurrence
             else
             {
                 Start = caretPosition > previousCaretPosition ?
-                    Snapshot.CreateTrackingPoint(previousCaretPosition, PointTrackingMode.Positive)
+                    snapshot.CreateTrackingPoint(previousCaretPosition, PointTrackingMode.Positive)
                     : Caret;
 
                 End = caretPosition > previousCaretPosition ?
                     Caret
-                    : Snapshot.CreateTrackingPoint(previousCaretPosition, PointTrackingMode.Positive);
+                    : snapshot.CreateTrackingPoint(previousCaretPosition, PointTrackingMode.Positive);
             }
-            if (Start.GetPosition(Snapshot) == End.GetPosition(Snapshot))
+            if (Start.GetPosition(snapshot) == End.GetPosition(snapshot))
             {
                 Start = null;
                 End = null;

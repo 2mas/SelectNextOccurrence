@@ -2,7 +2,7 @@
 
 namespace SelectNextOccurrence.Options
 {
-    class ExtensionSettingAttribute : Attribute
+    internal class ExtensionSettingAttribute : Attribute
     {
     }
 }
