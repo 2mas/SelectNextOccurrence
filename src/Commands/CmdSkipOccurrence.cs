@@ -15,16 +15,16 @@ namespace SelectNextOccurrence.Commands
         /// <param name="e"></param>
         internal override void OnCommandInvoked(object sender, EventArgs e)
         {
-            if (!view.HasAggregateFocus)
+            if (!View.HasAggregateFocus)
                 return;
 
-            adornmentLayer.Selector.SelectNextOccurrence();
+            AdornmentLayer.Selector.SelectNextOccurrence();
 
-            if (adornmentLayer.Selector.Selections.Count > 1)
-                adornmentLayer.Selector.Selections.RemoveAt(adornmentLayer.Selector.Selections.Count - 2);
+            if (AdornmentLayer.Selector.Selections.Count > 1)
+                AdornmentLayer.Selector.Selections.RemoveAt(AdornmentLayer.Selector.Selections.Count - 2);
 
-            if (adornmentLayer.Selector.Selections.Any())
-                adornmentLayer.DrawAdornments();
+            if (AdornmentLayer.Selector.Selections.Any())
+                AdornmentLayer.DrawAdornments();
         }
     }
 }

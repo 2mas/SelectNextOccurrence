@@ -18,17 +18,16 @@ namespace SelectNextOccurrence
     {
         #region members
 
+        internal Selector Selector;
+        internal ITextSnapshot Snapshot => this.view.TextSnapshot;
+
         private readonly IAdornmentLayer layer;
 
         private readonly IWpfTextView view;
 
-        internal ITextSnapshot Snapshot { get { return this.view.TextSnapshot; } }
-
         private Brush caretBrush;
 
         private Brush selectionBrush;
-
-        internal Selector Selector;
 
         #endregion
 
@@ -97,7 +96,7 @@ namespace SelectNextOccurrence
                 return;
             }
 
-            IEditorFormatMap formatMap = formatMapService.GetEditorFormatMap(view);
+            var formatMap = formatMapService.GetEditorFormatMap(view);
 
             var dictPlainText = formatMap.GetProperties("Plain Text");
             caretBrush = (SolidColorBrush)dictPlainText[EditorFormatDefinition.ForegroundBrushId];
@@ -138,7 +137,7 @@ namespace SelectNextOccurrence
             }
 
             var span = new SnapshotSpan(caretPoint.GetPoint(Snapshot), 1);
-            Geometry geometry = view.TextViewLines.GetTextMarkerGeometry(span);
+            var geometry = view.TextViewLines.GetTextMarkerGeometry(span);
 
             if (geometry != null)
             {
@@ -148,7 +147,7 @@ namespace SelectNextOccurrence
                     geometry
                 );
 
-                Rectangle rectangle = new Rectangle()
+                var rectangle = new Rectangle()
                 {
                     Fill = caretBrush,
                     Width = drawing.Bounds.Width / 6,
@@ -165,7 +164,7 @@ namespace SelectNextOccurrence
 
         private void DrawSelection(Selection selection)
         {
-            Geometry geometry = view.TextViewLines.GetMarkerGeometry(
+            var geometry = view.TextViewLines.GetMarkerGeometry(
                     new SnapshotSpan(
                         selection.Start.GetPoint(Snapshot),
                         selection.End.GetPoint(Snapshot)
@@ -202,7 +201,5 @@ namespace SelectNextOccurrence
             }
         }
         #endregion
-
-
     }
 }

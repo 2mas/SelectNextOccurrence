@@ -15,9 +15,9 @@ namespace SelectNextOccurrence.Commands
     {
         private readonly IWpfTextView view;
 
-        private ITextSnapshot Snapshot { get { return this.view.TextSnapshot; } }
+        private ITextSnapshot Snapshot => this.view.TextSnapshot;
 
-        private Selector Selector { get { return this.adornmentLayer.Selector; } }
+        private Selector Selector => this.adornmentLayer.Selector;
 
         private readonly AdornmentLayer adornmentLayer;
 
@@ -38,7 +38,7 @@ namespace SelectNextOccurrence.Commands
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             // Return not supported when the command does nothing
-            int result = unchecked((int)Constants.OLECMDERR_E_NOTSUPPORTED);
+            var result = unchecked((int)Constants.OLECMDERR_E_NOTSUPPORTED);
 
             if (pguidCmdGroup == VSConstants.VSStd2K)
             {
@@ -64,10 +64,10 @@ namespace SelectNextOccurrence.Commands
             if (!Selector.Selections.Any())
                 return ProcessSingleCursor(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut, ref result);
 
-            bool modifySelections = false;
-            bool clearSelections = false;
-            bool verticalMove = false;
-            bool processReverseOrder = false;
+            var modifySelections = false;
+            var clearSelections = false;
+            var verticalMove = false;
+            var processReverseOrder = false;
 
             if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID
                 || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
@@ -84,7 +84,7 @@ namespace SelectNextOccurrence.Commands
                             // Only multi-paste different texts if all our selections have been copied with 
                             // this extension, otherwise paste as default. 
                             // Copied text get reset when new new selections are added
-                            if (Selector.Selections.All(s => !String.IsNullOrEmpty(s.CopiedText)))
+                            if (Selector.Selections.All(s => !string.IsNullOrEmpty(s.CopiedText)))
                             {
                                 return HandleMultiPaste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                             }
@@ -228,8 +228,8 @@ namespace SelectNextOccurrence.Commands
 
                 if (Selector.SavedClipboard.Count() > 1)
                 {
-                    int count = 1;
-                    int clipboardCount = Selector.SavedClipboard.Count();
+                    var count = 1;
+                    var clipboardCount = Selector.SavedClipboard.Count();
 
                     if (!Selector.Dte.UndoContext.IsOpen)
                         Selector.Dte.UndoContext.Open(Vsix.Name);
@@ -241,7 +241,7 @@ namespace SelectNextOccurrence.Commands
 
                         if (count < clipboardCount)
                         {
-                            Selector.editorOperations.InsertNewLine();
+                            Selector.EditorOperations.InsertNewLine();
                             count++;
                         }
                     }
@@ -273,7 +273,7 @@ namespace SelectNextOccurrence.Commands
 
         private int ProcessSelections(bool modifySelections, bool clearSelections, bool verticalMove, bool processReverseOrder, ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            int result = VSConstants.S_OK;
+            var result = VSConstants.S_OK;
 
             if (!Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Open(Vsix.Name);
@@ -383,7 +383,7 @@ namespace SelectNextOccurrence.Commands
         /// <returns></returns>
         private int HandleMultiCopyCut(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            int result = VSConstants.S_OK;
+            var result = VSConstants.S_OK;
 
             if (!Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Open(Vsix.Name);
@@ -426,14 +426,14 @@ namespace SelectNextOccurrence.Commands
         /// <returns></returns>
         private int HandleMultiPaste(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            int result = VSConstants.S_OK;
+            var result = VSConstants.S_OK;
 
             if (!Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Open(Vsix.Name);
 
             foreach (var selection in Selector.Selections)
             {
-                if (!String.IsNullOrEmpty(selection.CopiedText))
+                if (!string.IsNullOrEmpty(selection.CopiedText))
                 {
                     if (selection.IsSelection())
                     {

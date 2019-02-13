@@ -15,15 +15,15 @@ namespace SelectNextOccurrence.Commands
         /// <param name="e"></param>
         internal override void OnCommandInvoked(object sender, EventArgs e)
         {
-            if (!view.HasAggregateFocus)
+            if (!View.HasAggregateFocus)
                 return;
 
-            adornmentLayer.Selector.SelectNextOccurrence(reverseDirection: false, exactMatch: true);
+            AdornmentLayer.Selector.SelectNextOccurrence(reverseDirection: false, exactMatch: true);
 
-            if (adornmentLayer.Selector.Selections.Any())
-                adornmentLayer.DrawAdornments();
+            if (AdornmentLayer.Selector.Selections.Any())
+                AdornmentLayer.DrawAdornments();
 
-            adornmentLayer.Selector.IsReversing = false;
+            AdornmentLayer.Selector.IsReversing = false;
         }
     }
 }

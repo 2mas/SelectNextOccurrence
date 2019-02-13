@@ -16,20 +16,20 @@ namespace SelectNextOccurrence.Commands
         /// <param name="e"></param>
         internal override void OnCommandInvoked(object sender, EventArgs e)
         {
-            if (!view.HasAggregateFocus)
+            if (!View.HasAggregateFocus)
                 return;
 
-            if (adornmentLayer.Selector.Selections.Count > 1)
-                adornmentLayer.Selector.Selections.RemoveAt(adornmentLayer.Selector.Selections.Count - 1);
+            if (AdornmentLayer.Selector.Selections.Count > 1)
+                AdornmentLayer.Selector.Selections.RemoveAt(AdornmentLayer.Selector.Selections.Count - 1);
 
-            if (adornmentLayer.Selector.Selections.Any())
+            if (AdornmentLayer.Selector.Selections.Any())
             {
-                adornmentLayer.DrawAdornments();
+                AdornmentLayer.DrawAdornments();
 
-                view.Caret.MoveTo(adornmentLayer.Selector.Selections.Last().Caret.GetPoint(adornmentLayer.Snapshot));
-                view.ViewScroller.EnsureSpanVisible(
+                View.Caret.MoveTo(AdornmentLayer.Selector.Selections.Last().Caret.GetPoint(AdornmentLayer.Snapshot));
+                View.ViewScroller.EnsureSpanVisible(
                     new SnapshotSpan(
-                        view.Caret.Position.BufferPosition,
+                        View.Caret.Position.BufferPosition,
                         0
                     )
                 );

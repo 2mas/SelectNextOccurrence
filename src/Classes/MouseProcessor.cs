@@ -22,13 +22,9 @@ namespace SelectNextOccurrence
     class MouseProcessor : IMouseProcessor
     {
         private readonly IWpfTextView textView;
-        private AdornmentLayer adornmentLayer
-        {
-            get
-            {
-                return this.textView.Properties.GetProperty<AdornmentLayer>(typeof(AdornmentLayer));
-            }
-        }
+
+        private AdornmentLayer AdornmentLayer => this.textView.Properties
+            .GetProperty<AdornmentLayer>(typeof(AdornmentLayer));
 
         public MouseProcessor(IWpfTextView wpfTextView)
         {
@@ -43,24 +39,24 @@ namespace SelectNextOccurrence
         public void PostprocessMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             // Only act on single clicks, not selections
-            if (adornmentLayer != null && textView.Selection.IsEmpty)
+            if (AdornmentLayer != null && textView.Selection.IsEmpty)
             {
                 if (ExtensionOptions.Instance.AddMouseCursors && CheckModifiers())
                 {
-                    if (adornmentLayer.Selector.stashedCaret != null)
-                        adornmentLayer.Selector.ApplyStashedCaretPosition();
+                    if (AdornmentLayer.Selector.StashedCaret != null)
+                        AdornmentLayer.Selector.ApplyStashedCaretPosition();
 
-                    adornmentLayer.Selector.AddCurrentCaretToSelections();
+                    AdornmentLayer.Selector.AddCurrentCaretToSelections();
                 }
                 else
                 {
-                    adornmentLayer.Selector.DiscardSelections();
+                    AdornmentLayer.Selector.DiscardSelections();
                 }
 
-                adornmentLayer.DrawAdornments();
+                AdornmentLayer.DrawAdornments();
             }
 
-            adornmentLayer.Selector.ClearStashedCaretPosition();
+            AdornmentLayer?.Selector.ClearStashedCaretPosition();
         }
 
         /// <summary>
@@ -74,18 +70,18 @@ namespace SelectNextOccurrence
                 return;
 
             // Only act on single clicks, not selections
-            if (adornmentLayer != null
+            if (AdornmentLayer != null
                 && textView.Selection.IsEmpty
-                && adornmentLayer.Selector.Selections.Count == 0)
+                && AdornmentLayer.Selector.Selections.Count == 0)
             {
                 if (CheckModifiers())
                 {
-                    adornmentLayer.Selector.StashCurrentCaretPosition();
+                    AdornmentLayer.Selector.StashCurrentCaretPosition();
                 }
                 else
                 {
-                    adornmentLayer.Selector.ClearStashedCaretPosition();
-                    adornmentLayer.Selector.DiscardSelections();
+                    AdornmentLayer.Selector.ClearStashedCaretPosition();
+                    AdornmentLayer.Selector.DiscardSelections();
                 }
             }
         }

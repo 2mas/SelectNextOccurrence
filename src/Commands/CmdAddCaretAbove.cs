@@ -15,17 +15,17 @@ namespace SelectNextOccurrence.Commands
         /// <param name="e"></param>
         internal override void OnCommandInvoked(object sender, EventArgs e)
         {
-            if (!view.HasAggregateFocus)
+            if (!View.HasAggregateFocus)
                 return;
 
-            if (!adornmentLayer.Selector.Selections.Any())
+            if (!AdornmentLayer.Selector.Selections.Any())
             {
                 // Add current caret
-                adornmentLayer.Selector.AddCurrentCaretToSelections();
+                AdornmentLayer.Selector.AddCurrentCaretToSelections();
             }
 
-            adornmentLayer.Selector.AddCaretAbove();
-            adornmentLayer.DrawAdornments();
+            AdornmentLayer.Selector.AddCaretAbove();
+            AdornmentLayer.DrawAdornments();
         }
     }
 }

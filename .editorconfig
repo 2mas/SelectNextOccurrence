@@ -88,7 +88,7 @@ dotnet_style_null_propagation                                                = t
 # C# Code Style Settings
 # Implicit and explicit types
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference#implicit-and-explicit-types
-csharp_style_var_for_built_in_types                                          = false : warning
+csharp_style_var_for_built_in_types                                          = true : warning
 csharp_style_var_when_type_is_apparent                                       = true : warning
 csharp_style_var_elsewhere                                                   = true : warning
 # Expression-bodied members

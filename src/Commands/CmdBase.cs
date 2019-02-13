@@ -5,14 +5,14 @@ namespace SelectNextOccurrence.Commands
 {
     internal abstract class CmdBase
     {
-        internal AdornmentLayer adornmentLayer;
+        internal AdornmentLayer AdornmentLayer;
 
-        internal IWpfTextView view;
+        internal IWpfTextView View;
 
         protected CmdBase(IWpfTextView view)
         {
-            this.view = view;
-            this.adornmentLayer = view.Properties
+            this.View = view;
+            this.AdornmentLayer = view.Properties
                 .GetProperty<AdornmentLayer>(typeof(AdornmentLayer));
         }
 

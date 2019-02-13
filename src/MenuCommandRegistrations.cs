@@ -17,15 +17,9 @@ namespace SelectNextOccurrence
         /// <param name="package"></param>
         private MenuCommandRegistrations(Package package)
         {
-            if (package == null)
-            {
-                throw new ArgumentNullException("package");
-            }
+            this.package = package ?? throw new ArgumentNullException("package");
 
-            this.package = package;
-
-            OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if (commandService != null)
+            if (this.ServiceProvider.GetService(typeof(IMenuCommandService)) is OleMenuCommandService commandService)
             {
                 var ConvertSelectionToMultipleCursorsCmd = new MenuCommand(
                     this.ConvertSelectionToMultipleCursorsCallback,
