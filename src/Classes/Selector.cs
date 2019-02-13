@@ -62,12 +62,6 @@ namespace SelectNextOccurrence
         internal string SearchText;
 
         /// <summary>
-        /// An indicator wether we are selecting rtl, reversing happens in the CommandTarget
-        /// when moving to the left while selecting
-        /// </summary>
-        internal bool IsReversing = false;
-
-        /// <summary>
         /// Saves a caretposition to be added to selections at a later time
         /// Usecase is when adding the first caret by mouse-clicking, checks needs to
         /// made when releasing the cursor
@@ -212,8 +206,6 @@ namespace SelectNextOccurrence
                 if (!string.IsNullOrEmpty(EditorOperations.SelectedText))
                     AddCurrentSelectionToSelections();
 
-                IsReversing = false;
-
                 return;
             }
 
@@ -267,8 +259,6 @@ namespace SelectNextOccurrence
 
                 View.Selection.Clear();
             }
-
-            IsReversing = false;
         }
 
         /// <summary>
@@ -381,6 +371,37 @@ namespace SelectNextOccurrence
                     .Select(s => s.First()).ToList();
 
                 Selections = distinctSelections;
+            }
+        }
+
+        internal void CombineOverlappingSelections()
+        {
+            var overlappingSelections = new List<int>();
+            var selections = Selections
+                .Where(s => s.IsSelection())
+                .Select((selection, index) => new { index, selection })
+                .OrderBy(s => s.selection.Caret.GetPoint(Snapshot))
+                .ToList();
+            for (var index = 0; index < selections.Count - 1; index++)
+            {
+                var selection = selections[index].selection;
+                var nextSelection = selections[index + 1].selection;
+                if (selection.End.GetPoint(Snapshot) > nextSelection.Start.GetPoint(Snapshot))
+                {
+                    nextSelection.Start = Snapshot.CreateTrackingPoint(
+                        selection.Start.GetPosition(Snapshot),
+                        PointTrackingMode.Positive
+                    );
+                    if (selection.IsReversed(Snapshot))
+                    {
+                        nextSelection.Caret = selection.Caret;
+                    }
+                    overlappingSelections.Add(selections[index].index);
+                }
+            }
+            foreach (var index in overlappingSelections.OrderByDescending(n => n))
+            {
+                Selections.RemoveAt(index);
             }
         }
 

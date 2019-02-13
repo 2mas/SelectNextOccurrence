@@ -68,6 +68,7 @@ namespace SelectNextOccurrence.Commands
             var clearSelections = false;
             var verticalMove = false;
             var processReverseOrder = false;
+            var invokeCommand = false;
 
             if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID
                 || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
@@ -92,7 +93,6 @@ namespace SelectNextOccurrence.Commands
                         case ((uint)VSConstants.VSStd97CmdID.Undo):
                         case ((uint)VSConstants.VSStd97CmdID.Redo):
                             result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                            Selector.IsReversing = false;
                             adornmentLayer.DrawAdornments();
                             return result;
                     }
@@ -105,7 +105,6 @@ namespace SelectNextOccurrence.Commands
                         case ((uint)VSConstants.VSStd2KCmdID.DOWN):
                             verticalMove = true;
                             clearSelections = true;
-                            Selector.IsReversing = false;
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.LEFT):
                         case ((uint)VSConstants.VSStd2KCmdID.RIGHT):
@@ -113,10 +112,8 @@ namespace SelectNextOccurrence.Commands
                         case ((uint)VSConstants.VSStd2KCmdID.WORDNEXT):
                             // Remove selected spans but keep carets
                             clearSelections = true;
-                            Selector.IsReversing = false;
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.CANCEL):
-                            Selector.IsReversing = false;
                             Selector.DiscardSelections();
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.PAGEDN):
@@ -126,40 +123,26 @@ namespace SelectNextOccurrence.Commands
                         case ((uint)VSConstants.VSStd2KCmdID.END_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.HOME_EXT):
                             Selector.DiscardSelections();
-                            Selector.IsReversing = false;
                             result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.UP_EXT):
+                        case ((uint)VSConstants.VSStd2KCmdID.DOWN_EXT):
                             verticalMove = true;
-                            Selector.IsReversing = Selector.Selections.All(s => !s.IsSelection())
-                                || Selector.IsReversing
-                                || Selector.Selections.Last().Reversing(Snapshot);
                             modifySelections = true;
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.WORDPREV_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.BOL_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.LEFT_EXT):
-                            Selector.IsReversing = Selector.Selections.All(s => !s.IsSelection())
-                                || Selector.IsReversing
-                                || Selector.Selections.Last().Reversing(Snapshot);
-                            modifySelections = true;
-                            break;
-                        case ((uint)VSConstants.VSStd2KCmdID.DOWN_EXT):
-                            verticalMove = true;
-                            Selector.IsReversing = !(Selector.Selections.All(s => !s.IsSelection()) || !Selector.IsReversing);
-                            modifySelections = true;
-                            break;
                         case ((uint)VSConstants.VSStd2KCmdID.WORDNEXT_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.EOL_EXT):
                         case ((uint)VSConstants.VSStd2KCmdID.RIGHT_EXT):
-                            Selector.IsReversing = !(Selector.Selections.All(s => !s.IsSelection()) || !Selector.IsReversing);
                             modifySelections = true;
                             break;
                         case ((uint)VSConstants.VSStd2KCmdID.SELLOWCASE):
                         case ((uint)VSConstants.VSStd2KCmdID.SELUPCASE):
                         case ((uint)VSConstants.VSStd2KCmdID.COMMENT_BLOCK):
                         case ((uint)VSConstants.VSStd2KCmdID.UNCOMMENT_BLOCK):
-                            modifySelections = true;
+                            invokeCommand = true;
                             break;
                     }
                 }
@@ -169,10 +152,10 @@ namespace SelectNextOccurrence.Commands
                     switch (nCmdID)
                     {
                         case ((uint)VSConstants.VSStd12CmdID.MoveSelLinesUp):
-                            modifySelections = true;
+                            invokeCommand = true;
                             break;
                         case ((uint)VSConstants.VSStd12CmdID.MoveSelLinesDown):
-                            modifySelections = true;
+                            invokeCommand = true;
                             processReverseOrder = true;
                             break;
                     }
@@ -186,6 +169,7 @@ namespace SelectNextOccurrence.Commands
                     clearSelections,
                     verticalMove,
                     processReverseOrder,
+                    invokeCommand,
                     ref pguidCmdGroup,
                     nCmdID,
                     nCmdexecopt,
@@ -271,7 +255,17 @@ namespace SelectNextOccurrence.Commands
             }
         }
 
-        private int ProcessSelections(bool modifySelections, bool clearSelections, bool verticalMove, bool processReverseOrder, ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        private int ProcessSelections(
+            bool modifySelections,
+            bool clearSelections,
+            bool verticalMove,
+            bool processReverseOrder,
+            bool invokeCommand,
+            ref Guid pguidCmdGroup,
+            uint nCmdID,
+            uint nCmdexecopt,
+            IntPtr pvaIn,
+            IntPtr pvaOut)
         {
             var result = VSConstants.S_OK;
 
@@ -289,11 +283,13 @@ namespace SelectNextOccurrence.Commands
                             selection.Start.GetPoint(Snapshot),
                             selection.End.GetPoint(Snapshot)
                         ),
-                        Selector.IsReversing
+                        selection.IsReversed(Snapshot)
                     );
                 }
 
                 view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+
+                var previousCaretPosition = selection.Caret.GetPosition(Snapshot);
 
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
@@ -310,8 +306,6 @@ namespace SelectNextOccurrence.Commands
 
                 selection.Caret = Snapshot.CreateTrackingPoint(position, PointTrackingMode.Positive);
 
-                view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
-
                 if (view.Selection.IsEmpty)
                 {
                     selection.Start = null;
@@ -321,24 +315,38 @@ namespace SelectNextOccurrence.Commands
 
                 if (modifySelections)
                 {
+                    selection.SetSelection(previousCaretPosition, Snapshot);
+                    view.Selection.Clear();
+                }
+
+                if (invokeCommand)
+                {
                     var newSpan = view.Selection.StreamSelectionSpan;
 
-                    selection.Start = Snapshot.CreateTrackingPoint(
-                        newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                        newSpan.End.Position.Position
-                        : newSpan.Start.Position.Position,
-                        PointTrackingMode.Positive
-                    );
+                    if (!view.Selection.IsEmpty)
+                    {
+                        selection.Start = Snapshot.CreateTrackingPoint(
+                            newSpan.Start.Position.Position > newSpan.End.Position.Position ?
+                            newSpan.End.Position.Position
+                            : newSpan.Start.Position.Position,
+                            PointTrackingMode.Positive
+                        );
 
-                    selection.End = Snapshot.CreateTrackingPoint(
-                        newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                        newSpan.Start.Position.Position
-                        : newSpan.End.Position.Position,
-                        PointTrackingMode.Positive
-                    );
+                        selection.End = Snapshot.CreateTrackingPoint(
+                            newSpan.Start.Position.Position > newSpan.End.Position.Position ?
+                            newSpan.Start.Position.Position
+                            : newSpan.End.Position.Position,
+                            PointTrackingMode.Positive
+                        );
+                    }
 
                     view.Selection.Clear();
                 }
+            }
+
+            if (modifySelections)
+            {
+                Selector.CombineOverlappingSelections();
             }
 
             if (processReverseOrder) Selector.Selections.Reverse();
@@ -357,6 +365,8 @@ namespace SelectNextOccurrence.Commands
                     endPosition - startPosition
                 );
             }
+
+            view.Caret.MoveTo(Selector.Selections.Last().Caret.GetPoint(Snapshot));
 
             // Goes to caret-only mode
             if (clearSelections)
@@ -406,7 +416,7 @@ namespace SelectNextOccurrence.Commands
                 }
             }
 
-            Selector.SavedClipboard = Selector.Selections.Where(s => !String.IsNullOrEmpty(s.CopiedText))
+            Selector.SavedClipboard = Selector.Selections.Where(s => !string.IsNullOrEmpty(s.CopiedText))
                 .Select(s => s.CopiedText);
 
             if (Selector.Dte.UndoContext.IsOpen)

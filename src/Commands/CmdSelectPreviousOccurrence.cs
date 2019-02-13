@@ -22,8 +22,6 @@ namespace SelectNextOccurrence.Commands
 
             if (AdornmentLayer.Selector.Selections.Any())
                 AdornmentLayer.DrawAdornments();
-
-            AdornmentLayer.Selector.IsReversing = false;
         }
     }
 }
