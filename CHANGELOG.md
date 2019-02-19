@@ -10,6 +10,12 @@
 
 # Change log
 
+#### 1.3.69
+- [x] Improved vertical caret movement by keeping column position
+- [x] Combines overlapping selections
+- [x] Added support for comment/uncomment on multiple selections
+- [x] Fixed moving multiple consequitive lines
+
 #### 1.3.52
 - [x] Keeping selections when invoking Edit.MakeUppercase and Edit.MakeLowercase - thanks @ Mr-Badger
 
