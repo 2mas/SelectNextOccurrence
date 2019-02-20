@@ -326,7 +326,6 @@ namespace SelectNextOccurrence.Commands
                 else if (modifySelections)
                 {
                     selection.SetSelection(previousCaretPosition, Snapshot);
-                    view.Selection.Clear();
                 }
 
                 if (invokeCommand)
@@ -349,8 +348,6 @@ namespace SelectNextOccurrence.Commands
                             PointTrackingMode.Positive
                         );
                     }
-
-                    view.Selection.Clear();
                 }
             }
 
@@ -375,6 +372,7 @@ namespace SelectNextOccurrence.Commands
             }
 
             view.Caret.MoveTo(Selector.Selections.Last().Caret.GetPoint(Snapshot));
+            view.Selection.Clear();
 
             // Goes to caret-only mode
             if (clearSelections)
