@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Windows;
 using Microsoft.VisualStudio;
@@ -315,17 +315,8 @@ namespace SelectNextOccurrence.Commands
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
                 var position = view.Caret.Position.BufferPosition.Position;
-                if (verticalMove)
-                {
-                    position = selection.GetCaretColumnPosition(position, Snapshot);
-                }
-                else
-                {
-                    var caretLine = Snapshot.GetLineFromPosition(position);
-                    selection.ColumnPosition = position - caretLine.Start.Position;
-                }
 
-                selection.Caret = Snapshot.CreateTrackingPoint(position, PointTrackingMode.Positive);
+                selection.SetCaretPosition(position, verticalMove, Snapshot);
 
                 if (view.Selection.IsEmpty)
                 {
