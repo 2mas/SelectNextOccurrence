@@ -322,10 +322,8 @@ namespace SelectNextOccurrence.Commands
                 {
                     selection.Start = null;
                     selection.End = null;
-                    modifySelections = false;
                 }
-
-                if (modifySelections)
+                else if (modifySelections)
                 {
                     selection.SetSelection(previousCaretPosition, Snapshot);
                     view.Selection.Clear();
