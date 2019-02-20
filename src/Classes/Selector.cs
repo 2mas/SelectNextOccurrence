@@ -164,8 +164,10 @@ namespace SelectNextOccurrence
                 var start = Snapshot.CreateTrackingPoint(occurrence.Start, PointTrackingMode.Positive);
                 var end = Snapshot.CreateTrackingPoint(occurrence.End, PointTrackingMode.Positive);
 
+                var lastSelection = Selections.Last(s => s.IsSelection());
+
                 // If previous selection was reversed, set this caret to beginning of this selection
-                var caret = Selections.Last().Caret.GetPosition(Snapshot) == Selections.Last().Start.GetPosition(Snapshot) ?
+                var caret = lastSelection.Caret.GetPosition(Snapshot) == lastSelection.Start.GetPosition(Snapshot) ?
                     start : end;
 
                 Selections.Add(
@@ -234,18 +236,11 @@ namespace SelectNextOccurrence
                     // Start the search from previous end-position if it exists, otherwise caret
                     int startIndex;
 
-                    if (reverseDirection)
-                    {
-                        startIndex = Selections.Last().Start != null ?
-                            Selections.Last().Start.GetPosition(Snapshot)
-                            : Selections.Last().Caret.GetPosition(Snapshot);
-                    }
-                    else
-                    {
-                        startIndex = Selections.Last().End != null ?
-                            Selections.Last().End.GetPosition(Snapshot)
-                            : Selections.Last().Caret.GetPosition(Snapshot);
-                    }
+                    var lastSelection = Selections.Last(s => s.IsSelection());
+
+                    startIndex = reverseDirection ?
+                        lastSelection.Start.GetPosition(Snapshot)
+                        : lastSelection.End.GetPosition(Snapshot);
 
                     var occurrence = textSearchService.FindNext(
                         startIndex,
