@@ -321,6 +321,8 @@ namespace SelectNextOccurrence
                 EditorOperations.MoveLineUp(false);
                 AddCurrentCaretToSelections();
             }
+            Selections = Selections.OrderBy(n => n.Caret.GetPosition(Snapshot)).ToList();
+            View.Caret.MoveTo(Selections.First().Caret.GetPoint(Snapshot));
         }
 
         internal void AddCaretBelow()
@@ -331,6 +333,8 @@ namespace SelectNextOccurrence
                 EditorOperations.MoveLineDown(false);
                 AddCurrentCaretToSelections();
             }
+            Selections = Selections.OrderBy(n => n.Caret.GetPosition(Snapshot)).ToList();
+            View.Caret.MoveTo(Selections.Last().Caret.GetPoint(Snapshot));
         }
 
         internal void AddCurrentCaretToSelections()
