@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
@@ -201,11 +201,7 @@ namespace SelectNextOccurrence
             // Caret placed on a word, but nothing selected
             if (!Selections.Any() && View.Selection.IsEmpty)
             {
-                EditorOperations.SelectCurrentWord();
-
-                if (!string.IsNullOrEmpty(EditorOperations.SelectedText))
-                    AddCurrentSelectionToSelections();
-
+                SelectCurrentWord(View.Caret.Position.BufferPosition);
                 return;
             }
 
@@ -225,8 +221,7 @@ namespace SelectNextOccurrence
                     foreach (var selection in oldSelections)
                     {
                         View.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
-                        EditorOperations.SelectCurrentWord();
-                        AddCurrentSelectionToSelections();
+                        SelectCurrentWord(selection.Caret.GetPoint(Snapshot));
                     }
                 }
                 else
@@ -259,6 +254,28 @@ namespace SelectNextOccurrence
 
                 View.Selection.Clear();
             }
+        }
+
+        private void SelectCurrentWord(SnapshotPoint caretPosition)
+        {
+            EditorOperations.SelectCurrentWord();
+
+            if (string.IsNullOrEmpty(EditorOperations.SelectedText))
+                return;
+
+            if (EditorOperations.SelectedText.Length == 1 && GetCurrentColumnPosition(caretPosition) != 0)
+            {
+                View.Caret.MoveTo(caretPosition - 1);
+                EditorOperations.SelectCurrentWord();
+
+                if (EditorOperations.SelectedText.Length <= 1)
+                {
+                    View.Caret.MoveTo(caretPosition);
+                    EditorOperations.SelectCurrentWord();
+                }
+            }
+
+            AddCurrentSelectionToSelections();
         }
 
         /// <summary>
