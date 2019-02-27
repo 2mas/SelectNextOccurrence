@@ -260,22 +260,17 @@ namespace SelectNextOccurrence
         {
             EditorOperations.SelectCurrentWord();
 
-            var selectedText = EditorOperations.SelectedText;
-
-            if (selectedText.Length == 0)
+            if (EditorOperations.SelectedText.Length == 0)
                 return;
 
-            if (!char.IsLetterOrDigit(selectedText[0])
+            if (!char.IsLetterOrDigit(EditorOperations.SelectedText[0])
                 && GetCurrentColumnPosition(caretPosition) != 0)
             {
-                View.Caret.MoveTo(caretPosition - 1);
-                EditorOperations.SelectCurrentWord();
+                var previousChar = Snapshot.ToCharArray(caretPosition - 1, 1);
 
-                selectedText = EditorOperations.SelectedText;
-
-                if (selectedText.Length == 0 || !char.IsLetterOrDigit(selectedText[0]))
+                if (char.IsLetterOrDigit(previousChar[0]))
                 {
-                    View.Caret.MoveTo(caretPosition);
+                    View.Caret.MoveTo(caretPosition - 1);
                     EditorOperations.SelectCurrentWord();
                 }
             }
