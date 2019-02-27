@@ -262,11 +262,10 @@ namespace SelectNextOccurrence
 
             var selectedText = EditorOperations.SelectedText;
 
-            if (string.IsNullOrEmpty(selectedText))
+            if (selectedText.Length == 0)
                 return;
 
-            if (selectedText.Length == 1
-                && !char.IsLetterOrDigit(selectedText[0])
+            if (!char.IsLetterOrDigit(selectedText[0])
                 && GetCurrentColumnPosition(caretPosition) != 0)
             {
                 View.Caret.MoveTo(caretPosition - 1);
@@ -274,9 +273,7 @@ namespace SelectNextOccurrence
 
                 selectedText = EditorOperations.SelectedText;
 
-                if (selectedText.Length == 0
-                    || (selectedText.Length == 1
-                    && !char.IsLetterOrDigit(selectedText[0])))
+                if (selectedText.Length == 0 || !char.IsLetterOrDigit(selectedText[0]))
                 {
                     View.Caret.MoveTo(caretPosition);
                     EditorOperations.SelectCurrentWord();
