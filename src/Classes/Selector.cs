@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
@@ -260,15 +260,23 @@ namespace SelectNextOccurrence
         {
             EditorOperations.SelectCurrentWord();
 
-            if (string.IsNullOrEmpty(EditorOperations.SelectedText))
+            var selectedText = EditorOperations.SelectedText;
+
+            if (string.IsNullOrEmpty(selectedText))
                 return;
 
-            if (EditorOperations.SelectedText.Length == 1 && GetCurrentColumnPosition(caretPosition) != 0)
+            if (selectedText.Length == 1
+                && !char.IsLetterOrDigit(selectedText[0])
+                && GetCurrentColumnPosition(caretPosition) != 0)
             {
                 View.Caret.MoveTo(caretPosition - 1);
                 EditorOperations.SelectCurrentWord();
 
-                if (EditorOperations.SelectedText.Length <= 1)
+                selectedText = EditorOperations.SelectedText;
+
+                if (selectedText.Length == 0
+                    || (selectedText.Length == 1
+                    && !char.IsLetterOrDigit(selectedText[0])))
                 {
                     View.Caret.MoveTo(caretPosition);
                     EditorOperations.SelectCurrentWord();
