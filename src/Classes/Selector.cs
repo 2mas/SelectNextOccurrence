@@ -256,6 +256,12 @@ namespace SelectNextOccurrence
             }
         }
 
+        /// <summary>
+        /// Selects the current word at caret, but shifts the selection to
+        /// the left to the previous word if the character at the caretposition is not a letter or digit and is
+        /// immediately preceded by a word
+        /// </summary>
+        /// <param name="caretPosition"></param>
         private void SelectCurrentWord(SnapshotPoint caretPosition)
         {
             EditorOperations.SelectCurrentWord();
