@@ -359,8 +359,7 @@ namespace SelectNextOccurrence
         internal void AddCurrentCaretToSelections()
         {
             var caretPosition = View.Caret.Position.BufferPosition.Position;
-            if (!Selections.Any(s => s.Caret.GetPoint(Snapshot).Position == caretPosition)
-            )
+            if (!Selections.Any(s => s.Caret.GetPoint(Snapshot).Position == caretPosition))
             {
                 Selections.Add(
                     new Selection

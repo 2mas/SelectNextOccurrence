@@ -13,6 +13,8 @@ namespace SelectNextOccurrence.Commands
     /// </summary>
     class CommandTarget : IOleCommandTarget
     {
+        private enum ProcessOrder { Normal, TopToBottom, BottomToTop }
+
         private readonly IWpfTextView view;
 
         private ITextSnapshot Snapshot => this.view.TextSnapshot;
@@ -67,7 +69,7 @@ namespace SelectNextOccurrence.Commands
             var modifySelections = false;
             var clearSelections = false;
             var verticalMove = false;
-            var processReverseOrder = false;
+            var processOrder = ProcessOrder.Normal;
             var invokeCommand = false;
 
             if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID
@@ -153,10 +155,11 @@ namespace SelectNextOccurrence.Commands
                     {
                         case ((uint)VSConstants.VSStd12CmdID.MoveSelLinesUp):
                             invokeCommand = true;
+                            processOrder = ProcessOrder.TopToBottom;
                             break;
                         case ((uint)VSConstants.VSStd12CmdID.MoveSelLinesDown):
                             invokeCommand = true;
-                            processReverseOrder = true;
+                            processOrder = ProcessOrder.BottomToTop;
                             break;
                     }
                 }
@@ -168,7 +171,7 @@ namespace SelectNextOccurrence.Commands
                     modifySelections,
                     clearSelections,
                     verticalMove,
-                    processReverseOrder,
+                    processOrder,
                     invokeCommand,
                     ref pguidCmdGroup,
                     nCmdID,
@@ -259,7 +262,7 @@ namespace SelectNextOccurrence.Commands
             bool modifySelections,
             bool clearSelections,
             bool verticalMove,
-            bool processReverseOrder,
+            ProcessOrder processOrder,
             bool invokeCommand,
             ref Guid pguidCmdGroup,
             uint nCmdID,
@@ -272,9 +275,27 @@ namespace SelectNextOccurrence.Commands
             if (!Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Open(Vsix.Name);
 
-            if (processReverseOrder) Selector.Selections.Reverse();
+            // Contains the same selection-elements but possibly re-ordered
+            // Selector keeps original order to support undo
+            var selectionsToProcess = Selector.Selections;
 
-            foreach (var selection in Selector.Selections)
+            switch (processOrder)
+            {
+                case ProcessOrder.TopToBottom:
+                    selectionsToProcess = Selector.Selections
+                        .OrderBy(n => n.Caret.GetPosition(Snapshot)).ToList();
+                    break;
+                case ProcessOrder.BottomToTop:
+                    selectionsToProcess = Selector.Selections
+                        .OrderByDescending(n => n.Caret.GetPosition(Snapshot)).ToList();
+                    break;
+                case ProcessOrder.Normal:
+                default:
+                    selectionsToProcess = Selector.Selections;
+                    break;
+            }
+
+            foreach (var selection in selectionsToProcess)
             {
                 if (selection.IsSelection())
                 {
@@ -348,8 +369,6 @@ namespace SelectNextOccurrence.Commands
             {
                 Selector.CombineOverlappingSelections();
             }
-
-            if (processReverseOrder) Selector.Selections.Reverse();
 
             if (Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Close();
