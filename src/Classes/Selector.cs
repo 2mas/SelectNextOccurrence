@@ -165,7 +165,7 @@ namespace SelectNextOccurrence
                 var end = Snapshot.CreateTrackingPoint(occurrence.End, PointTrackingMode.Positive);
 
                 // If previous selection was reversed, set this caret to beginning of this selection
-                var caret = Selections.Last().Caret.GetPosition(Snapshot) == Selections.Last().Start.GetPosition(Snapshot) ?
+                var caret = Selections.Last().Caret.GetPosition(Snapshot) == Selections.Last().Start?.GetPosition(Snapshot) ?
                     start : end;
 
                 Selections.Add(
