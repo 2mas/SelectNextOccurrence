@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Windows;
 using Microsoft.VisualStudio;
@@ -315,29 +315,17 @@ namespace SelectNextOccurrence.Commands
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
                 var position = view.Caret.Position.BufferPosition.Position;
-                if (verticalMove)
-                {
-                    position = selection.GetCaretColumnPosition(position, Snapshot);
-                }
-                else
-                {
-                    var caretLine = Snapshot.GetLineFromPosition(position);
-                    selection.ColumnPosition = position - caretLine.Start.Position;
-                }
 
-                selection.Caret = Snapshot.CreateTrackingPoint(position, PointTrackingMode.Positive);
+                selection.SetCaretPosition(position, verticalMove, Snapshot);
 
                 if (view.Selection.IsEmpty)
                 {
                     selection.Start = null;
                     selection.End = null;
-                    modifySelections = false;
                 }
-
-                if (modifySelections)
+                else if (modifySelections)
                 {
                     selection.SetSelection(previousCaretPosition, Snapshot);
-                    view.Selection.Clear();
                 }
 
                 if (invokeCommand)
@@ -360,8 +348,6 @@ namespace SelectNextOccurrence.Commands
                             PointTrackingMode.Positive
                         );
                     }
-
-                    view.Selection.Clear();
                 }
             }
 
@@ -386,6 +372,7 @@ namespace SelectNextOccurrence.Commands
             }
 
             view.Caret.MoveTo(Selector.Selections.Last().Caret.GetPoint(Snapshot));
+            view.Selection.Clear();
 
             // Goes to caret-only mode
             if (clearSelections)

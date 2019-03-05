@@ -45,6 +45,20 @@ namespace SelectNextOccurrence
             return Caret.GetPosition(snapshot) == Start?.GetPosition(snapshot);
         }
 
+        internal void SetCaretPosition(int position, bool verticalMove, ITextSnapshot snapshot)
+        {
+            if (verticalMove)
+            {
+                position = GetCaretColumnPosition(position, snapshot);
+            }
+            else
+            {
+                ColumnPosition = position - snapshot.GetLineFromPosition(position).Start.Position;
+            }
+
+            Caret = snapshot.CreateTrackingPoint(position, PointTrackingMode.Positive);
+        }
+
         internal void SetSelection(int previousCaretPosition, ITextSnapshot snapshot)
         {
             var caretPosition = Caret.GetPosition(snapshot);
