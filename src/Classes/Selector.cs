@@ -212,6 +212,9 @@ namespace SelectNextOccurrence
             // Multiple selections
             if (Selections.Any())
             {
+                var orderedSelections = Selections.OrderBy(n => n.Caret.GetPosition(Snapshot));
+                var startSelection = reverseDirection ? orderedSelections.First() : orderedSelections.Last();
+
                 // Select words at caret again, this is where we have abandoned selections and goes to carets
                 if (Selections.All(s => !s.IsSelection()))
                 {
@@ -226,21 +229,9 @@ namespace SelectNextOccurrence
                 }
                 else
                 {
-                    // Start the search from previous end-position if it exists, otherwise caret
-                    int startIndex;
-
-                    if (reverseDirection)
-                    {
-                        startIndex = Selections.Last().Start != null ?
-                            Selections.Last().Start.GetPosition(Snapshot)
-                            : Selections.Last().Caret.GetPosition(Snapshot);
-                    }
-                    else
-                    {
-                        startIndex = Selections.Last().End != null ?
-                            Selections.Last().End.GetPosition(Snapshot)
-                            : Selections.Last().Caret.GetPosition(Snapshot);
-                    }
+                    var startIndex = reverseDirection ?
+                        startSelection.Start?.GetPosition(Snapshot) ?? startSelection.Caret.GetPosition(Snapshot)
+                        : startSelection.End?.GetPosition(Snapshot) ?? startSelection.Caret.GetPosition(Snapshot);
 
                     var occurrence = textSearchService.FindNext(
                         startIndex,
@@ -253,6 +244,8 @@ namespace SelectNextOccurrence
                 }
 
                 View.Selection.Clear();
+
+                View.Caret.MoveTo(startSelection.Caret.GetPoint(Snapshot));
             }
         }
 
