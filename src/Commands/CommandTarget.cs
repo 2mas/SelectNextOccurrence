@@ -349,6 +349,7 @@ namespace SelectNextOccurrence.Commands
                         );
                     }
                 }
+                view.Selection.Clear();
             }
 
             if (modifySelections)
@@ -372,7 +373,6 @@ namespace SelectNextOccurrence.Commands
             }
 
             view.Caret.MoveTo(Selector.Selections.Last().Caret.GetPoint(Snapshot));
-            view.Selection.Clear();
 
             // Goes to caret-only mode
             if (clearSelections)
