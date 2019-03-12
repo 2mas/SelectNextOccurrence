@@ -44,9 +44,9 @@ namespace SelectNextOccurrence
             IWpfTextView view,
             ITextSearchService textSearchService,
             IEditorOperationsFactoryService editorOperationsService,
-            IEditorFormatMapService formatMapService = null,
-            ITextStructureNavigator textStructureNavigator = null,
-            IOutliningManagerService outliningManagerService = null
+            IEditorFormatMapService formatMapService,
+            ITextStructureNavigator textStructureNavigator,
+            IOutliningManagerService outliningManagerService
             )
         {
             view.Properties.GetOrCreateSingletonProperty(
@@ -60,7 +60,6 @@ namespace SelectNextOccurrence
                 view,
                 textSearchService,
                 editorOperationsService,
-                formatMapService,
                 textStructureNavigator,
                 outliningManagerService
             );

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
@@ -73,23 +73,21 @@ namespace SelectNextOccurrence
         /// </summary>
         /// <param name="view"></param>
         /// <param name="textSearchService"></param>
-        /// <param name="IEditorOperationsFactoryService"></param>
-        /// <param name="IEditorFormatMapService"></param>
-        /// <param name="ITextStructureNavigator"></param>
-        /// <param name="IOutliningManagerService"></param>
+        /// <param name="editorOperationsService"></param>
+        /// <param name="textStructureNavigator"></param>
+        /// <param name="outliningManagerService"></param>
         public Selector(
             IWpfTextView view,
             ITextSearchService textSearchService,
             IEditorOperationsFactoryService editorOperationsService,
-            IEditorFormatMapService formatMapService = null,
-            ITextStructureNavigator textStructureNavigator = null,
-            IOutliningManagerService outliningManagerService = null
+            ITextStructureNavigator textStructureNavigator,
+            IOutliningManagerService outliningManagerService
             )
         {
             this.View = view;
 
             // Services
-            this.textSearchService = textSearchService ?? throw new ArgumentNullException("textSearchService");
+            this.textSearchService = textSearchService;
             this.EditorOperations = editorOperationsService.GetEditorOperations(this.View);
             this.textStructureNavigator = textStructureNavigator;
             this.outliningManager = outliningManagerService?.GetOutliningManager(this.View);
@@ -212,9 +210,6 @@ namespace SelectNextOccurrence
             // Multiple selections
             if (Selections.Any())
             {
-                var orderedSelections = Selections.OrderBy(n => n.Caret.GetPosition(Snapshot));
-                var startSelection = reverseDirection ? orderedSelections.First() : orderedSelections.Last();
-
                 // Select words at caret again, this is where we have abandoned selections and goes to carets
                 if (Selections.Any(s => !s.IsSelection()))
                 {
@@ -236,6 +231,9 @@ namespace SelectNextOccurrence
                 }
                 else
                 {
+                    var orderedSelections = Selections.OrderBy(n => n.Caret.GetPosition(Snapshot));
+                    var startSelection = reverseDirection ? orderedSelections.First() : orderedSelections.Last();
+
                     var startIndex = reverseDirection ?
                         startSelection.Start?.GetPosition(Snapshot) ?? startSelection.Caret.GetPosition(Snapshot)
                         : startSelection.End?.GetPosition(Snapshot) ?? startSelection.Caret.GetPosition(Snapshot);
@@ -251,8 +249,7 @@ namespace SelectNextOccurrence
                 }
 
                 View.Selection.Clear();
-
-                View.Caret.MoveTo(startSelection.Caret.GetPoint(Snapshot));
+                View.Caret.MoveTo(Selections.Last().Caret.GetPoint(Snapshot));
             }
         }
 
