@@ -1,14 +1,13 @@
 # Road map
-
-- [x] Command to add caret above/below current caret (modifier(s) + Up/Down-key)
-- [x] Command to convert a block-selection into carets
-- [x] Command to select all occurrences
-- [x] Undo last selection
-- [x] Skip next occurrence (Sublime Ctrl+K, Ctrl+D)
 - [ ] Make statement completion working on multiple selections, see [issue](https://github.com/2mas/SelectNextOccurrence/issues/5)
-- [x] Add support for Visual Studio 2015
 
 # Change log
+
+#### 1.3.80
+- [x] Enabling combinations of selecting next/previous occurrences
+- [x] Adjustments and bug-fixes involving selections, caret-positions, line-movement etc
+
+Thanks Mr-Badger
 
 #### 1.3.69
 - [x] Improved vertical caret movement by keeping column position
