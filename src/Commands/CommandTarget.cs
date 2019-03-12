@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows;
 using Microsoft.VisualStudio;
@@ -363,13 +363,17 @@ namespace SelectNextOccurrence.Commands
             // Set new searchtext needed if selection is modified
             if (modifySelections)
             {
-                var startPosition = Selector.Selections.Last().Start.GetPosition(Snapshot);
-                var endPosition = Selector.Selections.Last().End.GetPosition(Snapshot);
+                var lastSelection = Selector.Selections.Last();
+                if (lastSelection.IsSelection())
+                {
+                    var startPosition = lastSelection.Start.GetPosition(Snapshot);
+                    var endPosition = lastSelection.End.GetPosition(Snapshot);
 
-                Selector.SearchText = Snapshot.GetText(
-                    startPosition,
-                    endPosition - startPosition
-                );
+                    Selector.SearchText = Snapshot.GetText(
+                        startPosition,
+                        endPosition - startPosition
+                    );
+                }
             }
 
             view.Caret.MoveTo(Selector.Selections.Last().Caret.GetPoint(Snapshot));
