@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
@@ -216,15 +216,22 @@ namespace SelectNextOccurrence
                 var startSelection = reverseDirection ? orderedSelections.First() : orderedSelections.Last();
 
                 // Select words at caret again, this is where we have abandoned selections and goes to carets
-                if (Selections.All(s => !s.IsSelection()))
+                if (Selections.Any(s => !s.IsSelection()))
                 {
                     var oldSelections = Selections;
                     Selections = new List<Selection>();
 
                     foreach (var selection in oldSelections)
                     {
-                        View.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
-                        SelectCurrentWord(selection.Caret.GetPoint(Snapshot));
+                        if (!selection.IsSelection())
+                        {
+                            View.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+                            SelectCurrentWord(selection.Caret.GetPoint(Snapshot));
+                        }
+                        else
+                        {
+                            Selections.Add(selection);
+                        }
                     }
                 }
                 else
