@@ -3,6 +3,9 @@
 
 # Change log
 
+#### 1.3.83
+- [x] Bugfix: fixes search when wrapping document, caused by the mixing of next/previous introduced in 1.3.80
+
 #### 1.3.80
 - [x] Enabling combinations of selecting next/previous occurrences
 - [x] Adjustments and bug-fixes involving selections, caret-positions, line-movement etc
