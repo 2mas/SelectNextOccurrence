@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Text.Outlining;
@@ -67,6 +65,8 @@ namespace SelectNextOccurrence
         /// made when releasing the cursor
         /// </summary>
         internal ITrackingPoint StashedCaret { get; private set; }
+
+        public bool HasWrappedDocument { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Selector"/> class.
@@ -231,8 +231,8 @@ namespace SelectNextOccurrence
                 }
                 else
                 {
-                    var orderedSelections = Selections.OrderBy(n => n.Caret.GetPosition(Snapshot));
-                    var startSelection = reverseDirection ? orderedSelections.First() : orderedSelections.Last();
+                    var orderedSelections = HasWrappedDocument ? Selections : Selections.OrderBy(n => n.Caret.GetPosition(Snapshot)).ToList();
+                    var startSelection = reverseDirection && !HasWrappedDocument ? orderedSelections.First() : orderedSelections.Last();
 
                     var startIndex = reverseDirection ?
                         startSelection.Start?.GetPosition(Snapshot) ?? startSelection.Caret.GetPosition(Snapshot)
@@ -245,7 +245,17 @@ namespace SelectNextOccurrence
                     );
 
                     if (occurrence.HasValue)
+                    {
                         ProcessFoundOccurrence(occurrence.Value);
+
+                        if (!reverseDirection && Selections.Last().Caret.GetPosition(Snapshot) <
+                            Selections.First().Caret.GetPosition(Snapshot))
+                            HasWrappedDocument = true;
+
+                        if (reverseDirection && Selections.Last().Caret.GetPosition(Snapshot) >
+                            Selections.First().Caret.GetPosition(Snapshot))
+                            HasWrappedDocument = true;
+                    }
                 }
 
                 View.Selection.Clear();
@@ -471,6 +481,7 @@ namespace SelectNextOccurrence
             }
 
             Selections.Clear();
+            HasWrappedDocument = false;
         }
 
         internal void ClearSavedClipboard()
