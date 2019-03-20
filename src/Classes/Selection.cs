@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text;
 
 namespace SelectNextOccurrence
 {
@@ -59,7 +59,7 @@ namespace SelectNextOccurrence
             Caret = snapshot.CreateTrackingPoint(position, PointTrackingMode.Positive);
         }
 
-        internal void SetSelection(int previousCaretPosition, ITextSnapshot snapshot)
+        internal void UpdateSelection(int previousCaretPosition, ITextSnapshot snapshot)
         {
             var caretPosition = Caret.GetPosition(snapshot);
 
@@ -101,6 +101,23 @@ namespace SelectNextOccurrence
                 Start = null;
                 End = null;
             }
+        }
+
+        internal void SetSelection(VirtualSnapshotSpan newSpan, ITextSnapshot snapshot)
+        {
+            Start = snapshot.CreateTrackingPoint(
+                newSpan.Start.Position.Position > newSpan.End.Position.Position ?
+                newSpan.End.Position.Position
+                : newSpan.Start.Position.Position,
+                PointTrackingMode.Positive
+            );
+
+            End = snapshot.CreateTrackingPoint(
+                newSpan.Start.Position.Position > newSpan.End.Position.Position ?
+                newSpan.Start.Position.Position
+                : newSpan.End.Position.Position,
+                PointTrackingMode.Positive
+            );
         }
 
         /// <summary>

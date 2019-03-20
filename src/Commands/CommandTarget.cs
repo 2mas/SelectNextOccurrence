@@ -324,29 +324,11 @@ namespace SelectNextOccurrence.Commands
                 }
                 else if (modifySelections)
                 {
-                    selection.SetSelection(previousCaretPosition, Snapshot);
+                    selection.UpdateSelection(previousCaretPosition, Snapshot);
                 }
-
-                if (invokeCommand)
+                else if (invokeCommand)
                 {
-                    var newSpan = view.Selection.StreamSelectionSpan;
-
-                    if (!view.Selection.IsEmpty)
-                    {
-                        selection.Start = Snapshot.CreateTrackingPoint(
-                            newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                            newSpan.End.Position.Position
-                            : newSpan.Start.Position.Position,
-                            PointTrackingMode.Positive
-                        );
-
-                        selection.End = Snapshot.CreateTrackingPoint(
-                            newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                            newSpan.Start.Position.Position
-                            : newSpan.End.Position.Position,
-                            PointTrackingMode.Positive
-                        );
-                    }
+                    selection.SetSelection(view.Selection.StreamSelectionSpan, Snapshot);
                 }
                 view.Selection.Clear();
             }
