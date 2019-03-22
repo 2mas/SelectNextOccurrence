@@ -306,12 +306,20 @@ namespace SelectNextOccurrence.Commands
                         selection.IsReversed(Snapshot)
                     );
                 }
-
-                view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+                if (selection.VirtualSpaces == 0)
+                {
+                    view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+                }
+                else
+                {
+                    view.Caret.MoveTo(selection.GetVirtualPoint(Snapshot));
+                }
 
                 var previousCaretPosition = selection.Caret.GetPosition(Snapshot);
 
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+
+                selection.VirtualSpaces = view.Caret.InVirtualSpace ? view.Caret.Position.VirtualSpaces : 0;
 
                 var position = view.Caret.Position.BufferPosition.Position;
 
@@ -357,7 +365,7 @@ namespace SelectNextOccurrence.Commands
                 }
             }
 
-            view.Caret.MoveTo(Selector.Selections.Last().Caret.GetPoint(Snapshot));
+            view.Caret.MoveTo(Selector.Selections.Last().GetVirtualPoint(Snapshot));
             view.Selection.Clear();
 
             // Goes to caret-only mode
