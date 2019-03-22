@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -115,7 +115,8 @@ namespace SelectNextOccurrence
                     Start = Snapshot.CreateTrackingPoint(start, PointTrackingMode.Positive),
                     End = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive),
                     Caret = Snapshot.CreateTrackingPoint(caret, PointTrackingMode.Positive),
-                    ColumnPosition = GetCurrentColumnPosition(caret)
+                    ColumnPosition = GetCurrentColumnPosition(caret),
+                    VirtualSpaces = View.Caret.Position.VirtualSpaces
                 }
             );
 
@@ -377,7 +378,8 @@ namespace SelectNextOccurrence
                             caretPosition,
                             PointTrackingMode.Positive
                         ),
-                        ColumnPosition = GetCurrentColumnPosition(caretPosition)
+                        ColumnPosition = GetCurrentColumnPosition(caretPosition),
+                        VirtualSpaces = View.Caret.Position.VirtualSpaces
                     }
                 );
             }

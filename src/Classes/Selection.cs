@@ -13,11 +13,18 @@ namespace SelectNextOccurrence
 
         internal int ColumnPosition { get; set; }
 
+        internal int VirtualSpaces { get; set; }
+
         /// <summary>
         /// Contains the copied/cut text of the current selection for use in the same document when pasting into the same active cursors.
         /// When pasting across documents the static <see cref="Selector.SavedClipboard"/> is used
         /// </summary>
         internal string CopiedText { get; set; }
+
+        internal VirtualSnapshotPoint GetVirtualPoint(ITextSnapshot snapshot)
+        {
+            return new VirtualSnapshotPoint(Caret.GetPoint(snapshot), VirtualSpaces);
+        }
 
         internal bool OverlapsWith(SnapshotSpan span, ITextSnapshot snapshot)
         {

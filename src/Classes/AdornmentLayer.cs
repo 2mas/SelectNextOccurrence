@@ -120,22 +120,20 @@ namespace SelectNextOccurrence
             {
                 foreach (var selection in Selector.Selections)
                 {
-                    if (selection.Start != null && selection.End != null)
+                    if (selection.IsSelection())
                         DrawSelection(selection);
 
-                    DrawCaret(selection.Caret);
+                    DrawCaret(selection);
                 }
             }
         }
 
-        private void DrawCaret(ITrackingPoint caretPoint)
+        private void DrawCaret(Selection selection)
         {
-            if (caretPoint.GetPosition(Snapshot) >= Snapshot.Length)
-            {
+            if (selection.Caret.GetPosition(Snapshot) >= Snapshot.Length)
                 return;
-            }
 
-            var span = new SnapshotSpan(caretPoint.GetPoint(Snapshot), 1);
+            var span = new SnapshotSpan(selection.Caret.GetPoint(Snapshot), 1);
             var geometry = view.TextViewLines.GetTextMarkerGeometry(span);
 
             if (geometry != null)
@@ -154,7 +152,7 @@ namespace SelectNextOccurrence
                     Margin = new System.Windows.Thickness(0, 0, 0, 0),
                 };
 
-                Canvas.SetLeft(rectangle, geometry.Bounds.Left);
+                Canvas.SetLeft(rectangle, geometry.Bounds.Left + (selection.VirtualSpaces * drawing.Bounds.Width));
                 Canvas.SetTop(rectangle, geometry.Bounds.Top);
 
                 layer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, Vsix.Name, rectangle, null);
@@ -183,7 +181,7 @@ namespace SelectNextOccurrence
                 var drawingImage = new DrawingImage(drawing);
                 drawingImage.Freeze();
 
-                var image = new System.Windows.Controls.Image
+                var image = new Image
                 {
                     Source = drawingImage,
                 };
