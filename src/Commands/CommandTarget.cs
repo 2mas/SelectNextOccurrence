@@ -74,7 +74,8 @@ namespace SelectNextOccurrence.Commands
 
             if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID
                 || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
-                || pguidCmdGroup == typeof(VSConstants.VSStd12CmdID).GUID)
+                || pguidCmdGroup == typeof(VSConstants.VSStd12CmdID).GUID
+                || pguidCmdGroup == PackageGuids.guidNextOccurrenceCommandsPackageCmdSet)
             {
                 if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
                 {
@@ -162,6 +163,11 @@ namespace SelectNextOccurrence.Commands
                             processOrder = ProcessOrder.BottomToTop;
                             break;
                     }
+                }
+
+                if (pguidCmdGroup == PackageGuids.guidNextOccurrenceCommandsPackageCmdSet)
+                {
+                    verticalMove = nCmdID == 304 || nCmdID == 305;
                 }
             }
 
@@ -320,11 +326,9 @@ namespace SelectNextOccurrence.Commands
 
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
-                selection.VirtualSpaces = view.Caret.InVirtualSpace ? view.Caret.Position.VirtualSpaces : 0;
+                selection.VirtualSpaces = view.Caret.Position.VirtualSpaces;
 
-                var position = view.Caret.Position.BufferPosition.Position;
-
-                selection.SetCaretPosition(position, verticalMove, Snapshot);
+                selection.SetCaretPosition(view.Caret.Position.BufferPosition, verticalMove, Snapshot);
 
                 if (view.Selection.IsEmpty)
                 {
@@ -350,7 +354,7 @@ namespace SelectNextOccurrence.Commands
             if (Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Close();
 
-            // Set new searchtext needed if selection is modified
+            // Set new search text. Needed if selection is modified
             if (modifySelections)
             {
                 var lastSelection = Selector.Selections.Last();

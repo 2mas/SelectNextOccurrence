@@ -84,7 +84,7 @@ namespace SelectNextOccurrence
                     Start = End;
                     End = Caret;
                 }
-                else if (caretPosition > startPosition && startPosition != previousCaretPosition)
+                else if (caretPosition >= startPosition && startPosition != previousCaretPosition)
                 {
                     End = Caret;
                 }
