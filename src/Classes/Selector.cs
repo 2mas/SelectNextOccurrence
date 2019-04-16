@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -346,22 +346,49 @@ namespace SelectNextOccurrence
 
         internal void AddCaretAbove()
         {
-            foreach (var selecton in Selections.ToList())
+            foreach (var selection in Selections.ToList())
             {
-                View.Caret.MoveTo(selecton.Caret.GetPoint(Snapshot));
+                View.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
                 EditorOperations.MoveLineUp(false);
-                AddCurrentCaretToSelections();
+                AddCaretMoveToSelections(selection);
             }
+
+            View.Caret.MoveTo(Selections.Last().GetVirtualPoint(Snapshot));
+            Selections.ForEach(s => s.CopiedText = null);
         }
 
         internal void AddCaretBelow()
         {
-            foreach (var selecton in Selections.ToList())
+            foreach (var selection in Selections.ToList())
             {
-                View.Caret.MoveTo(selecton.Caret.GetPoint(Snapshot));
+                View.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
                 EditorOperations.MoveLineDown(false);
-                AddCurrentCaretToSelections();
+                AddCaretMoveToSelections(selection);
             }
+
+            View.Caret.MoveTo(Selections.Last().GetVirtualPoint(Snapshot));
+            Selections.ForEach(s => s.CopiedText = null);
+        }
+
+        internal void AddCaretMoveToSelections(Selection selection)
+        {
+            var caretPosition = View.Caret.Position.BufferPosition;
+            if (Selections.Any(s => s.Caret.GetPoint(Snapshot) == caretPosition))
+                return;
+
+            var newSelection = new Selection
+            {
+                Start = null,
+                End = null,
+                Caret = Snapshot.CreateTrackingPoint(caretPosition, PointTrackingMode.Positive),
+                ColumnPosition = selection.ColumnPosition,
+                VirtualSpaces = View.Caret.Position.VirtualSpaces
+            };
+
+            var newPosition = newSelection.GetCaretColumnPosition(caretPosition, Snapshot);
+            newSelection.Caret = Snapshot.CreateTrackingPoint(newPosition, PointTrackingMode.Positive);
+
+            Selections.Add(newSelection);
         }
 
         internal void AddCurrentCaretToSelections()
@@ -376,9 +403,9 @@ namespace SelectNextOccurrence
                         End = null,
                         Caret = Snapshot.CreateTrackingPoint(
                             caretPosition,
-                            PointTrackingMode.Positive
-                        ),
-                        ColumnPosition = GetCurrentColumnPosition(caretPosition),
+                            PointTrackingMode.Positive),
+                        ColumnPosition = GetCurrentColumnPosition(caretPosition)
+                            + View.Caret.Position.VirtualSpaces,
                         VirtualSpaces = View.Caret.Position.VirtualSpaces
                     }
                 );
