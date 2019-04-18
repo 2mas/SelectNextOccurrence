@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows;
 using Microsoft.VisualStudio;
@@ -159,7 +159,8 @@ namespace SelectNextOccurrence.Commands
 
                 if (pguidCmdGroup == PackageGuids.guidNextOccurrenceCommandsPackageCmdSet)
                 {
-                    verticalMove = nCmdID == 304 || nCmdID == 305;
+                    verticalMove = nCmdID == PackageIds.AddCaretAboveCommandId
+                        || nCmdID == PackageIds.AddCaretBelowCommandId;
                 }
             }
             else if (pguidCmdGroup == PackageGuids.guidExtensionSubWordNavigation)
