@@ -40,11 +40,11 @@ namespace SelectNextOccurrence.Commands
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             // Return not supported when the command does nothing
-            var result = unchecked((int)Constants.OLECMDERR_E_NOTSUPPORTED);
+            var result = unchecked((int) Constants.OLECMDERR_E_NOTSUPPORTED);
 
             if (pguidCmdGroup == VSConstants.VSStd2K)
             {
-                switch ((VSConstants.VSStd2KCmdID)nCmdID)
+                switch ((VSConstants.VSStd2KCmdID) nCmdID)
                 {
                     case VSConstants.VSStd2KCmdID.SolutionPlatform:
                         return result;
@@ -53,7 +53,7 @@ namespace SelectNextOccurrence.Commands
 
             if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
             {
-                switch ((VSConstants.VSStd97CmdID)nCmdID)
+                switch ((VSConstants.VSStd97CmdID) nCmdID)
                 {
                     case VSConstants.VSStd97CmdID.SolutionCfg:
                         return result;
@@ -74,7 +74,7 @@ namespace SelectNextOccurrence.Commands
 
             if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
             {
-                switch ((VSConstants.VSStd97CmdID)nCmdID)
+                switch ((VSConstants.VSStd97CmdID) nCmdID)
                 {
                     case VSConstants.VSStd97CmdID.Copy:
                     case VSConstants.VSStd97CmdID.Cut:
@@ -97,7 +97,7 @@ namespace SelectNextOccurrence.Commands
             }
             else if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID)
             {
-                switch ((VSConstants.VSStd2KCmdID)nCmdID)
+                switch ((VSConstants.VSStd2KCmdID) nCmdID)
                 {
                     case VSConstants.VSStd2KCmdID.UP:
                     case VSConstants.VSStd2KCmdID.DOWN:
@@ -145,7 +145,7 @@ namespace SelectNextOccurrence.Commands
             }
             else if (pguidCmdGroup == typeof(VSConstants.VSStd12CmdID).GUID)
             {
-                switch ((VSConstants.VSStd12CmdID)nCmdID)
+                switch ((VSConstants.VSStd12CmdID) nCmdID)
                 {
                     case VSConstants.VSStd12CmdID.MoveSelLinesUp:
                         invokeCommand = true;
@@ -208,7 +208,7 @@ namespace SelectNextOccurrence.Commands
         {
             // if paste, see if we have a saved clipboard to apply
             if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
-                    && nCmdID == (uint)VSConstants.VSStd97CmdID.Paste
+                    && nCmdID == (uint) VSConstants.VSStd97CmdID.Paste
                     && Selector.SavedClipboard.Any())
             {
                 // Clipboard saved, paste these on new lines if current clipboard does match the last item
@@ -246,8 +246,8 @@ namespace SelectNextOccurrence.Commands
             {
                 // if copy/cut, clear saved clipboard
                 if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
-                            && (nCmdID == (uint)VSConstants.VSStd97CmdID.Copy
-                                || (nCmdID == (uint)VSConstants.VSStd97CmdID.Cut)
+                            && ( nCmdID == (uint) VSConstants.VSStd97CmdID.Copy
+                                || ( nCmdID == (uint) VSConstants.VSStd97CmdID.Cut )
                                 )
                             )
                     Selector.ClearSavedClipboard();

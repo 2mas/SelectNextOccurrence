@@ -1,4 +1,4 @@
-﻿# http://EditorConfig.org
+# http://EditorConfig.org
 
 #################
 # Common Settings
@@ -144,14 +144,14 @@ csharp_indent_switch_labels                                                  = t
 csharp_indent_labels                                                         = no_change
 # Spacing options
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference#spacing
-csharp_space_after_cast                                                      = false
+csharp_space_after_cast                                                      = true
 csharp_space_after_keywords_in_control_flow_statements                       = true
 csharp_space_between_method_declaration_parameter_list_parentheses           = false
 csharp_space_between_method_call_parameter_list_parentheses                  = false
 csharp_space_between_parentheses                                             = expressions
 csharp_space_before_colon_in_inheritance_clause                              = true
 csharp_space_after_colon_in_inheritance_clause                               = true
-csharp_space_around_binary_operators                                         = false
+csharp_space_around_binary_operators                                         = before_and_after
 csharp_space_between_method_declaration_empty_parameter_list_parentheses     = false
 csharp_space_between_method_call_name_and_opening_parenthesis                = false
 csharp_space_between_method_call_empty_parameter_list_parentheses            = false

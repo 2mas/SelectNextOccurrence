@@ -98,10 +98,10 @@ namespace SelectNextOccurrence
             var formatMap = formatMapService.GetEditorFormatMap(view);
 
             var dictPlainText = formatMap.GetProperties("Plain Text");
-            caretBrush = (SolidColorBrush)dictPlainText[EditorFormatDefinition.ForegroundBrushId];
+            caretBrush = (SolidColorBrush) dictPlainText[EditorFormatDefinition.ForegroundBrushId];
 
             var dictSelectedText = formatMap.GetProperties("Selected Text");
-            var b = (SolidColorBrush)dictSelectedText[EditorFormatDefinition.BackgroundBrushId];
+            var b = (SolidColorBrush) dictSelectedText[EditorFormatDefinition.BackgroundBrushId];
 
             selectionBrush = new SolidColorBrush(Color.FromArgb(120, b.Color.R, b.Color.G, b.Color.B));
         }
