@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -348,7 +348,7 @@ namespace SelectNextOccurrence
         {
             foreach (var selection in Selections.ToList())
             {
-                View.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+                View.Caret.MoveTo(selection.GetVirtualPoint(Snapshot));
                 EditorOperations.MoveLineUp(false);
                 AddCaretMoveToSelections(selection);
             }
@@ -361,7 +361,7 @@ namespace SelectNextOccurrence
         {
             foreach (var selection in Selections.ToList())
             {
-                View.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+                View.Caret.MoveTo(selection.GetVirtualPoint(Snapshot));
                 EditorOperations.MoveLineDown(false);
                 AddCaretMoveToSelections(selection);
             }
@@ -373,9 +373,6 @@ namespace SelectNextOccurrence
         internal void AddCaretMoveToSelections(Selection selection)
         {
             var caretPosition = View.Caret.Position.BufferPosition;
-            if (Selections.Any(s => s.Caret.GetPoint(Snapshot) == caretPosition))
-                return;
-
             var newSelection = new Selection
             {
                 Start = null,
@@ -387,6 +384,9 @@ namespace SelectNextOccurrence
 
             var newPosition = newSelection.GetCaretColumnPosition(caretPosition, Snapshot);
             newSelection.Caret = Snapshot.CreateTrackingPoint(newPosition, PointTrackingMode.Positive);
+
+            if (Selections.Any(s => s.Caret.GetPoint(Snapshot) == newPosition))
+                return;
 
             Selections.Add(newSelection);
         }
@@ -407,6 +407,27 @@ namespace SelectNextOccurrence
                         ColumnPosition = GetCurrentColumnPosition(caretPosition)
                             + View.Caret.Position.VirtualSpaces,
                         VirtualSpaces = View.Caret.Position.VirtualSpaces
+                    }
+                );
+            }
+
+            Selections.ForEach(s => s.CopiedText = null);
+        }
+
+        internal void AddMouseCaretToSelections()
+        {
+            var caretPosition = View.Caret.Position.BufferPosition.Position;
+            if (!Selections.Any(s => s.Caret.GetPoint(Snapshot).Position == caretPosition))
+            {
+                Selections.Add(
+                    new Selection
+                    {
+                        Start = null,
+                        End = null,
+                        Caret = Snapshot.CreateTrackingPoint(
+                            caretPosition,
+                            PointTrackingMode.Positive),
+                        ColumnPosition = GetCurrentColumnPosition(caretPosition)
                     }
                 );
             }
