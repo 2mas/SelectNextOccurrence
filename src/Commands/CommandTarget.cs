@@ -74,7 +74,8 @@ namespace SelectNextOccurrence.Commands
 
             if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID
                 || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
-                || pguidCmdGroup == typeof(VSConstants.VSStd12CmdID).GUID)
+                || pguidCmdGroup == typeof(VSConstants.VSStd12CmdID).GUID
+                || pguidCmdGroup == PackageGuids.ExtensionSubWordNavigation)
             {
                 if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
                 {
@@ -160,6 +161,16 @@ namespace SelectNextOccurrence.Commands
                         case ((uint)VSConstants.VSStd12CmdID.MoveSelLinesDown):
                             invokeCommand = true;
                             processOrder = ProcessOrder.BottomToTop;
+                            break;
+                    }
+                }
+                if (pguidCmdGroup == PackageGuids.ExtensionSubWordNavigation)
+                {
+                    switch(nCmdID)
+                    {
+                        case PackageIds.ExtensionSubwordNavigationNextExtend:
+                        case PackageIds.ExtensionSubwordNavigationPreviousExtend:
+                            modifySelections = true;
                             break;
                     }
                 }
