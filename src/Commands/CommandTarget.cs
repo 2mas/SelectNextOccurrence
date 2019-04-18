@@ -11,7 +11,7 @@ namespace SelectNextOccurrence.Commands
     /// <summary>
     /// Handles keyboard, typing and combinations in text-editor
     /// </summary>
-    class CommandTarget : IOleCommandTarget
+    internal class CommandTarget : IOleCommandTarget
     {
         private enum ProcessOrder { Normal, TopToBottom, BottomToTop }
 
@@ -44,7 +44,7 @@ namespace SelectNextOccurrence.Commands
 
             if (pguidCmdGroup == VSConstants.VSStd2K)
             {
-                switch ((VSConstants.VSStd2KCmdID) nCmdID)
+                switch ((VSConstants.VSStd2KCmdID)nCmdID)
                 {
                     case VSConstants.VSStd2KCmdID.SolutionPlatform:
                         return result;
@@ -53,7 +53,7 @@ namespace SelectNextOccurrence.Commands
 
             if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
             {
-                switch ((VSConstants.VSStd97CmdID) nCmdID)
+                switch ((VSConstants.VSStd97CmdID)nCmdID)
                 {
                     case VSConstants.VSStd97CmdID.SolutionCfg:
                         return result;
@@ -72,107 +72,99 @@ namespace SelectNextOccurrence.Commands
             var processOrder = ProcessOrder.Normal;
             var invokeCommand = false;
 
-            if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID
-                || pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
-                || pguidCmdGroup == typeof(VSConstants.VSStd12CmdID).GUID
-                || pguidCmdGroup == PackageGuids.ExtensionSubWordNavigation)
+            if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
             {
-                if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
+                switch ((VSConstants.VSStd97CmdID)nCmdID)
                 {
-                    switch (nCmdID)
-                    {
-                        case ((uint)VSConstants.VSStd97CmdID.Copy):
-                        case ((uint)VSConstants.VSStd97CmdID.Cut):
-                            return HandleMultiCopyCut(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                        case ((uint)VSConstants.VSStd97CmdID.Paste):
-                            // Only multi-paste different texts if all our selections have been copied with 
-                            // this extension, otherwise paste as default. 
-                            // Copied text get reset when new new selections are added
-                            if (Selector.Selections.All(s => !string.IsNullOrEmpty(s.CopiedText)))
-                            {
-                                return HandleMultiPaste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                            }
-                            break;
-                        case ((uint)VSConstants.VSStd97CmdID.Undo):
-                        case ((uint)VSConstants.VSStd97CmdID.Redo):
-                            result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                            adornmentLayer.DrawAdornments();
-                            return result;
-                    }
+                    case VSConstants.VSStd97CmdID.Copy:
+                    case VSConstants.VSStd97CmdID.Cut:
+                        return HandleMultiCopyCut(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                    case VSConstants.VSStd97CmdID.Paste:
+                        // Only multi-paste different texts if all our selections have been copied with 
+                        // this extension, otherwise paste as default. 
+                        // Copied text get reset when new new selections are added
+                        if (Selector.Selections.All(s => !string.IsNullOrEmpty(s.CopiedText)))
+                        {
+                            return HandleMultiPaste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                        }
+                        break;
+                    case VSConstants.VSStd97CmdID.Undo:
+                    case VSConstants.VSStd97CmdID.Redo:
+                        result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                        adornmentLayer.DrawAdornments();
+                        return result;
                 }
-                if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID)
+            }
+            else if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID)
+            {
+                switch ((VSConstants.VSStd2KCmdID)nCmdID)
                 {
-                    switch (nCmdID)
-                    {
-                        case ((uint)VSConstants.VSStd2KCmdID.UP):
-                        case ((uint)VSConstants.VSStd2KCmdID.DOWN):
-                            verticalMove = true;
-                            clearSelections = true;
-                            break;
-                        case ((uint)VSConstants.VSStd2KCmdID.LEFT):
-                        case ((uint)VSConstants.VSStd2KCmdID.RIGHT):
-                        case ((uint)VSConstants.VSStd2KCmdID.WORDPREV):
-                        case ((uint)VSConstants.VSStd2KCmdID.WORDNEXT):
-                            // Remove selected spans but keep carets
-                            clearSelections = true;
-                            break;
-                        case ((uint)VSConstants.VSStd2KCmdID.CANCEL):
-                            Selector.DiscardSelections();
-                            break;
-                        case ((uint)VSConstants.VSStd2KCmdID.PAGEDN):
-                        case ((uint)VSConstants.VSStd2KCmdID.PAGEUP):
-                        case ((uint)VSConstants.VSStd2KCmdID.END):
-                        case ((uint)VSConstants.VSStd2KCmdID.HOME):
-                        case ((uint)VSConstants.VSStd2KCmdID.END_EXT):
-                        case ((uint)VSConstants.VSStd2KCmdID.HOME_EXT):
-                            Selector.DiscardSelections();
-                            result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                            break;
-                        case ((uint)VSConstants.VSStd2KCmdID.UP_EXT):
-                        case ((uint)VSConstants.VSStd2KCmdID.DOWN_EXT):
-                            verticalMove = true;
-                            modifySelections = true;
-                            break;
-                        case ((uint)VSConstants.VSStd2KCmdID.WORDPREV_EXT):
-                        case ((uint)VSConstants.VSStd2KCmdID.BOL_EXT):
-                        case ((uint)VSConstants.VSStd2KCmdID.LEFT_EXT):
-                        case ((uint)VSConstants.VSStd2KCmdID.WORDNEXT_EXT):
-                        case ((uint)VSConstants.VSStd2KCmdID.EOL_EXT):
-                        case ((uint)VSConstants.VSStd2KCmdID.RIGHT_EXT):
-                            modifySelections = true;
-                            break;
-                        case ((uint)VSConstants.VSStd2KCmdID.SELLOWCASE):
-                        case ((uint)VSConstants.VSStd2KCmdID.SELUPCASE):
-                        case ((uint)VSConstants.VSStd2KCmdID.COMMENT_BLOCK):
-                        case ((uint)VSConstants.VSStd2KCmdID.UNCOMMENT_BLOCK):
-                            invokeCommand = true;
-                            break;
-                    }
+                    case VSConstants.VSStd2KCmdID.UP:
+                    case VSConstants.VSStd2KCmdID.DOWN:
+                        verticalMove = true;
+                        clearSelections = true;
+                        break;
+                    case VSConstants.VSStd2KCmdID.LEFT:
+                    case VSConstants.VSStd2KCmdID.RIGHT:
+                    case VSConstants.VSStd2KCmdID.WORDPREV:
+                    case VSConstants.VSStd2KCmdID.WORDNEXT:
+                        clearSelections = true;
+                        break;
+                    case VSConstants.VSStd2KCmdID.CANCEL:
+                        Selector.DiscardSelections();
+                        break;
+                    case VSConstants.VSStd2KCmdID.PAGEDN:
+                    case VSConstants.VSStd2KCmdID.PAGEUP:
+                    case VSConstants.VSStd2KCmdID.END:
+                    case VSConstants.VSStd2KCmdID.HOME:
+                    case VSConstants.VSStd2KCmdID.END_EXT:
+                    case VSConstants.VSStd2KCmdID.HOME_EXT:
+                        Selector.DiscardSelections();
+                        result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                        break;
+                    case VSConstants.VSStd2KCmdID.UP_EXT:
+                    case VSConstants.VSStd2KCmdID.DOWN_EXT:
+                        verticalMove = true;
+                        modifySelections = true;
+                        break;
+                    case VSConstants.VSStd2KCmdID.WORDPREV_EXT:
+                    case VSConstants.VSStd2KCmdID.BOL_EXT:
+                    case VSConstants.VSStd2KCmdID.LEFT_EXT:
+                    case VSConstants.VSStd2KCmdID.WORDNEXT_EXT:
+                    case VSConstants.VSStd2KCmdID.EOL_EXT:
+                    case VSConstants.VSStd2KCmdID.RIGHT_EXT:
+                        modifySelections = true;
+                        break;
+                    case VSConstants.VSStd2KCmdID.SELLOWCASE:
+                    case VSConstants.VSStd2KCmdID.SELUPCASE:
+                    case VSConstants.VSStd2KCmdID.COMMENT_BLOCK:
+                    case VSConstants.VSStd2KCmdID.UNCOMMENT_BLOCK:
+                        invokeCommand = true;
+                        break;
                 }
-
-                if (pguidCmdGroup == typeof(VSConstants.VSStd12CmdID).GUID)
+            }
+            else if (pguidCmdGroup == typeof(VSConstants.VSStd12CmdID).GUID)
+            {
+                switch ((VSConstants.VSStd12CmdID)nCmdID)
                 {
-                    switch (nCmdID)
-                    {
-                        case ((uint)VSConstants.VSStd12CmdID.MoveSelLinesUp):
-                            invokeCommand = true;
-                            processOrder = ProcessOrder.TopToBottom;
-                            break;
-                        case ((uint)VSConstants.VSStd12CmdID.MoveSelLinesDown):
-                            invokeCommand = true;
-                            processOrder = ProcessOrder.BottomToTop;
-                            break;
-                    }
+                    case VSConstants.VSStd12CmdID.MoveSelLinesUp:
+                        invokeCommand = true;
+                        processOrder = ProcessOrder.TopToBottom;
+                        break;
+                    case VSConstants.VSStd12CmdID.MoveSelLinesDown:
+                        invokeCommand = true;
+                        processOrder = ProcessOrder.BottomToTop;
+                        break;
                 }
-                if (pguidCmdGroup == PackageGuids.ExtensionSubWordNavigation)
+            }
+            else if (pguidCmdGroup == PackageGuids.guidExtensionSubWordNavigation)
+            {
+                switch (nCmdID)
                 {
-                    switch(nCmdID)
-                    {
-                        case PackageIds.ExtensionSubwordNavigationNextExtend:
-                        case PackageIds.ExtensionSubwordNavigationPreviousExtend:
-                            modifySelections = true;
-                            break;
-                    }
+                    case PackageIds.ExtensionSubwordNavigationNextExtend:
+                    case PackageIds.ExtensionSubwordNavigationPreviousExtend:
+                        modifySelections = true;
+                        break;
                 }
             }
 
@@ -249,10 +241,6 @@ namespace SelectNextOccurrence.Commands
 
                     return result;
                 }
-                else
-                {
-                    return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                }
             }
             else
             {
@@ -264,9 +252,9 @@ namespace SelectNextOccurrence.Commands
                             )
                     Selector.ClearSavedClipboard();
 
-                // continue normal processing
-                return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
             }
+            // continue normal processing
+            return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
 
         private int ProcessSelections(
