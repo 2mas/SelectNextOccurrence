@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows;
 using Microsoft.VisualStudio;
@@ -166,6 +166,12 @@ namespace SelectNextOccurrence.Commands
                         modifySelections = true;
                         break;
                 }
+
+                if (pguidCmdGroup == PackageGuids.guidNextOccurrenceCommandsPackageCmdSet)
+                {
+                    verticalMove = nCmdID == PackageIds.AddCaretAboveCommandId
+                        || nCmdID == PackageIds.AddCaretBelowCommandId;
+                }
             }
 
             if (Selector.Selections.Any())
@@ -306,16 +312,22 @@ namespace SelectNextOccurrence.Commands
                         selection.IsReversed(Snapshot)
                     );
                 }
-
-                view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+                if (selection.VirtualSpaces == 0)
+                {
+                    view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+                }
+                else
+                {
+                    view.Caret.MoveTo(selection.GetVirtualPoint(Snapshot));
+                }
 
                 var previousCaretPosition = selection.Caret.GetPosition(Snapshot);
 
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
-                var position = view.Caret.Position.BufferPosition.Position;
+                selection.VirtualSpaces = view.Caret.Position.VirtualSpaces;
 
-                selection.SetCaretPosition(position, verticalMove, Snapshot);
+                selection.SetCaretPosition(view.Caret.Position.BufferPosition, verticalMove, Snapshot);
 
                 if (view.Selection.IsEmpty)
                 {
@@ -324,29 +336,11 @@ namespace SelectNextOccurrence.Commands
                 }
                 else if (modifySelections)
                 {
-                    selection.SetSelection(previousCaretPosition, Snapshot);
+                    selection.UpdateSelection(previousCaretPosition, Snapshot);
                 }
-
-                if (invokeCommand)
+                else if (invokeCommand)
                 {
-                    var newSpan = view.Selection.StreamSelectionSpan;
-
-                    if (!view.Selection.IsEmpty)
-                    {
-                        selection.Start = Snapshot.CreateTrackingPoint(
-                            newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                            newSpan.End.Position.Position
-                            : newSpan.Start.Position.Position,
-                            PointTrackingMode.Positive
-                        );
-
-                        selection.End = Snapshot.CreateTrackingPoint(
-                            newSpan.Start.Position.Position > newSpan.End.Position.Position ?
-                            newSpan.Start.Position.Position
-                            : newSpan.End.Position.Position,
-                            PointTrackingMode.Positive
-                        );
-                    }
+                    selection.SetSelection(view.Selection.StreamSelectionSpan, Snapshot);
                 }
                 view.Selection.Clear();
             }
@@ -359,7 +353,7 @@ namespace SelectNextOccurrence.Commands
             if (Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Close();
 
-            // Set new searchtext needed if selection is modified
+            // Set new search text. Needed if selection is modified
             if (modifySelections)
             {
                 var lastSelection = Selector.Selections.Last();
@@ -375,7 +369,7 @@ namespace SelectNextOccurrence.Commands
                 }
             }
 
-            view.Caret.MoveTo(Selector.Selections.Last().Caret.GetPoint(Snapshot));
+            view.Caret.MoveTo(Selector.Selections.Last().GetVirtualPoint(Snapshot));
             view.Selection.Clear();
 
             // Goes to caret-only mode

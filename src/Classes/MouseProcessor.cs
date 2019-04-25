@@ -46,7 +46,7 @@ namespace SelectNextOccurrence
                     if (AdornmentLayer.Selector.StashedCaret != null)
                         AdornmentLayer.Selector.ApplyStashedCaretPosition();
 
-                    AdornmentLayer.Selector.AddCurrentCaretToSelections();
+                    AdornmentLayer.Selector.AddMouseCaretToSelections();
                 }
                 else
                 {

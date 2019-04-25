@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text;
 
 namespace SelectNextOccurrence
 {
@@ -13,11 +13,18 @@ namespace SelectNextOccurrence
 
         internal int ColumnPosition { get; set; }
 
+        internal int VirtualSpaces { get; set; }
+
         /// <summary>
         /// Contains the copied/cut text of the current selection for use in the same document when pasting into the same active cursors.
         /// When pasting across documents the static <see cref="Selector.SavedClipboard"/> is used
         /// </summary>
         internal string CopiedText { get; set; }
+
+        internal VirtualSnapshotPoint GetVirtualPoint(ITextSnapshot snapshot)
+        {
+            return new VirtualSnapshotPoint(Caret.GetPoint(snapshot), VirtualSpaces);
+        }
 
         internal bool OverlapsWith(SnapshotSpan span, ITextSnapshot snapshot)
         {
@@ -59,7 +66,7 @@ namespace SelectNextOccurrence
             Caret = snapshot.CreateTrackingPoint(position, PointTrackingMode.Positive);
         }
 
-        internal void SetSelection(int previousCaretPosition, ITextSnapshot snapshot)
+        internal void UpdateSelection(int previousCaretPosition, ITextSnapshot snapshot)
         {
             var caretPosition = Caret.GetPosition(snapshot);
 
@@ -77,7 +84,7 @@ namespace SelectNextOccurrence
                     Start = End;
                     End = Caret;
                 }
-                else if (caretPosition > startPosition && startPosition != previousCaretPosition)
+                else if (caretPosition >= startPosition && startPosition != previousCaretPosition)
                 {
                     End = Caret;
                 }
@@ -101,6 +108,23 @@ namespace SelectNextOccurrence
                 Start = null;
                 End = null;
             }
+        }
+
+        internal void SetSelection(VirtualSnapshotSpan newSpan, ITextSnapshot snapshot)
+        {
+            Start = snapshot.CreateTrackingPoint(
+                newSpan.Start.Position.Position > newSpan.End.Position.Position ?
+                newSpan.End.Position.Position
+                : newSpan.Start.Position.Position,
+                PointTrackingMode.Positive
+            );
+
+            End = snapshot.CreateTrackingPoint(
+                newSpan.Start.Position.Position > newSpan.End.Position.Position ?
+                newSpan.Start.Position.Position
+                : newSpan.End.Position.Position,
+                PointTrackingMode.Positive
+            );
         }
 
         /// <summary>
