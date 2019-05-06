@@ -118,6 +118,9 @@ namespace SelectNextOccurrence
 
             if (Selector.Selections.Any())
             {
+                if (!view.Caret.IsHidden)
+                    view.Caret.IsHidden = true;
+
                 foreach (var selection in Selector.Selections)
                 {
                     if (selection.IsSelection())
@@ -125,6 +128,11 @@ namespace SelectNextOccurrence
 
                     DrawCaret(selection);
                 }
+            }
+            else
+            {
+                if (view.Caret.IsHidden)
+                    view.Caret.IsHidden = false;
             }
         }
 

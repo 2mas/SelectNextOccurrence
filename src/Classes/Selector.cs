@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -532,6 +532,7 @@ namespace SelectNextOccurrence
 
             Selections.Clear();
             HasWrappedDocument = false;
+            View.Caret.IsHidden = false;
         }
 
         internal void ClearSavedClipboard()
