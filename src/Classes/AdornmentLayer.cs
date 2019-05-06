@@ -152,7 +152,7 @@ namespace SelectNextOccurrence
                     Margin = new System.Windows.Thickness(0, 0, 0, 0),
                 };
 
-                Canvas.SetLeft(rectangle, geometry.Bounds.Left + (selection.VirtualSpaces * drawing.Bounds.Width));
+                Canvas.SetLeft(rectangle, geometry.Bounds.Left + (selection.VirtualSpaces * view.TextViewLines[0].VirtualSpaceWidth));
                 Canvas.SetTop(rectangle, geometry.Bounds.Top);
 
                 layer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, Vsix.Name, rectangle, null);

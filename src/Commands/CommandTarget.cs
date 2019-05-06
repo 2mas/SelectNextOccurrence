@@ -87,6 +87,7 @@ namespace SelectNextOccurrence.Commands
                         {
                             return HandleMultiPaste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                         }
+
                         break;
                     case VSConstants.VSStd97CmdID.Undo:
                     case VSConstants.VSStd97CmdID.Redo:
@@ -156,6 +157,12 @@ namespace SelectNextOccurrence.Commands
                         processOrder = ProcessOrder.BottomToTop;
                         break;
                 }
+
+                if (pguidCmdGroup == PackageGuids.guidNextOccurrenceCommandsPackageCmdSet)
+                {
+                    verticalMove = nCmdID == PackageIds.AddCaretAboveCommandId
+                                   || nCmdID == PackageIds.AddCaretBelowCommandId;
+                }
             }
             else if (pguidCmdGroup == PackageGuids.guidExtensionSubWordNavigation)
             {
@@ -170,7 +177,7 @@ namespace SelectNextOccurrence.Commands
                 if (pguidCmdGroup == PackageGuids.guidNextOccurrenceCommandsPackageCmdSet)
                 {
                     verticalMove = nCmdID == PackageIds.AddCaretAboveCommandId
-                        || nCmdID == PackageIds.AddCaretBelowCommandId;
+                                   || nCmdID == PackageIds.AddCaretBelowCommandId;
                 }
             }
 
