@@ -120,8 +120,6 @@ namespace SelectNextOccurrence
                 }
             );
 
-            Selections.ForEach(s => s.CopiedText = null);
-
             SearchText = EditorOperations.SelectedText;
         }
 
@@ -335,7 +333,6 @@ namespace SelectNextOccurrence
                     }
                 );
 
-                Selections.ForEach(s => s.CopiedText = null);
                 View.Selection.Clear();
             }
             else
@@ -354,7 +351,6 @@ namespace SelectNextOccurrence
             }
 
             View.Caret.MoveTo(Selections.Last().GetVirtualPoint(Snapshot));
-            Selections.ForEach(s => s.CopiedText = null);
         }
 
         internal void AddCaretBelow()
@@ -367,7 +363,6 @@ namespace SelectNextOccurrence
             }
 
             View.Caret.MoveTo(Selections.Last().GetVirtualPoint(Snapshot));
-            Selections.ForEach(s => s.CopiedText = null);
         }
 
         internal void AddCaretMoveToSelections(Selection selection)
@@ -410,8 +405,6 @@ namespace SelectNextOccurrence
                     }
                 );
             }
-
-            Selections.ForEach(s => s.CopiedText = null);
         }
 
         internal void AddMouseCaretToSelections()
@@ -431,8 +424,6 @@ namespace SelectNextOccurrence
                     }
                 );
             }
-
-            Selections.ForEach(s => s.CopiedText = null);
         }
 
         /// <summary>
@@ -484,6 +475,16 @@ namespace SelectNextOccurrence
             }
         }
 
+        internal string GetCurrentlySelectedText()
+        {
+            return EditorOperations.SelectedText;
+        }
+
+        internal bool InsertText(string text)
+        {
+            return EditorOperations.InsertText(text);
+        }
+
         #region stashed cursors
         internal void StashCurrentCaretPosition()
         {
@@ -523,13 +524,6 @@ namespace SelectNextOccurrence
         /// </summary>
         internal void DiscardSelections()
         {
-            if (Selections.Any() && Selections.All(s => !string.IsNullOrEmpty(s.CopiedText)))
-            {
-                SavedClipboard = Selections
-                    .Where(s => !string.IsNullOrEmpty(s.CopiedText))
-                    .Select(s => s.CopiedText).ToList();
-            }
-
             Selections.Clear();
             HasWrappedDocument = false;
             View.Caret.IsHidden = false;

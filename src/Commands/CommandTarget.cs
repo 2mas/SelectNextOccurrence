@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using Microsoft.VisualStudio;
@@ -80,12 +81,19 @@ namespace SelectNextOccurrence.Commands
                     case VSConstants.VSStd97CmdID.Cut:
                         return HandleMultiCopyCut(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                     case VSConstants.VSStd97CmdID.Paste:
-                        // Only multi-paste different texts if all our selections have been copied with 
-                        // this extension, otherwise paste as default. 
-                        // Copied text get reset when new new selections are added
-                        if (Selector.Selections.All(s => !string.IsNullOrEmpty(s.CopiedText)))
+                        // Only perform multi-paste if the saved clipboard have been copied with 
+                        // this extension, otherwise paste as default.
+                        if (Selector.SavedClipboard.Any() && Selector.Selections.Any())
                         {
-                            return HandleMultiPaste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            // Copy/cut has been made from a non-multiedit place, proceed normal multi-processing
+                            if (Clipboard.GetText() != Selector.SavedClipboard.Last())
+                            {
+                                Selector.ClearSavedClipboard();
+                            }
+                            else
+                            {
+                                return HandleMultiPaste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            }
                         }
 
                         break;
@@ -239,8 +247,7 @@ namespace SelectNextOccurrence.Commands
 
                     foreach (var clipboardText in Selector.SavedClipboard)
                     {
-                        Clipboard.SetText(clipboardText);
-                        result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                        Selector.InsertText(clipboardText);
 
                         if (count < clipboardCount)
                         {
@@ -259,13 +266,15 @@ namespace SelectNextOccurrence.Commands
             {
                 // if copy/cut, clear saved clipboard
                 if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
-                            && ( nCmdID == (uint) VSConstants.VSStd97CmdID.Copy
-                                || ( nCmdID == (uint) VSConstants.VSStd97CmdID.Cut )
-                                )
-                            )
+                    && ( nCmdID == (uint) VSConstants.VSStd97CmdID.Copy
+                         || ( nCmdID == (uint) VSConstants.VSStd97CmdID.Cut )
+                    )
+                )
+                {
                     Selector.ClearSavedClipboard();
-
+                }
             }
+
             // continue normal processing
             return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
@@ -409,6 +418,8 @@ namespace SelectNextOccurrence.Commands
             if (!Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Open(Vsix.Name);
 
+            var copiedTexts = new List<string>();
+
             foreach (var selection in Selector.Selections)
             {
                 if (selection.IsSelection())
@@ -421,14 +432,17 @@ namespace SelectNextOccurrence.Commands
                         false
                     );
 
-                    // Copies/cuts and saves the text on the selection
+                    var copiedText = Selector.GetCurrentlySelectedText();
+
+                    if (!string.IsNullOrEmpty(copiedText))
+                        copiedTexts.Add(copiedText);
+
+                    // Copies/cuts and saves the text as static list of strings
                     result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                    selection.CopiedText = Clipboard.GetText();
                 }
             }
 
-            Selector.SavedClipboard = Selector.Selections.Where(s => !string.IsNullOrEmpty(s.CopiedText))
-                .Select(s => s.CopiedText);
+            Selector.SavedClipboard = copiedTexts;
 
             if (Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Close();
@@ -448,34 +462,43 @@ namespace SelectNextOccurrence.Commands
         private int HandleMultiPaste(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             var result = VSConstants.S_OK;
+            var clipboardCount = Selector.SavedClipboard.Count();
 
-            if (!Selector.Dte.UndoContext.IsOpen)
-                Selector.Dte.UndoContext.Open(Vsix.Name);
-
-            foreach (var selection in Selector.Selections)
+            if (clipboardCount > 0)
             {
-                if (!string.IsNullOrEmpty(selection.CopiedText))
+                if (!Selector.Dte.UndoContext.IsOpen)
+                    Selector.Dte.UndoContext.Open(Vsix.Name);
+
+                var index = 0;
+
+                foreach (var selection in Selector.Selections)
                 {
-                    if (selection.IsSelection())
+                    if (index == clipboardCount) break;
+
+                    var copiedText = Selector.SavedClipboard.ElementAt(index);
+                    if (!string.IsNullOrEmpty(copiedText))
                     {
-                        view.Selection.Select(
-                            new SnapshotSpan(
-                                selection.Start.GetPoint(Snapshot),
-                                selection.End.GetPoint(Snapshot)
-                            ),
-                            false
-                        );
+                        if (selection.IsSelection())
+                        {
+                            view.Selection.Select(
+                                new SnapshotSpan(
+                                    selection.Start.GetPoint(Snapshot),
+                                    selection.End.GetPoint(Snapshot)
+                                ),
+                                false
+                            );
+                        }
+
+                        view.Caret.MoveTo(selection.GetVirtualPoint(Snapshot));
+                        Selector.InsertText(copiedText);
                     }
 
-                    view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
-
-                    Clipboard.SetText(selection.CopiedText);
-                    result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                    index++;
                 }
-            }
 
-            if (Selector.Dte.UndoContext.IsOpen)
-                Selector.Dte.UndoContext.Close();
+                if (Selector.Dte.UndoContext.IsOpen)
+                    Selector.Dte.UndoContext.Close();
+            }
 
             return result;
         }
