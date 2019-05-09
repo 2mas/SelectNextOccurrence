@@ -57,7 +57,7 @@ namespace SelectNextOccurrence
                 ColumnPosition = position - snapshot.GetLineFromPosition(position).Start.Position;
             }
 
-            Caret = snapshot.CreateTrackingPoint(position, PointTrackingMode.Positive);
+            Caret = snapshot.CreateTrackingPoint(position);
         }
 
         internal void UpdateSelection(int previousCaretPosition, ITextSnapshot snapshot)
@@ -90,12 +90,12 @@ namespace SelectNextOccurrence
             else
             {
                 Start = caretPosition > previousCaretPosition ?
-                    snapshot.CreateTrackingPoint(previousCaretPosition, PointTrackingMode.Positive)
+                    snapshot.CreateTrackingPoint(previousCaretPosition)
                     : Caret;
 
                 End = caretPosition > previousCaretPosition ?
                     Caret
-                    : snapshot.CreateTrackingPoint(previousCaretPosition, PointTrackingMode.Positive);
+                    : snapshot.CreateTrackingPoint(previousCaretPosition);
             }
             if (Start.GetPosition(snapshot) == End.GetPosition(snapshot))
             {
@@ -109,15 +109,13 @@ namespace SelectNextOccurrence
             Start = snapshot.CreateTrackingPoint(
                 newSpan.Start.Position.Position > newSpan.End.Position.Position ?
                 newSpan.End.Position.Position
-                : newSpan.Start.Position.Position,
-                PointTrackingMode.Positive
+                : newSpan.Start.Position.Position
             );
 
             End = snapshot.CreateTrackingPoint(
                 newSpan.Start.Position.Position > newSpan.End.Position.Position ?
                 newSpan.Start.Position.Position
-                : newSpan.End.Position.Position,
-                PointTrackingMode.Positive
+                : newSpan.End.Position.Position
             );
         }
 

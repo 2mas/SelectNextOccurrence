@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -112,9 +112,9 @@ namespace SelectNextOccurrence
             Selections.Add(
                 new Selection
                 {
-                    Start = Snapshot.CreateTrackingPoint(start, PointTrackingMode.Positive),
-                    End = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive),
-                    Caret = Snapshot.CreateTrackingPoint(caret, PointTrackingMode.Positive),
+                    Start = Snapshot.CreateTrackingPoint(start),
+                    End = Snapshot.CreateTrackingPoint(end),
+                    Caret = Snapshot.CreateTrackingPoint(caret),
                     ColumnPosition = GetCurrentColumnPosition(caret),
                     VirtualSpaces = View.Caret.Position.VirtualSpaces
                 }
@@ -158,12 +158,11 @@ namespace SelectNextOccurrence
         {
             if (!Selections.Any(s => s.OverlapsWith(occurrence, Snapshot)))
             {
-                var start = Snapshot.CreateTrackingPoint(occurrence.Start, PointTrackingMode.Positive);
-                var end = Snapshot.CreateTrackingPoint(occurrence.End, PointTrackingMode.Positive);
+                var start = Snapshot.CreateTrackingPoint(occurrence.Start);
+                var end = Snapshot.CreateTrackingPoint(occurrence.End);
 
                 // If previous selection was reversed, set this caret to beginning of this selection
-                var caret = Selections.Last().Caret.GetPosition(Snapshot) == Selections.Last().Start?.GetPosition(Snapshot) ?
-                    start : end;
+                var caret = Selections.Last().IsReversed(Snapshot) ? start : end;
 
                 Selections.Add(
                     new Selection
@@ -180,10 +179,7 @@ namespace SelectNextOccurrence
                 View.Caret.MoveTo(caret == start ? occurrence.Start : occurrence.End);
 
                 View.ViewScroller.EnsureSpanVisible(
-                    new SnapshotSpan(
-                        View.Caret.Position.BufferPosition,
-                        0
-                    )
+                    new SnapshotSpan(View.Caret.Position.BufferPosition, 0)
                 );
             }
         }
@@ -372,13 +368,13 @@ namespace SelectNextOccurrence
             {
                 Start = null,
                 End = null,
-                Caret = Snapshot.CreateTrackingPoint(caretPosition, PointTrackingMode.Positive),
+                Caret = Snapshot.CreateTrackingPoint(caretPosition),
                 ColumnPosition = selection.ColumnPosition,
                 VirtualSpaces = View.Caret.Position.VirtualSpaces
             };
 
             var newPosition = newSelection.GetCaretColumnPosition(caretPosition, Snapshot);
-            newSelection.Caret = Snapshot.CreateTrackingPoint(newPosition, PointTrackingMode.Positive);
+            newSelection.Caret = Snapshot.CreateTrackingPoint(newPosition);
 
             if (Selections.Any(s => s.Caret.GetPoint(Snapshot) == newPosition))
                 return;
@@ -396,9 +392,7 @@ namespace SelectNextOccurrence
                     {
                         Start = null,
                         End = null,
-                        Caret = Snapshot.CreateTrackingPoint(
-                            caretPosition,
-                            PointTrackingMode.Positive),
+                        Caret = Snapshot.CreateTrackingPoint(caretPosition),
                         ColumnPosition = GetCurrentColumnPosition(caretPosition)
                             + View.Caret.Position.VirtualSpaces,
                         VirtualSpaces = View.Caret.Position.VirtualSpaces
@@ -417,9 +411,7 @@ namespace SelectNextOccurrence
                     {
                         Start = null,
                         End = null,
-                        Caret = Snapshot.CreateTrackingPoint(
-                            caretPosition,
-                            PointTrackingMode.Positive),
+                        Caret = Snapshot.CreateTrackingPoint(caretPosition),
                         ColumnPosition = GetCurrentColumnPosition(caretPosition)
                     }
                 );
@@ -458,10 +450,8 @@ namespace SelectNextOccurrence
                 var nextSelection = selections[index + 1].selection;
                 if (selection.End.GetPoint(Snapshot) > nextSelection.Start.GetPoint(Snapshot))
                 {
-                    nextSelection.Start = Snapshot.CreateTrackingPoint(
-                        selection.Start.GetPosition(Snapshot),
-                        PointTrackingMode.Positive
-                    );
+                    nextSelection.Start = Snapshot.CreateTrackingPoint(selection.Start.GetPosition(Snapshot));
+
                     if (selection.IsReversed(Snapshot))
                     {
                         nextSelection.Caret = selection.Caret;
@@ -488,10 +478,7 @@ namespace SelectNextOccurrence
         #region stashed cursors
         internal void StashCurrentCaretPosition()
         {
-            StashedCaret = Snapshot.CreateTrackingPoint(
-                            View.Caret.Position.BufferPosition.Position,
-                            PointTrackingMode.Positive
-                        );
+            StashedCaret = Snapshot.CreateTrackingPoint(View.Caret.Position.BufferPosition.Position);
         }
 
         internal void ClearStashedCaretPosition()
