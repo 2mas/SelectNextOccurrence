@@ -8,5 +8,11 @@ namespace SelectNextOccurrence
         {
             return snapshot.CreateTrackingPoint(position, PointTrackingMode.Positive);
         }
+
+        public static int GetLineColumnFromPosition(this ITextSnapshot snapshot, int caretPosition)
+        {
+            var snapshotLine = snapshot.GetLineFromPosition(caretPosition);
+            return caretPosition - snapshotLine.Start.Position;
+        }
     }
 }

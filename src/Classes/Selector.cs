@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -115,7 +115,7 @@ namespace SelectNextOccurrence
                     Start = Snapshot.CreateTrackingPoint(start),
                     End = Snapshot.CreateTrackingPoint(end),
                     Caret = Snapshot.CreateTrackingPoint(caret),
-                    ColumnPosition = GetCurrentColumnPosition(caret),
+                    ColumnPosition = Snapshot.GetLineColumnFromPosition(caret),
                     VirtualSpaces = View.Caret.Position.VirtualSpaces
                 }
             );
@@ -170,7 +170,7 @@ namespace SelectNextOccurrence
                         Start = start,
                         End = end,
                         Caret = caret,
-                        ColumnPosition = GetCurrentColumnPosition(caret.GetPoint(Snapshot))
+                        ColumnPosition = Snapshot.GetLineColumnFromPosition(caret.GetPoint(Snapshot))
                     }
                 );
 
@@ -272,11 +272,11 @@ namespace SelectNextOccurrence
                 return;
 
             if (!char.IsLetterOrDigit(EditorOperations.SelectedText[0])
-                && GetCurrentColumnPosition(caretPosition) != 0)
+                && Snapshot.GetLineColumnFromPosition(caretPosition) != 0)
             {
-                var previousChar = Snapshot.ToCharArray(caretPosition - 1, 1);
+                var previousChar = Snapshot.ToCharArray(caretPosition - 1, 1)[0];
 
-                if (char.IsLetterOrDigit(previousChar[0]))
+                if (char.IsLetterOrDigit(previousChar))
                 {
                     View.Caret.MoveTo(caretPosition - 1);
                     EditorOperations.SelectCurrentWord();
@@ -294,18 +294,14 @@ namespace SelectNextOccurrence
             // Get a valid first selection to begin with
             SelectNextOccurrence();
 
-            var occurrences = textSearchService.FindAll(GetFindData());
-            foreach (var occurrence in occurrences)
+            foreach (var occurrence in textSearchService.FindAll(GetFindData()))
                 ProcessFoundOccurrence(occurrence);
         }
 
         internal void ConvertSelectionToMultipleCursors()
         {
-            var start = View.Selection.Start.Position.Position;
-            var end = View.Selection.End.Position.Position;
-
-            var beginLineNumber = Snapshot.GetLineFromPosition(start).LineNumber;
-            var endLineNumber = Snapshot.GetLineFromPosition(end).LineNumber;
+            var beginLineNumber = View.Selection.Start.Position.GetContainingLine().LineNumber;
+            var endLineNumber = View.Selection.End.Position.GetContainingLine().LineNumber;
 
             if (beginLineNumber != endLineNumber)
             {
@@ -315,8 +311,8 @@ namespace SelectNextOccurrence
                     Selections.Add(
                         new Selection
                         {
-                            Caret = Snapshot.CreateTrackingPoint(line.End.Position, PointTrackingMode.Positive),
-                            ColumnPosition = GetCurrentColumnPosition(line.End.Position)
+                            Caret = Snapshot.CreateTrackingPoint(line.End.Position),
+                            ColumnPosition = Snapshot.GetLineColumnFromPosition(line.End.Position)
                         }
                     );
                 }
@@ -324,8 +320,8 @@ namespace SelectNextOccurrence
                 Selections.Add(
                     new Selection
                     {
-                        Caret = Snapshot.CreateTrackingPoint(end, PointTrackingMode.Positive),
-                        ColumnPosition = GetCurrentColumnPosition(end)
+                        Caret = Snapshot.CreateTrackingPoint(View.Selection.End.Position),
+                        ColumnPosition = Snapshot.GetLineColumnFromPosition(View.Selection.End.Position)
                     }
                 );
 
@@ -393,7 +389,7 @@ namespace SelectNextOccurrence
                         Start = null,
                         End = null,
                         Caret = Snapshot.CreateTrackingPoint(caretPosition),
-                        ColumnPosition = GetCurrentColumnPosition(caretPosition)
+                        ColumnPosition = Snapshot.GetLineColumnFromPosition(caretPosition)
                             + View.Caret.Position.VirtualSpaces,
                         VirtualSpaces = View.Caret.Position.VirtualSpaces
                     }
@@ -412,7 +408,7 @@ namespace SelectNextOccurrence
                         Start = null,
                         End = null,
                         Caret = Snapshot.CreateTrackingPoint(caretPosition),
-                        ColumnPosition = GetCurrentColumnPosition(caretPosition)
+                        ColumnPosition = Snapshot.GetLineColumnFromPosition(caretPosition)
                     }
                 );
             }
@@ -497,7 +493,7 @@ namespace SelectNextOccurrence
                         Start = null,
                         End = null,
                         Caret = StashedCaret,
-                        ColumnPosition = GetCurrentColumnPosition(stashedCaretPosition)
+                        ColumnPosition = Snapshot.GetLineColumnFromPosition(stashedCaretPosition)
                     }
                 );
             }
@@ -519,12 +515,6 @@ namespace SelectNextOccurrence
         internal void ClearSavedClipboard()
         {
             SavedClipboard = new List<string>();
-        }
-
-        private int GetCurrentColumnPosition(int caretPosition)
-        {
-            var snapshotLine = Snapshot.GetLineFromPosition(caretPosition);
-            return caretPosition - snapshotLine.Start.Position;
         }
     }
 }
