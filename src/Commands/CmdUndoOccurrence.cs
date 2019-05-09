@@ -33,10 +33,7 @@ namespace SelectNextOccurrence.Commands
 
                 View.Caret.MoveTo(AdornmentLayer.Selector.Selections.Last().Caret.GetPoint(AdornmentLayer.Snapshot));
                 View.ViewScroller.EnsureSpanVisible(
-                    new SnapshotSpan(
-                        View.Caret.Position.BufferPosition,
-                        0
-                    )
+                    new SnapshotSpan(View.Caret.Position.BufferPosition, 0)
                 );
             }
         }

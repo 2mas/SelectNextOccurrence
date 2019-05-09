@@ -19,7 +19,7 @@ namespace SelectNextOccurrence
         }
     }
 
-    class MouseProcessor : IMouseProcessor
+    internal class MouseProcessor : IMouseProcessor
     {
         private readonly IWpfTextView textView;
 
@@ -33,7 +33,7 @@ namespace SelectNextOccurrence
 
         private bool CheckModifiers()
         {
-            return (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt));
+            return Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt);
         }
 
         public void PostprocessMouseLeftButtonUp(MouseButtonEventArgs e)

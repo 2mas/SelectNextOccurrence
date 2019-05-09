@@ -38,26 +38,26 @@ namespace SelectNextOccurrence
 
         #endregion
 
-        internal readonly IWpfTextView View;
+        private readonly IWpfTextView View;
 
-        internal ITextSnapshot Snapshot => this.View.TextSnapshot;
+        private ITextSnapshot Snapshot => View.TextSnapshot;
 
         /// <summary>
         /// Contains all tracking-points for selections and carets
         /// This is what is getting drawn in the adornment layer
         /// </summary>
-        internal List<Selection> Selections;
+        internal List<Selection> Selections { get; set; }
 
         /// <summary>
         /// Stores copied texts from selections after they are abandoned for later pasting
         /// when back to one caret or across multiple documents
         /// </summary>
-        internal static IEnumerable<string> SavedClipboard = new List<string>();
+        internal static IEnumerable<string> SavedClipboard { get; set; } = new List<string>();
 
         /// <summary>
         /// The last search-term
         /// </summary>
-        internal string SearchText;
+        internal string SearchText { get; set; }
 
         /// <summary>
         /// Saves a caretposition to be added to selections at a later time
@@ -66,7 +66,7 @@ namespace SelectNextOccurrence
         /// </summary>
         internal ITrackingPoint StashedCaret { get; private set; }
 
-        public bool HasWrappedDocument { get; set; }
+        internal bool HasWrappedDocument { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Selector"/> class.
@@ -81,8 +81,7 @@ namespace SelectNextOccurrence
             ITextSearchService textSearchService,
             IEditorOperationsFactoryService editorOperationsService,
             ITextStructureNavigator textStructureNavigator,
-            IOutliningManagerService outliningManagerService
-            )
+            IOutliningManagerService outliningManagerService)
         {
             this.View = view;
 
@@ -103,11 +102,10 @@ namespace SelectNextOccurrence
         /// </summary>
         private void AddCurrentSelectionToSelections()
         {
-            var start = View.Selection.Start.Position.Position;
-            var end = View.Selection.End.Position.Position;
-
-            var caret = !View.Selection.IsReversed ?
-                end : start;
+            var start = View.Selection.Start.Position;
+            var end = View.Selection.End.Position;
+            var caret = View.Selection.IsReversed
+                ? start : end;
 
             Selections.Add(
                 new Selection
@@ -160,9 +158,8 @@ namespace SelectNextOccurrence
             {
                 var start = Snapshot.CreateTrackingPoint(occurrence.Start);
                 var end = Snapshot.CreateTrackingPoint(occurrence.End);
-
-                // If previous selection was reversed, set this caret to beginning of this selection
-                var caret = Selections.Last().IsReversed(Snapshot) ? start : end;
+                var caret = Selections.Last().IsReversed(Snapshot)
+                    ? start : end;
 
                 Selections.Add(
                     new Selection
@@ -380,8 +377,8 @@ namespace SelectNextOccurrence
 
         internal void AddCurrentCaretToSelections()
         {
-            var caretPosition = View.Caret.Position.BufferPosition.Position;
-            if (!Selections.Any(s => s.Caret.GetPoint(Snapshot).Position == caretPosition))
+            var caretPosition = View.Caret.Position.BufferPosition;
+            if (!Selections.Any(s => s.Caret.GetPosition(Snapshot) == caretPosition))
             {
                 Selections.Add(
                     new Selection
@@ -399,8 +396,8 @@ namespace SelectNextOccurrence
 
         internal void AddMouseCaretToSelections()
         {
-            var caretPosition = View.Caret.Position.BufferPosition.Position;
-            if (!Selections.Any(s => s.Caret.GetPoint(Snapshot).Position == caretPosition))
+            var caretPosition = View.Caret.Position.BufferPosition;
+            if (!Selections.Any(s => s.Caret.GetPosition(Snapshot) == caretPosition))
             {
                 Selections.Add(
                     new Selection
@@ -474,7 +471,7 @@ namespace SelectNextOccurrence
         #region stashed cursors
         internal void StashCurrentCaretPosition()
         {
-            StashedCaret = Snapshot.CreateTrackingPoint(View.Caret.Position.BufferPosition.Position);
+            StashedCaret = Snapshot.CreateTrackingPoint(View.Caret.Position.BufferPosition);
         }
 
         internal void ClearStashedCaretPosition()
@@ -484,8 +481,8 @@ namespace SelectNextOccurrence
 
         internal void ApplyStashedCaretPosition()
         {
-            var stashedCaretPosition = StashedCaret.GetPoint(Snapshot).Position;
-            if (!Selections.Any(s => s.Caret.GetPoint(Snapshot).Position == stashedCaretPosition))
+            var stashedCaretPosition = StashedCaret.GetPosition(Snapshot);
+            if (!Selections.Any(s => s.Caret.GetPoint(Snapshot) == stashedCaretPosition))
             {
                 Selections.Add(
                     new Selection

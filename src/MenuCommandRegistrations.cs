@@ -96,11 +96,7 @@ namespace SelectNextOccurrence
         /// <summary>
         /// Gets the instance of the command.
         /// </summary>
-        public static MenuCommandRegistrations Instance
-        {
-            get;
-            private set;
-        }
+        public static MenuCommandRegistrations Instance { get; private set; }
 
 
         /// <summary>

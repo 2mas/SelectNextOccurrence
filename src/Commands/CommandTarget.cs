@@ -18,11 +18,11 @@ namespace SelectNextOccurrence.Commands
 
         private readonly IWpfTextView view;
 
-        private ITextSnapshot Snapshot => this.view.TextSnapshot;
-
-        private Selector Selector => this.adornmentLayer.Selector;
-
         private readonly AdornmentLayer adornmentLayer;
+
+        private ITextSnapshot Snapshot => view.TextSnapshot;
+
+        private Selector Selector => adornmentLayer.Selector;
 
         public IOleCommandTarget NextCommandTarget { get; set; }
 
@@ -473,7 +473,8 @@ namespace SelectNextOccurrence.Commands
 
                 foreach (var selection in Selector.Selections)
                 {
-                    if (index == clipboardCount) break;
+                    if (index == clipboardCount)
+                        break;
 
                     var copiedText = Selector.SavedClipboard.ElementAt(index);
                     if (!string.IsNullOrEmpty(copiedText))

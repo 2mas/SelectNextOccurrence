@@ -38,7 +38,7 @@ namespace SelectNextOccurrence
 
         internal bool IsSelection()
         {
-            return (Start != null && End != null);
+            return Start != null && End != null;
         }
 
         internal bool IsReversed(ITextSnapshot snapshot)
@@ -143,9 +143,9 @@ namespace SelectNextOccurrence
             {
                 return snapshot.Length;
             }
-            else if (ColumnPosition > (caretPosition - caretLine.Start.Position))
+            else if (ColumnPosition > ( caretPosition - caretLine.Start.Position ))
             {
-                var correctColumnPosition = (ColumnPosition > caretLine.Length) ?
+                var correctColumnPosition = ( ColumnPosition > caretLine.Length ) ?
                     caretLine.Length
                     : ColumnPosition;
                 return caretLine.Start.Position + correctColumnPosition;
