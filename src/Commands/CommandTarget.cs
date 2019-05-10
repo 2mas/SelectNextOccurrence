@@ -86,7 +86,7 @@ namespace SelectNextOccurrence.Commands
                         if (Selector.SavedClipboard.Any() && Selector.Selections.Any())
                         {
                             // Copy/cut has been made from a non-multiedit place, proceed normal multi-processing
-                            if (Clipboard.GetText() != Selector.SavedClipboard.Last())
+                            if (Clipboard.GetText() != string.Join(Environment.NewLine, Selector.SavedClipboard))
                             {
                                 Selector.ClearSavedClipboard();
                             }
@@ -213,69 +213,18 @@ namespace SelectNextOccurrence.Commands
             return result;
         }
 
-        /// <summary>
-        /// When no multiple selections are active, perform checks for multi-paste.
-        /// Multi-paste gets active if its previously stored on selections that are now discarded
-        /// and the current clipboards content equals the last stored clipboard-item
-        /// </summary>
-        /// <param name="pguidCmdGroup"></param>
-        /// <param name="nCmdID"></param>
-        /// <param name="nCmdexecopt"></param>
-        /// <param name="pvaIn"></param>
-        /// <param name="pvaOut"></param>
-        /// <param name="result"></param>
-        /// <returns></returns>
         private int ProcessSingleCursor(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut, ref int result)
         {
-            // if paste, see if we have a saved clipboard to apply
+            // if copy/cut, clear saved clipboard
             if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
-                    && nCmdID == (uint) VSConstants.VSStd97CmdID.Paste
-                    && Selector.SavedClipboard.Any())
-            {
-                // Clipboard saved, paste these on new lines if current clipboard does match the last item
-                // If they dont match, a copy/cut has been made from somewhere else
-                if (Clipboard.GetText() != Selector.SavedClipboard.Last())
-                    Selector.ClearSavedClipboard();
-
-                if (Selector.SavedClipboard.Count() > 1)
-                {
-                    var count = 1;
-                    var clipboardCount = Selector.SavedClipboard.Count();
-
-                    if (!Selector.Dte.UndoContext.IsOpen)
-                        Selector.Dte.UndoContext.Open(Vsix.Name);
-
-                    foreach (var clipboardText in Selector.SavedClipboard)
-                    {
-                        Selector.InsertText(clipboardText);
-
-                        if (count < clipboardCount)
-                        {
-                            Selector.EditorOperations.InsertNewLine();
-                            count++;
-                        }
-                    }
-
-                    if (Selector.Dte.UndoContext.IsOpen)
-                        Selector.Dte.UndoContext.Close();
-
-                    return result;
-                }
-            }
-            else
-            {
-                // if copy/cut, clear saved clipboard
-                if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
-                    && ( nCmdID == (uint) VSConstants.VSStd97CmdID.Copy
-                         || ( nCmdID == (uint) VSConstants.VSStd97CmdID.Cut )
-                    )
+                && ( nCmdID == (uint) VSConstants.VSStd97CmdID.Copy
+                     || ( nCmdID == (uint) VSConstants.VSStd97CmdID.Cut )
                 )
-                {
-                    Selector.ClearSavedClipboard();
-                }
+            )
+            {
+                Selector.ClearSavedClipboard();
             }
 
-            // continue normal processing
             return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
 
@@ -403,7 +352,8 @@ namespace SelectNextOccurrence.Commands
         }
 
         /// <summary>
-        /// Copies/cuts each selection as normal, and saves the text into the selection-item
+        /// Copies/cuts each selection as normal, saves the texts into static <see cref="Selector.SavedClipboard"/>
+        /// Selections are processed from top to bottom
         /// </summary>
         /// <param name="pguidCmdGroup"></param>
         /// <param name="nCmdID"></param>
@@ -420,7 +370,7 @@ namespace SelectNextOccurrence.Commands
 
             var copiedTexts = new List<string>();
 
-            foreach (var selection in Selector.Selections)
+            foreach (var selection in Selector.Selections.OrderBy(s => s.Caret.GetPosition(Snapshot)))
             {
                 if (selection.IsSelection())
                 {
@@ -444,6 +394,15 @@ namespace SelectNextOccurrence.Commands
 
             Selector.SavedClipboard = copiedTexts;
 
+            try
+            {
+                Clipboard.SetText(string.Join(Environment.NewLine, Selector.SavedClipboard));
+            }
+            catch
+            {
+                System.Diagnostics.Debug.WriteLine("Clipboard copy error saving: {0}", string.Join(Environment.NewLine, Selector.SavedClipboard));
+            }
+
             if (Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Close();
 
@@ -452,6 +411,7 @@ namespace SelectNextOccurrence.Commands
 
         /// <summary>
         /// If a previous multi-copy/cut has been made, this pastes the saved text at cursor-positions
+        /// Selections are processed from top to bottom
         /// </summary>
         /// <param name="pguidCmdGroup"></param>
         /// <param name="nCmdID"></param>
@@ -471,7 +431,7 @@ namespace SelectNextOccurrence.Commands
 
                 var index = 0;
 
-                foreach (var selection in Selector.Selections)
+                foreach (var selection in Selector.Selections.OrderBy(s => s.Caret.GetPosition(Snapshot)))
                 {
                     if (index == clipboardCount)
                         break;
