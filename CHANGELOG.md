@@ -3,6 +3,11 @@
 
 # Change log
 
+#### 1.3.96
+- [x] Add Virtual space support
+- [x] Rebuilt copy/paste functionality to improve speed and enable pasting of multiple selections into external documents
+- [x] Added compatibility for the extension Subword Navigation
+
 #### 1.3.83
 - [x] Bugfix: fixes search when wrapping document, caused by the mixing of next/previous introduced in 1.3.80
 
