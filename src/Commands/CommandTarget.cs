@@ -57,6 +57,7 @@ namespace SelectNextOccurrence.Commands
                 switch ((VSConstants.VSStd97CmdID) nCmdID)
                 {
                     case VSConstants.VSStd97CmdID.SolutionCfg:
+                    case VSConstants.VSStd97CmdID.SearchCombo:
                         return result;
                 }
             }
