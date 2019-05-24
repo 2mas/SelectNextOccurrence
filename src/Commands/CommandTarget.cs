@@ -40,15 +40,12 @@ namespace SelectNextOccurrence.Commands
 
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            // Return not supported when the command does nothing
-            var result = unchecked((int) Constants.OLECMDERR_E_NOTSUPPORTED);
-
             if (pguidCmdGroup == VSConstants.VSStd2K)
             {
                 switch ((VSConstants.VSStd2KCmdID) nCmdID)
                 {
                     case VSConstants.VSStd2KCmdID.SolutionPlatform:
-                        return result;
+                        return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                 }
             }
 
@@ -58,11 +55,11 @@ namespace SelectNextOccurrence.Commands
                 {
                     case VSConstants.VSStd97CmdID.SolutionCfg:
                     case VSConstants.VSStd97CmdID.SearchCombo:
-                        return result;
+                        return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                 }
             }
 
-            result = VSConstants.S_OK;
+            var result = VSConstants.S_OK;
             System.Diagnostics.Debug.WriteLine("grp: {0}, id: {1}", pguidCmdGroup.ToString(), nCmdID.ToString());
 
             if (!Selector.Selections.Any())
