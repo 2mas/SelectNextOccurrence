@@ -265,18 +265,18 @@ namespace SelectNextOccurrence
         {
             EditorOperations.SelectCurrentWord();
 
-            if (EditorOperations.SelectedText.Length == 0)
-                return;
-
-            if (!char.IsLetterOrDigit(EditorOperations.SelectedText[0])
-                && Snapshot.GetLineColumnFromPosition(caretPosition) != 0)
+            if (EditorOperations.SelectedText.Length != 0)
             {
-                var previousChar = Snapshot.ToCharArray(caretPosition - 1, 1)[0];
-
-                if (char.IsLetterOrDigit(previousChar))
+                if (!char.IsLetterOrDigit(EditorOperations.SelectedText[0])
+                    && Snapshot.GetLineColumnFromPosition(caretPosition) != 0)
                 {
-                    View.Caret.MoveTo(caretPosition - 1);
-                    EditorOperations.SelectCurrentWord();
+                    var previousChar = Snapshot.ToCharArray(caretPosition - 1, 1)[0];
+
+                    if (char.IsLetterOrDigit(previousChar))
+                    {
+                        View.Caret.MoveTo(caretPosition - 1);
+                        EditorOperations.SelectCurrentWord();
+                    }
                 }
             }
 
