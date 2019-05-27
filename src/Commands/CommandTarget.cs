@@ -180,11 +180,11 @@ namespace SelectNextOccurrence.Commands
                         break;
                 }
 
-                if (pguidCmdGroup == PackageGuids.guidNextOccurrenceCommandsPackageCmdSet)
-                {
-                    verticalMove = nCmdID == PackageIds.AddCaretAboveCommandId
-                                   || nCmdID == PackageIds.AddCaretBelowCommandId;
-                }
+            }
+            else if (pguidCmdGroup == PackageGuids.guidNextOccurrenceCommandsPackageCmdSet)
+            {
+                verticalMove = nCmdID == PackageIds.AddCaretAboveCommandId
+                                || nCmdID == PackageIds.AddCaretBelowCommandId;
             }
 
             if (Selector.Selections.Any())
