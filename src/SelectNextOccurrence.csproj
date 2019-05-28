@@ -59,6 +59,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Classes\HistorySelection.cs" />
     <Compile Include="Extensions\TextSnapshotExtensions.cs" />
     <Compile Include="Commands\CmdSelectPreviousExactOccurrence.cs" />
     <Compile Include="Commands\CmdSelectNextExactOccurrence.cs" />

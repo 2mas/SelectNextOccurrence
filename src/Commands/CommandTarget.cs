@@ -97,9 +97,22 @@ namespace SelectNextOccurrence.Commands
                         break;
                     case VSConstants.VSStd97CmdID.Undo:
                     case VSConstants.VSStd97CmdID.Redo:
+                    {
+                        var selectionHistory = (VSConstants.VSStd97CmdID) nCmdID == VSConstants.VSStd97CmdID.Undo
+                            ? Selector.UndoSelectionHistory : Selector.RedoSelectionHistory;
+
                         result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                        if (selectionHistory.TryGetValue(view.TextSnapshot.Version.ReiteratedVersionNumber, out var selections))
+                        {
+                            Selector.Selections = Selector.CreateSelections(selections);
+                        }
+                        else
+                        {
+                            Selector.DiscardSelections();
+                        }
                         adornmentLayer.DrawAdornments();
                         return result;
+                    }
                 }
             }
             else if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID)
@@ -214,15 +227,28 @@ namespace SelectNextOccurrence.Commands
         private int ProcessSingleCursor(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut, ref int result)
         {
             // if copy/cut, clear saved clipboard
-            if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97
-                && ( nCmdID == (uint) VSConstants.VSStd97CmdID.Copy
-                     || ( nCmdID == (uint) VSConstants.VSStd97CmdID.Cut )
-                )
-            )
+            if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
             {
-                Selector.ClearSavedClipboard();
-            }
+                var command = (VSConstants.VSStd97CmdID) nCmdID;
+                if (command == VSConstants.VSStd97CmdID.Copy || command == VSConstants.VSStd97CmdID.Cut)
+                {
+                    Selector.ClearSavedClipboard();
+                }
+                else if (command == VSConstants.VSStd97CmdID.Undo || command == VSConstants.VSStd97CmdID.Redo)
+                {
+                    var selectionHistory = command == VSConstants.VSStd97CmdID.Undo
+                        ? Selector.UndoSelectionHistory : Selector.RedoSelectionHistory;
 
+                    result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+
+                    if (selectionHistory.TryGetValue(view.TextSnapshot.Version.ReiteratedVersionNumber, out var selections))
+                    {
+                        Selector.Selections = Selector.CreateSelections(selections);
+                        adornmentLayer.DrawAdornments();
+                    }
+                    return result;
+                }
+            }
             return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
 
@@ -246,6 +272,8 @@ namespace SelectNextOccurrence.Commands
             // Contains the same selection-elements but possibly re-ordered
             // Selector keeps original order to support undo
             var selectionsToProcess = Selector.Selections;
+            var previousVersion = view.TextSnapshot.Version.ReiteratedVersionNumber;
+            var previousSelections = Selector.CopyCurrentSelections();
 
             switch (processOrder)
             {
@@ -315,6 +343,13 @@ namespace SelectNextOccurrence.Commands
 
             if (Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Close();
+
+            var newVersion = view.TextSnapshot.Version.ReiteratedVersionNumber;
+            if (newVersion > previousVersion)
+            {
+                Selector.UndoSelectionHistory[previousVersion] = previousSelections;
+                Selector.RedoSelectionHistory[newVersion] = Selector.CopyCurrentSelections();
+            }
 
             // Set new search text. Needed if selection is modified
             if (modifySelections)

@@ -42,6 +42,9 @@ namespace SelectNextOccurrence
 
         private ITextSnapshot Snapshot => View.TextSnapshot;
 
+        internal Dictionary<int, List<HistorySelection>> UndoSelectionHistory { get; set; }
+        internal Dictionary<int, List<HistorySelection>> RedoSelectionHistory { get; set; }
+
         /// <summary>
         /// Contains all tracking-points for selections and carets
         /// This is what is getting drawn in the adornment layer
@@ -93,6 +96,8 @@ namespace SelectNextOccurrence
             this.Dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
 
             this.Selections = new List<Selection>();
+            this.UndoSelectionHistory = new Dictionary<int, List<HistorySelection>>();
+            this.RedoSelectionHistory = new Dictionary<int, List<HistorySelection>>();
         }
 
         /// <summary>
@@ -179,6 +184,32 @@ namespace SelectNextOccurrence
                     new SnapshotSpan(View.Caret.Position.BufferPosition, 0)
                 );
             }
+        }
+
+        internal List<HistorySelection> CopyCurrentSelections()
+        {
+            return Selections.Select(s =>
+                new HistorySelection
+                {
+                    CaretPosition = s.Caret.GetPosition(Snapshot),
+                    StartPosition = s.Start?.GetPosition(Snapshot),
+                    EndPosition = s.End?.GetPosition(Snapshot),
+                    ColumnPosition = s.ColumnPosition,
+                    VirtualSpaces = s.VirtualSpaces
+                }).ToList();
+        }
+
+        internal List<Selection> CreateSelections(List<HistorySelection> selectionItems)
+        {
+            return selectionItems.Select(s =>
+                new Selection
+                {
+                    Caret = Snapshot.CreateTrackingPoint(s.CaretPosition),
+                    Start = s.StartPosition.HasValue ? Snapshot.CreateTrackingPoint(s.StartPosition.Value) : null,
+                    End = s.EndPosition.HasValue ? Snapshot.CreateTrackingPoint(s.EndPosition.Value) : null,
+                    ColumnPosition = s.ColumnPosition,
+                    VirtualSpaces = s.VirtualSpaces
+                }).ToList();
         }
 
         /// <summary>
