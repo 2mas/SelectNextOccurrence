@@ -96,23 +96,15 @@ namespace SelectNextOccurrence.Commands
 
                         break;
                     case VSConstants.VSStd97CmdID.Undo:
-                    case VSConstants.VSStd97CmdID.Redo:
-                    {
-                        var selectionHistory = (VSConstants.VSStd97CmdID) nCmdID == VSConstants.VSStd97CmdID.Undo
-                            ? Selector.UndoSelectionHistory : Selector.RedoSelectionHistory;
-
                         result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                        if (selectionHistory.TryGetValue(view.TextSnapshot.Version.ReiteratedVersionNumber, out var selections))
-                        {
-                            Selector.Selections = Selector.CreateSelections(selections);
-                        }
-                        else
-                        {
-                            Selector.DiscardSelections();
-                        }
+                        Selector.UndoSelectionsHistory();
                         adornmentLayer.DrawAdornments();
                         return result;
-                    }
+                    case VSConstants.VSStd97CmdID.Redo:
+                        result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                        Selector.RedoSelectionsHistory();
+                        adornmentLayer.DrawAdornments();
+                        return result;
                 }
             }
             else if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID)
@@ -234,18 +226,18 @@ namespace SelectNextOccurrence.Commands
                 {
                     Selector.ClearSavedClipboard();
                 }
-                else if (command == VSConstants.VSStd97CmdID.Undo || command == VSConstants.VSStd97CmdID.Redo)
+                else if (command == VSConstants.VSStd97CmdID.Undo)
                 {
-                    var selectionHistory = command == VSConstants.VSStd97CmdID.Undo
-                        ? Selector.UndoSelectionHistory : Selector.RedoSelectionHistory;
-
                     result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-
-                    if (selectionHistory.TryGetValue(view.TextSnapshot.Version.ReiteratedVersionNumber, out var selections))
-                    {
-                        Selector.Selections = Selector.CreateSelections(selections);
-                        adornmentLayer.DrawAdornments();
-                    }
+                    Selector.UndoSelectionsHistory();
+                    adornmentLayer.DrawAdornments();
+                    return result;
+                }
+                else if(command == VSConstants.VSStd97CmdID.Redo)
+                {
+                    result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                    Selector.RedoSelectionsHistory();
+                    adornmentLayer.DrawAdornments();
                     return result;
                 }
             }
@@ -272,8 +264,8 @@ namespace SelectNextOccurrence.Commands
             // Contains the same selection-elements but possibly re-ordered
             // Selector keeps original order to support undo
             var selectionsToProcess = Selector.Selections;
-            var previousVersion = view.TextSnapshot.Version.ReiteratedVersionNumber;
-            var previousSelections = Selector.CopyCurrentSelections();
+
+            Selector.StorePreviousSelectionsHistory();
 
             switch (processOrder)
             {
@@ -344,12 +336,7 @@ namespace SelectNextOccurrence.Commands
             if (Selector.Dte.UndoContext.IsOpen)
                 Selector.Dte.UndoContext.Close();
 
-            var newVersion = view.TextSnapshot.Version.ReiteratedVersionNumber;
-            if (newVersion > previousVersion)
-            {
-                Selector.UndoSelectionHistory[previousVersion] = previousSelections;
-                Selector.RedoSelectionHistory[newVersion] = Selector.CopyCurrentSelections();
-            }
+            Selector.SaveSelectionsHistory();
 
             // Set new search text. Needed if selection is modified
             if (modifySelections)

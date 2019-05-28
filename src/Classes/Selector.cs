@@ -40,10 +40,9 @@ namespace SelectNextOccurrence
 
         private readonly IWpfTextView View;
 
-        private ITextSnapshot Snapshot => View.TextSnapshot;
+        private readonly HistoryManager historyManager;
 
-        internal Dictionary<int, List<HistorySelection>> UndoSelectionHistory { get; set; }
-        internal Dictionary<int, List<HistorySelection>> RedoSelectionHistory { get; set; }
+        private ITextSnapshot Snapshot => View.TextSnapshot;
 
         /// <summary>
         /// Contains all tracking-points for selections and carets
@@ -96,8 +95,7 @@ namespace SelectNextOccurrence
             this.Dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
 
             this.Selections = new List<Selection>();
-            this.UndoSelectionHistory = new Dictionary<int, List<HistorySelection>>();
-            this.RedoSelectionHistory = new Dictionary<int, List<HistorySelection>>();
+            this.historyManager = new HistoryManager();
         }
 
         /// <summary>
@@ -184,32 +182,6 @@ namespace SelectNextOccurrence
                     new SnapshotSpan(View.Caret.Position.BufferPosition, 0)
                 );
             }
-        }
-
-        internal List<HistorySelection> CopyCurrentSelections()
-        {
-            return Selections.Select(s =>
-                new HistorySelection
-                {
-                    CaretPosition = s.Caret.GetPosition(Snapshot),
-                    StartPosition = s.Start?.GetPosition(Snapshot),
-                    EndPosition = s.End?.GetPosition(Snapshot),
-                    ColumnPosition = s.ColumnPosition,
-                    VirtualSpaces = s.VirtualSpaces
-                }).ToList();
-        }
-
-        internal List<Selection> CreateSelections(List<HistorySelection> selectionItems)
-        {
-            return selectionItems.Select(s =>
-                new Selection
-                {
-                    Caret = Snapshot.CreateTrackingPoint(s.CaretPosition),
-                    Start = s.StartPosition.HasValue ? Snapshot.CreateTrackingPoint(s.StartPosition.Value) : null,
-                    End = s.EndPosition.HasValue ? Snapshot.CreateTrackingPoint(s.EndPosition.Value) : null,
-                    ColumnPosition = s.ColumnPosition,
-                    VirtualSpaces = s.VirtualSpaces
-                }).ToList();
         }
 
         /// <summary>
@@ -486,6 +458,42 @@ namespace SelectNextOccurrence
             foreach (var index in overlappingSelections.OrderByDescending(n => n))
             {
                 Selections.RemoveAt(index);
+            }
+        }
+
+        /// <summary>
+        /// Stores previous selections in a temporary buffer.
+        /// The selections are only saved if SaveSelectionsHistory is called.
+        /// </summary>
+        internal void StorePreviousSelectionsHistory()
+        {
+            historyManager.StoreSelectionsHistory(Snapshot, Selections);
+        }
+
+        internal void SaveSelectionsHistory()
+        {
+            historyManager.SaveSelectionsToHistory(Snapshot, Selections);
+        }
+
+        internal void RedoSelectionsHistory()
+        {
+            SetSelectionsFromHistory(historyManager.RedoSelectionHistory);
+        }
+
+        internal void UndoSelectionsHistory()
+        {
+            SetSelectionsFromHistory(historyManager.UndoSelectionHistory);
+        }
+
+        private void SetSelectionsFromHistory(Dictionary<int, List<HistorySelection>> selectionHistory)
+        {
+            if (selectionHistory.TryGetValue(Snapshot.Version.ReiteratedVersionNumber, out var selections))
+            {
+                Selections = HistoryManager.CreateSelections(Snapshot, selections);
+            }
+            else
+            {
+                DiscardSelections();
             }
         }
 
