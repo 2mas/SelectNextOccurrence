@@ -40,6 +40,8 @@ namespace SelectNextOccurrence
 
         private readonly IWpfTextView View;
 
+        private readonly HistoryManager historyManager;
+
         private ITextSnapshot Snapshot => View.TextSnapshot;
 
         /// <summary>
@@ -93,6 +95,7 @@ namespace SelectNextOccurrence
             this.Dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
 
             this.Selections = new List<Selection>();
+            this.historyManager = new HistoryManager();
         }
 
         /// <summary>
@@ -455,6 +458,42 @@ namespace SelectNextOccurrence
             foreach (var index in overlappingSelections.OrderByDescending(n => n))
             {
                 Selections.RemoveAt(index);
+            }
+        }
+
+        /// <summary>
+        /// Stores previous selections in a temporary buffer.
+        /// The selections are only saved if SaveSelectionsHistory is called.
+        /// </summary>
+        internal void StorePreviousSelectionsHistory()
+        {
+            historyManager.StoreSelectionsHistory(Snapshot, Selections);
+        }
+
+        internal void SaveSelectionsHistory()
+        {
+            historyManager.SaveSelectionsToHistory(Snapshot, Selections);
+        }
+
+        internal void RedoSelectionsHistory()
+        {
+            SetSelectionsFromHistory(historyManager.RedoSelectionHistory);
+        }
+
+        internal void UndoSelectionsHistory()
+        {
+            SetSelectionsFromHistory(historyManager.UndoSelectionHistory);
+        }
+
+        private void SetSelectionsFromHistory(Dictionary<int, List<HistorySelection>> selectionHistory)
+        {
+            if (selectionHistory.TryGetValue(Snapshot.Version.ReiteratedVersionNumber, out var selections))
+            {
+                Selections = HistoryManager.CreateSelections(Snapshot, selections);
+            }
+            else
+            {
+                DiscardSelections();
             }
         }
 
