@@ -164,6 +164,13 @@ namespace SelectNextOccurrence.Commands
                         break;
                 }
             }
+            else if (pguidCmdGroup == PackageGuids.guidVS16Commands)
+            {
+                if (nCmdID == 48 || nCmdID == 49)
+                {
+                    invokeCommand = true;
+                }
+            }
             else if (pguidCmdGroup == PackageGuids.guidExtensionSubWordNavigation)
             {
                 switch (nCmdID)
