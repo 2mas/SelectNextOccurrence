@@ -68,8 +68,8 @@ namespace SelectNextOccurrence.Commands
             var modifySelections = false;
             var clearSelections = false;
             var verticalMove = false;
-            var processOrder = ProcessOrder.Normal;
             var invokeCommand = false;
+            var processOrder = ProcessOrder.Normal;
 
             if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
             {
@@ -163,12 +163,6 @@ namespace SelectNextOccurrence.Commands
                         processOrder = ProcessOrder.BottomToTop;
                         break;
                 }
-
-                if (pguidCmdGroup == PackageGuids.guidNextOccurrenceCommandsPackageCmdSet)
-                {
-                    verticalMove = nCmdID == PackageIds.AddCaretAboveCommandId
-                                   || nCmdID == PackageIds.AddCaretBelowCommandId;
-                }
             }
             else if (pguidCmdGroup == PackageGuids.guidExtensionSubWordNavigation)
             {
@@ -179,7 +173,6 @@ namespace SelectNextOccurrence.Commands
                         modifySelections = true;
                         break;
                 }
-
             }
             else if (pguidCmdGroup == PackageGuids.guidNextOccurrenceCommandsPackageCmdSet)
             {
