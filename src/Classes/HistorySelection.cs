@@ -7,6 +7,5 @@
         internal int CaretPosition { get; set; }
         internal int ColumnPosition { get; set; }
         internal int VirtualSpaces { get; set; }
-
     }
 }

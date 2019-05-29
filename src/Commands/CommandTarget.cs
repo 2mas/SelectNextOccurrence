@@ -93,7 +93,6 @@ namespace SelectNextOccurrence.Commands
                                 return HandleMultiPaste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                             }
                         }
-
                         break;
                     case VSConstants.VSStd97CmdID.Undo:
                         result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);

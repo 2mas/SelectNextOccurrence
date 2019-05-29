@@ -28,7 +28,7 @@ namespace SelectNextOccurrence
                     EndPosition = s.End?.GetPosition(snapshot),
                     ColumnPosition = s.ColumnPosition,
                     VirtualSpaces = s.VirtualSpaces
-            }).ToList();
+                }).ToList();
         }
 
         internal void SaveSelectionsToHistory(ITextSnapshot snapshot, List<Selection> selections)
@@ -54,6 +54,5 @@ namespace SelectNextOccurrence
                     VirtualSpaces = s.VirtualSpaces
                 }).ToList();
         }
-
     }
 }
