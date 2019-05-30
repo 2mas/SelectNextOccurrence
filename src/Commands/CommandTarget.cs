@@ -90,7 +90,7 @@ namespace SelectNextOccurrence.Commands
                             }
                             else
                             {
-                                return HandleMultiPaste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                                return HandleMultiPaste();
                             }
                         }
                         break;
@@ -257,14 +257,12 @@ namespace SelectNextOccurrence.Commands
         {
             var result = VSConstants.S_OK;
 
-            if (!Selector.Dte.UndoContext.IsOpen)
-                Selector.Dte.UndoContext.Open(Vsix.Name);
+            Selector.OpenUndoContext();
 
             // Contains the same selection-elements but possibly re-ordered
             // Selector keeps original order to support undo
             var selectionsToProcess = Selector.Selections;
 
-            Selector.StorePreviousSelectionsHistory();
 
             switch (processOrder)
             {
@@ -332,10 +330,7 @@ namespace SelectNextOccurrence.Commands
                 Selector.CombineOverlappingSelections();
             }
 
-            if (Selector.Dte.UndoContext.IsOpen)
-                Selector.Dte.UndoContext.Close();
-
-            Selector.SaveSelectionsHistory();
+            Selector.CloseUndoContext();
 
             // Set new search text. Needed if selection is modified
             if (modifySelections)
@@ -384,8 +379,7 @@ namespace SelectNextOccurrence.Commands
         {
             var result = VSConstants.S_OK;
 
-            if (!Selector.Dte.UndoContext.IsOpen)
-                Selector.Dte.UndoContext.Open(Vsix.Name);
+            Selector.OpenUndoContext();
 
             var copiedTexts = new List<string>();
 
@@ -422,8 +416,7 @@ namespace SelectNextOccurrence.Commands
                 System.Diagnostics.Debug.WriteLine("Clipboard copy error saving: {0}", string.Join(Environment.NewLine, Selector.SavedClipboard));
             }
 
-            if (Selector.Dte.UndoContext.IsOpen)
-                Selector.Dte.UndoContext.Close();
+            Selector.CloseUndoContext();
 
             return result;
         }
@@ -432,24 +425,17 @@ namespace SelectNextOccurrence.Commands
         /// If a previous multi-copy/cut has been made, this pastes the saved text at cursor-positions
         /// Selections are processed from top to bottom
         /// </summary>
-        /// <param name="pguidCmdGroup"></param>
-        /// <param name="nCmdID"></param>
-        /// <param name="nCmdexecopt"></param>
-        /// <param name="pvaIn"></param>
-        /// <param name="pvaOut"></param>
         /// <returns></returns>
-        private int HandleMultiPaste(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        private int HandleMultiPaste()
         {
             var result = VSConstants.S_OK;
             var clipboardCount = Selector.SavedClipboard.Count();
 
             if (clipboardCount > 0)
             {
-                if (!Selector.Dte.UndoContext.IsOpen)
-                    Selector.Dte.UndoContext.Open(Vsix.Name);
+                Selector.OpenUndoContext();
 
                 var index = 0;
-
                 foreach (var selection in Selector.Selections.OrderBy(s => s.Caret.GetPosition(Snapshot)))
                 {
                     if (index == clipboardCount)
@@ -476,8 +462,7 @@ namespace SelectNextOccurrence.Commands
                     index++;
                 }
 
-                if (Selector.Dte.UndoContext.IsOpen)
-                    Selector.Dte.UndoContext.Close();
+                Selector.CloseUndoContext();
             }
 
             return result;
