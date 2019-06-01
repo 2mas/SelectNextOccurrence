@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -383,17 +383,21 @@ namespace SelectNextOccurrence
             var caretPosition = View.Caret.Position.BufferPosition;
             if (!Selections.Any(s => s.Caret.GetPosition(Snapshot) == caretPosition))
             {
-                Selections.Add(
-                    new Selection
-                    {
-                        Start = null,
-                        End = null,
-                        Caret = Snapshot.CreateTrackingPoint(caretPosition),
-                        ColumnPosition = Snapshot.GetLineColumnFromPosition(caretPosition)
-                            + View.Caret.Position.VirtualSpaces,
-                        VirtualSpaces = View.Caret.Position.VirtualSpaces
-                    }
-                );
+                var newSelection = new Selection
+                {
+                    Caret = Snapshot.CreateTrackingPoint(caretPosition),
+                    ColumnPosition = Snapshot.GetLineColumnFromPosition(caretPosition)
+                        + View.Caret.Position.VirtualSpaces,
+                    VirtualSpaces = View.Caret.Position.VirtualSpaces
+                };
+
+                if (!View.Selection.IsEmpty)
+                {
+                    newSelection.Start = Snapshot.CreateTrackingPoint(View.Selection.Start.Position);
+                    newSelection.End = Snapshot.CreateTrackingPoint(View.Selection.End.Position);
+                }
+
+                Selections.Add(newSelection);
             }
         }
 
