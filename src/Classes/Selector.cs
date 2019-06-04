@@ -466,16 +466,25 @@ namespace SelectNextOccurrence
         }
 
         /// <summary>
-        /// Stores previous selections in a temporary buffer.
-        /// The selections are only saved if SaveSelectionsHistory is called.
+        /// Opens up the undo context for changes and stores previous selections
+        /// in a temporary buffer that are only saved if CloseUndoContext is called.
         /// </summary>
-        internal void StorePreviousSelectionsHistory()
+        internal void OpenUndoContext()
         {
+            if (!Dte.UndoContext.IsOpen)
+                Dte.UndoContext.Open(Vsix.Name);
+
             historyManager.StoreSelectionsHistory(Snapshot, Selections);
         }
 
-        internal void SaveSelectionsHistory()
+        /// <summary>
+        /// Closes the undo context and saves selections to history.
+        /// </summary>
+        internal void CloseUndoContext()
         {
+            if (Dte.UndoContext.IsOpen)
+                Dte.UndoContext.Close();
+
             historyManager.SaveSelectionsToHistory(Snapshot, Selections);
         }
 
