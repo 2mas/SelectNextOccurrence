@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -381,6 +381,7 @@ namespace SelectNextOccurrence
         internal void AddCurrentCaretToSelections()
         {
             var caretPosition = View.Caret.Position.BufferPosition;
+
             if (!Selections.Any(s => s.Caret.GetPosition(Snapshot) == caretPosition))
             {
                 var newSelection = new Selection
@@ -404,6 +405,7 @@ namespace SelectNextOccurrence
         internal void AddMouseCaretToSelections()
         {
             var caretPosition = View.Caret.Position.BufferPosition;
+
             if (!Selections.Any(s => s.Caret.GetPosition(Snapshot) == caretPosition))
             {
                 Selections.Add(
@@ -439,11 +441,13 @@ namespace SelectNextOccurrence
         internal void CombineOverlappingSelections()
         {
             var overlappingSelections = new List<int>();
+
             var selections = Selections
                 .Where(s => s.IsSelection())
                 .Select((selection, index) => new { index, selection })
                 .OrderBy(s => s.selection.Caret.GetPoint(Snapshot))
                 .ToList();
+
             for (var index = 0; index < selections.Count - 1; index++)
             {
                 var selection = selections[index].selection;
@@ -459,6 +463,7 @@ namespace SelectNextOccurrence
                     overlappingSelections.Add(selections[index].index);
                 }
             }
+
             foreach (var index in overlappingSelections.OrderByDescending(n => n))
             {
                 Selections.RemoveAt(index);
@@ -534,6 +539,7 @@ namespace SelectNextOccurrence
         internal void ApplyStashedCaretPosition()
         {
             var stashedCaretPosition = StashedCaret.GetPosition(Snapshot);
+
             if (!Selections.Any(s => s.Caret.GetPoint(Snapshot) == stashedCaretPosition))
             {
                 Selections.Add(

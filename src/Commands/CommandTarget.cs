@@ -263,7 +263,6 @@ namespace SelectNextOccurrence.Commands
             // Selector keeps original order to support undo
             var selectionsToProcess = Selector.Selections;
 
-
             switch (processOrder)
             {
                 case ProcessOrder.TopToBottom:
