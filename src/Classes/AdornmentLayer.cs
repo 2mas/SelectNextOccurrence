@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -169,12 +169,7 @@ namespace SelectNextOccurrence
 
         private void DrawSelection(Selection selection)
         {
-            var geometry = view.TextViewLines.GetMarkerGeometry(
-                    new SnapshotSpan(
-                        selection.Start.GetPoint(Snapshot),
-                        selection.End.GetPoint(Snapshot)
-                    )
-                );
+            var geometry = view.TextViewLines.GetMarkerGeometry(selection.GetSpan(Snapshot));
 
             if (geometry != null)
             {
@@ -197,12 +192,7 @@ namespace SelectNextOccurrence
                 Canvas.SetLeft(image, geometry.Bounds.Left);
                 Canvas.SetTop(image, geometry.Bounds.Top);
 
-                var span = new SnapshotSpan(
-                    selection.Start.GetPoint(Snapshot),
-                    selection.End.GetPoint(Snapshot)
-                );
-
-                layer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, Vsix.Name, image, null);
+                layer.AddAdornment(AdornmentPositioningBehavior.TextRelative, selection.GetSpan(Snapshot), Vsix.Name, image, null);
             }
         }
         #endregion

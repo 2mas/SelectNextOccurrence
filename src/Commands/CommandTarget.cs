@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -303,13 +303,7 @@ namespace SelectNextOccurrence.Commands
             {
                 if (selection.IsSelection())
                 {
-                    view.Selection.Select(
-                        new SnapshotSpan(
-                            selection.Start.GetPoint(Snapshot),
-                            selection.End.GetPoint(Snapshot)
-                        ),
-                        selection.IsReversed(Snapshot)
-                    );
+                    view.Selection.Select(selection.GetSpan(Snapshot), false);
                 }
 
                 var previousCaretPosition = selection.VirtualSpaces == 0
@@ -398,13 +392,7 @@ namespace SelectNextOccurrence.Commands
             {
                 if (selection.IsSelection())
                 {
-                    view.Selection.Select(
-                        new SnapshotSpan(
-                            selection.Start.GetPoint(Snapshot),
-                            selection.End.GetPoint(Snapshot)
-                        ),
-                        false
-                    );
+                    view.Selection.Select(selection.GetSpan(Snapshot), false);
 
                     var copiedText = Selector.GetCurrentlySelectedText();
 
@@ -457,13 +445,7 @@ namespace SelectNextOccurrence.Commands
                     {
                         if (selection.IsSelection())
                         {
-                            view.Selection.Select(
-                                new SnapshotSpan(
-                                    selection.Start.GetPoint(Snapshot),
-                                    selection.End.GetPoint(Snapshot)
-                                ),
-                                false
-                            );
+                            view.Selection.Select(selection.GetSpan(Snapshot), false);
                         }
 
                         view.Caret.MoveTo(selection.GetVirtualPoint(Snapshot));

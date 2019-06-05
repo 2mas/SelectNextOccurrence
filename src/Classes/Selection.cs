@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 
 namespace SelectNextOccurrence
@@ -21,19 +21,20 @@ namespace SelectNextOccurrence
             return new VirtualSnapshotPoint(Caret.GetPoint(snapshot), VirtualSpaces);
         }
 
+        internal SnapshotSpan GetSpan(ITextSnapshot snapshot)
+        {
+            return new SnapshotSpan(Start.GetPoint(snapshot), End.GetPoint(snapshot));
+        }
+
         internal bool OverlapsWith(SnapshotSpan span, ITextSnapshot snapshot)
         {
-            if (!IsSelection())
+            if (IsSelection())
             {
-                return span.OverlapsWith(
-                        new SnapshotSpan(Caret.GetPoint(snapshot), 1)
-                    );
+                return span.OverlapsWith(GetSpan(snapshot));
             }
             else
             {
-                return new SnapshotSpan(
-                        Start.GetPoint(snapshot), End.GetPoint(snapshot)
-                    ).OverlapsWith(span);
+                return span.OverlapsWith(new SnapshotSpan(Caret.GetPoint(snapshot), 1));
             }
         }
 
