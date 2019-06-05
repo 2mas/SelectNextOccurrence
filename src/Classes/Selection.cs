@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 
 namespace SelectNextOccurrence
 {
@@ -46,8 +47,10 @@ namespace SelectNextOccurrence
             return Caret.GetPosition(snapshot) == Start?.GetPosition(snapshot);
         }
 
-        internal void SetCaretPosition(int position, bool verticalMove, ITextSnapshot snapshot)
+        internal void SetCaretPosition(CaretPosition caretPosition, bool verticalMove, ITextSnapshot snapshot)
         {
+            var position = caretPosition.BufferPosition.Position;
+
             if (verticalMove)
             {
                 position = GetCaretColumnPosition(position, snapshot);
@@ -58,6 +61,7 @@ namespace SelectNextOccurrence
             }
 
             Caret = snapshot.CreateTrackingPoint(position);
+            VirtualSpaces = caretPosition.VirtualSpaces;
         }
 
         internal void UpdateSelection(int previousCaretPosition, ITextSnapshot snapshot)

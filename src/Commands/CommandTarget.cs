@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -252,7 +252,7 @@ namespace SelectNextOccurrence.Commands
                     adornmentLayer.DrawAdornments();
                     return result;
                 }
-                else if(command == VSConstants.VSStd97CmdID.Redo)
+                else if (command == VSConstants.VSStd97CmdID.Redo)
                 {
                     result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                     Selector.RedoSelectionsHistory();
@@ -311,22 +311,14 @@ namespace SelectNextOccurrence.Commands
                         selection.IsReversed(Snapshot)
                     );
                 }
-                if (selection.VirtualSpaces == 0)
-                {
-                    view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
-                }
-                else
-                {
-                    view.Caret.MoveTo(selection.GetVirtualPoint(Snapshot));
-                }
 
-                var previousCaretPosition = selection.Caret.GetPosition(Snapshot);
+                var previousCaretPosition = selection.VirtualSpaces == 0
+                    ? view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot))
+                    : view.Caret.MoveTo(selection.GetVirtualPoint(Snapshot));
 
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
-                selection.VirtualSpaces = view.Caret.Position.VirtualSpaces;
-
-                selection.SetCaretPosition(view.Caret.Position.BufferPosition, verticalMove, Snapshot);
+                selection.SetCaretPosition(view.Caret.Position, verticalMove, Snapshot);
 
                 if (view.Selection.IsEmpty)
                 {
@@ -335,7 +327,7 @@ namespace SelectNextOccurrence.Commands
                 }
                 else if (modifySelections)
                 {
-                    selection.UpdateSelection(previousCaretPosition, Snapshot);
+                    selection.UpdateSelection(previousCaretPosition.BufferPosition, Snapshot);
                 }
                 else if (invokeCommand)
                 {
