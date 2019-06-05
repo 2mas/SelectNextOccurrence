@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using Microsoft.VisualStudio;
@@ -60,7 +61,6 @@ namespace SelectNextOccurrence.Commands
             }
 
             var result = VSConstants.S_OK;
-            System.Diagnostics.Debug.WriteLine("grp: {0}, id: {1}", pguidCmdGroup.ToString(), nCmdID.ToString());
 
             if (!Selector.Selections.Any())
                 return ProcessSingleCursor(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut, ref result);
@@ -104,6 +104,9 @@ namespace SelectNextOccurrence.Commands
                         Selector.RedoSelectionsHistory();
                         adornmentLayer.DrawAdornments();
                         return result;
+                    default:
+                        Debug.WriteLine($"grp: {nameof(VSConstants.GUID_VSStandardCommandSet97)}, com: {(VSConstants.VSStd97CmdID) nCmdID}");
+                        break;
                 }
             }
             else if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID)
@@ -152,6 +155,9 @@ namespace SelectNextOccurrence.Commands
                     case VSConstants.VSStd2KCmdID.UNCOMMENT_BLOCK:
                         invokeCommand = true;
                         break;
+                    default:
+                        Debug.WriteLine($"grp: {nameof(VSConstants.VSStd2KCmdID)}, com: {(VSConstants.VSStd2KCmdID) nCmdID}");
+                        break;
                 }
             }
             else if (pguidCmdGroup == typeof(VSConstants.VSStd12CmdID).GUID)
@@ -166,6 +172,9 @@ namespace SelectNextOccurrence.Commands
                         invokeCommand = true;
                         processOrder = ProcessOrder.BottomToTop;
                         break;
+                    default:
+                        Debug.WriteLine($"grp: {nameof(VSConstants.VSStd12CmdID)}, com: {(VSConstants.VSStd12CmdID) nCmdID}");
+                        break;
                 }
             }
             else if (pguidCmdGroup == PackageGuids.guidVS16Commands)
@@ -173,6 +182,10 @@ namespace SelectNextOccurrence.Commands
                 if (nCmdID == 48 || nCmdID == 49)
                 {
                     invokeCommand = true;
+                }
+                else
+                {
+                    Debug.WriteLine($"grp: {nameof(PackageGuids.guidVS16Commands)}, id: {nCmdID}");
                 }
             }
             else if (pguidCmdGroup == PackageGuids.guidExtensionSubWordNavigation)
@@ -183,12 +196,19 @@ namespace SelectNextOccurrence.Commands
                     case PackageIds.ExtensionSubwordNavigationPreviousExtend:
                         modifySelections = true;
                         break;
+                    default:
+                        Debug.WriteLine($"grp: {nameof(PackageGuids.guidExtensionSubWordNavigation)}, id: {nCmdID}");
+                        break;
                 }
             }
             else if (pguidCmdGroup == PackageGuids.guidNextOccurrenceCommandsPackageCmdSet)
             {
                 verticalMove = nCmdID == PackageIds.AddCaretAboveCommandId
                                 || nCmdID == PackageIds.AddCaretBelowCommandId;
+            }
+            else
+            {
+                Debug.WriteLine($"grp: {pguidCmdGroup}, id: {nCmdID}");
             }
 
             if (Selector.Selections.Any())
@@ -412,7 +432,7 @@ namespace SelectNextOccurrence.Commands
             }
             catch
             {
-                System.Diagnostics.Debug.WriteLine("Clipboard copy error saving: {0}", string.Join(Environment.NewLine, Selector.SavedClipboard));
+                Debug.WriteLine("Clipboard copy error saving: {0}", string.Join(Environment.NewLine, Selector.SavedClipboard));
             }
 
             Selector.CloseUndoContext();
