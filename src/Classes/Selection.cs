@@ -1,4 +1,4 @@
-using Microsoft.VisualStudio.Text;
+﻿using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 
 namespace SelectNextOccurrence
@@ -9,7 +9,9 @@ namespace SelectNextOccurrence
     internal class Selection
     {
         internal ITrackingPoint Start { get; set; }
+
         internal ITrackingPoint End { get; set; }
+
         internal ITrackingPoint Caret { get; set; }
 
         internal int ColumnPosition { get; set; }

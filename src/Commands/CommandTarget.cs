@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -71,7 +71,7 @@ namespace SelectNextOccurrence.Commands
             var invokeCommand = false;
             var processOrder = ProcessOrder.Normal;
 
-            if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
+            if (pguidCmdGroup == typeof(VSConstants.VSStd97CmdID).GUID)
             {
                 switch ((VSConstants.VSStd97CmdID) nCmdID)
                 {
@@ -105,7 +105,7 @@ namespace SelectNextOccurrence.Commands
                         adornmentLayer.DrawAdornments();
                         return result;
                     default:
-                        Debug.WriteLine($"grp: {nameof(VSConstants.GUID_VSStandardCommandSet97)}, com: {(VSConstants.VSStd97CmdID) nCmdID}");
+                        Debug.WriteLine($"{nameof(VSConstants.VSStd97CmdID)}, com: {(VSConstants.VSStd97CmdID) nCmdID}");
                         break;
                 }
             }
@@ -156,7 +156,7 @@ namespace SelectNextOccurrence.Commands
                         invokeCommand = true;
                         break;
                     default:
-                        Debug.WriteLine($"grp: {nameof(VSConstants.VSStd2KCmdID)}, com: {(VSConstants.VSStd2KCmdID) nCmdID}");
+                        Debug.WriteLine($"{nameof(VSConstants.VSStd2KCmdID)}, com: {(VSConstants.VSStd2KCmdID) nCmdID}");
                         break;
                 }
             }
@@ -173,7 +173,7 @@ namespace SelectNextOccurrence.Commands
                         processOrder = ProcessOrder.BottomToTop;
                         break;
                     default:
-                        Debug.WriteLine($"grp: {nameof(VSConstants.VSStd12CmdID)}, com: {(VSConstants.VSStd12CmdID) nCmdID}");
+                        Debug.WriteLine($"{nameof(VSConstants.VSStd12CmdID)}, com: {(VSConstants.VSStd12CmdID) nCmdID}");
                         break;
                 }
             }
@@ -185,7 +185,7 @@ namespace SelectNextOccurrence.Commands
                 }
                 else
                 {
-                    Debug.WriteLine($"grp: {nameof(PackageGuids.guidVS16Commands)}, id: {nCmdID}");
+                    Debug.WriteLine($"{nameof(PackageGuids.guidVS16Commands)}, id: {nCmdID}");
                 }
             }
             else if (pguidCmdGroup == PackageGuids.guidExtensionSubWordNavigation)
@@ -197,7 +197,7 @@ namespace SelectNextOccurrence.Commands
                         modifySelections = true;
                         break;
                     default:
-                        Debug.WriteLine($"grp: {nameof(PackageGuids.guidExtensionSubWordNavigation)}, id: {nCmdID}");
+                        Debug.WriteLine($"{nameof(PackageGuids.guidExtensionSubWordNavigation)}, id: {nCmdID}");
                         break;
                 }
             }
@@ -208,7 +208,7 @@ namespace SelectNextOccurrence.Commands
             }
             else
             {
-                Debug.WriteLine($"grp: {pguidCmdGroup}, id: {nCmdID}");
+                Debug.WriteLine($"group: {pguidCmdGroup}, id: {nCmdID}");
             }
 
             if (Selector.Selections.Any())
@@ -333,13 +333,8 @@ namespace SelectNextOccurrence.Commands
             if (modifySelections)
             {
                 Selector.CombineOverlappingSelections();
-            }
 
-            Selector.CloseUndoContext();
-
-            // Set new search text. Needed if selection is modified
-            if (modifySelections)
-            {
+                // Set new search text. Needed if selection is modified
                 var lastSelection = Selector.Selections.Last();
                 if (lastSelection.IsSelection())
                 {
@@ -353,18 +348,19 @@ namespace SelectNextOccurrence.Commands
                 }
             }
 
+            Selector.CloseUndoContext();
+
             view.Caret.MoveTo(Selector.Selections.Last().GetVirtualPoint(Snapshot));
             view.Selection.Clear();
 
             // Goes to caret-only mode
             if (clearSelections)
             {
-                Selector.Selections.ForEach(s =>
-                    {
-                        s.Start = null;
-                        s.End = null;
-                    }
-                );
+                foreach (var selection in Selector.Selections)
+                {
+                    selection.Start = null;
+                    selection.End = null;
+                }
             }
 
             return result;

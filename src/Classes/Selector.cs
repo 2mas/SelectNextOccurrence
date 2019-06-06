@@ -226,8 +226,13 @@ namespace SelectNextOccurrence
                 }
                 else
                 {
-                    var orderedSelections = HasWrappedDocument ? Selections : Selections.OrderBy(n => n.Caret.GetPosition(Snapshot)).ToList();
-                    var startSelection = reverseDirection && !HasWrappedDocument ? orderedSelections.First() : orderedSelections.Last();
+                    var orderedSelections = HasWrappedDocument
+                        ? Selections
+                        : Selections.OrderBy(n => n.Caret.GetPosition(Snapshot)).ToList();
+
+                    var startSelection = reverseDirection && !HasWrappedDocument
+                        ? orderedSelections.First()
+                        : orderedSelections.Last();
 
                     var startIndex = reverseDirection ?
                         startSelection.Start?.GetPosition(Snapshot) ?? startSelection.Caret.GetPosition(Snapshot)
