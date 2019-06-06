@@ -38,11 +38,11 @@ namespace SelectNextOccurrence
 
         #endregion
 
-        private readonly IWpfTextView View;
+        private readonly IWpfTextView view;
 
         private readonly HistoryManager historyManager;
 
-        private ITextSnapshot Snapshot => View.TextSnapshot;
+        private ITextSnapshot Snapshot => view.TextSnapshot;
 
         /// <summary>
         /// Contains all tracking-points for selections and carets
@@ -85,13 +85,13 @@ namespace SelectNextOccurrence
             ITextStructureNavigator textStructureNavigator,
             IOutliningManagerService outliningManagerService)
         {
-            this.View = view;
+            this.view = view;
 
             // Services
             this.textSearchService = textSearchService;
-            this.EditorOperations = editorOperationsService.GetEditorOperations(this.View);
+            this.EditorOperations = editorOperationsService.GetEditorOperations(this.view);
             this.textStructureNavigator = textStructureNavigator;
-            this.outliningManager = outliningManagerService?.GetOutliningManager(this.View);
+            this.outliningManager = outliningManagerService?.GetOutliningManager(this.view);
             this.Dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
 
             this.Selections = new List<Selection>();
@@ -105,9 +105,9 @@ namespace SelectNextOccurrence
         /// </summary>
         private void AddCurrentSelectionToSelections()
         {
-            var start = View.Selection.Start.Position;
-            var end = View.Selection.End.Position;
-            var caret = View.Selection.IsReversed
+            var start = view.Selection.Start.Position;
+            var end = view.Selection.End.Position;
+            var caret = view.Selection.IsReversed
                 ? start : end;
 
             Selections.Add(
@@ -117,7 +117,7 @@ namespace SelectNextOccurrence
                     End = Snapshot.CreateTrackingPoint(end),
                     Caret = Snapshot.CreateTrackingPoint(caret),
                     ColumnPosition = Snapshot.GetLineColumnFromPosition(caret),
-                    VirtualSpaces = View.Caret.Position.VirtualSpaces
+                    VirtualSpaces = view.Caret.Position.VirtualSpaces
                 }
             );
 
@@ -176,10 +176,10 @@ namespace SelectNextOccurrence
 
                 outliningManager.ExpandAll(occurrence, r => r.IsCollapsed);
 
-                View.Caret.MoveTo(caret == start ? occurrence.Start : occurrence.End);
+                view.Caret.MoveTo(caret == start ? occurrence.Start : occurrence.End);
 
-                View.ViewScroller.EnsureSpanVisible(
-                    new SnapshotSpan(View.Caret.Position.BufferPosition, 0)
+                view.ViewScroller.EnsureSpanVisible(
+                    new SnapshotSpan(view.Caret.Position.BufferPosition, 0)
                 );
             }
         }
@@ -192,14 +192,14 @@ namespace SelectNextOccurrence
         internal void SelectNextOccurrence(bool reverseDirection = false, bool exactMatch = false)
         {
             // Caret placed on a word, but nothing selected
-            if (!Selections.Any() && View.Selection.IsEmpty)
+            if (!Selections.Any() && view.Selection.IsEmpty)
             {
-                SelectCurrentWord(View.Caret.Position.BufferPosition);
+                SelectCurrentWord(view.Caret.Position.BufferPosition);
                 return;
             }
 
             // First selection is selected by user, future selections will be located and selected on command-invocation
-            if (!Selections.Any() && !View.Selection.IsEmpty)
+            if (!Selections.Any() && !view.Selection.IsEmpty)
                 AddCurrentSelectionToSelections();
 
             // Multiple selections
@@ -215,7 +215,7 @@ namespace SelectNextOccurrence
                     {
                         if (!selection.IsSelection())
                         {
-                            View.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
+                            view.Caret.MoveTo(selection.Caret.GetPoint(Snapshot));
                             SelectCurrentWord(selection.Caret.GetPoint(Snapshot));
                         }
                         else
@@ -258,8 +258,8 @@ namespace SelectNextOccurrence
                     }
                 }
 
-                View.Selection.Clear();
-                View.Caret.MoveTo(Selections.Last().Caret.GetPoint(Snapshot));
+                view.Selection.Clear();
+                view.Caret.MoveTo(Selections.Last().Caret.GetPoint(Snapshot));
             }
         }
 
@@ -282,7 +282,7 @@ namespace SelectNextOccurrence
 
                     if (char.IsLetterOrDigit(previousChar))
                     {
-                        View.Caret.MoveTo(caretPosition - 1);
+                        view.Caret.MoveTo(caretPosition - 1);
                         EditorOperations.SelectCurrentWord();
                     }
                 }
@@ -305,8 +305,8 @@ namespace SelectNextOccurrence
 
         internal void ConvertSelectionToMultipleCursors()
         {
-            var beginLineNumber = View.Selection.Start.Position.GetContainingLine().LineNumber;
-            var endLineNumber = View.Selection.End.Position.GetContainingLine().LineNumber;
+            var beginLineNumber = view.Selection.Start.Position.GetContainingLine().LineNumber;
+            var endLineNumber = view.Selection.End.Position.GetContainingLine().LineNumber;
 
             if (beginLineNumber != endLineNumber)
             {
@@ -325,12 +325,12 @@ namespace SelectNextOccurrence
                 Selections.Add(
                     new Selection
                     {
-                        Caret = Snapshot.CreateTrackingPoint(View.Selection.End.Position),
-                        ColumnPosition = Snapshot.GetLineColumnFromPosition(View.Selection.End.Position)
+                        Caret = Snapshot.CreateTrackingPoint(view.Selection.End.Position),
+                        ColumnPosition = Snapshot.GetLineColumnFromPosition(view.Selection.End.Position)
                     }
                 );
 
-                View.Selection.Clear();
+                view.Selection.Clear();
             }
             else
             {
@@ -342,36 +342,36 @@ namespace SelectNextOccurrence
         {
             foreach (var selection in Selections.ToList())
             {
-                View.Caret.MoveTo(selection.GetVirtualPoint(Snapshot));
+                view.Caret.MoveTo(selection.GetVirtualPoint(Snapshot));
                 EditorOperations.MoveLineUp(false);
                 AddCaretMoveToSelections(selection);
             }
 
-            View.Caret.MoveTo(Selections.Last().GetVirtualPoint(Snapshot));
+            view.Caret.MoveTo(Selections.Last().GetVirtualPoint(Snapshot));
         }
 
         internal void AddCaretBelow()
         {
             foreach (var selection in Selections.ToList())
             {
-                View.Caret.MoveTo(selection.GetVirtualPoint(Snapshot));
+                view.Caret.MoveTo(selection.GetVirtualPoint(Snapshot));
                 EditorOperations.MoveLineDown(false);
                 AddCaretMoveToSelections(selection);
             }
 
-            View.Caret.MoveTo(Selections.Last().GetVirtualPoint(Snapshot));
+            view.Caret.MoveTo(Selections.Last().GetVirtualPoint(Snapshot));
         }
 
         internal void AddCaretMoveToSelections(Selection selection)
         {
-            var caretPosition = View.Caret.Position.BufferPosition;
+            var caretPosition = view.Caret.Position.BufferPosition;
             var newSelection = new Selection
             {
                 Start = null,
                 End = null,
                 Caret = Snapshot.CreateTrackingPoint(caretPosition),
                 ColumnPosition = selection.ColumnPosition,
-                VirtualSpaces = View.Caret.Position.VirtualSpaces
+                VirtualSpaces = view.Caret.Position.VirtualSpaces
             };
 
             var newPosition = newSelection.GetCaretColumnPosition(caretPosition, Snapshot);
@@ -385,7 +385,7 @@ namespace SelectNextOccurrence
 
         internal void AddCurrentCaretToSelections()
         {
-            var caretPosition = View.Caret.Position.BufferPosition;
+            var caretPosition = view.Caret.Position.BufferPosition;
 
             if (!Selections.Any(s => s.Caret.GetPosition(Snapshot) == caretPosition))
             {
@@ -393,14 +393,14 @@ namespace SelectNextOccurrence
                 {
                     Caret = Snapshot.CreateTrackingPoint(caretPosition),
                     ColumnPosition = Snapshot.GetLineColumnFromPosition(caretPosition)
-                        + View.Caret.Position.VirtualSpaces,
-                    VirtualSpaces = View.Caret.Position.VirtualSpaces
+                        + view.Caret.Position.VirtualSpaces,
+                    VirtualSpaces = view.Caret.Position.VirtualSpaces
                 };
 
-                if (!View.Selection.IsEmpty)
+                if (!view.Selection.IsEmpty)
                 {
-                    newSelection.Start = Snapshot.CreateTrackingPoint(View.Selection.Start.Position);
-                    newSelection.End = Snapshot.CreateTrackingPoint(View.Selection.End.Position);
+                    newSelection.Start = Snapshot.CreateTrackingPoint(view.Selection.Start.Position);
+                    newSelection.End = Snapshot.CreateTrackingPoint(view.Selection.End.Position);
                 }
 
                 Selections.Add(newSelection);
@@ -409,7 +409,7 @@ namespace SelectNextOccurrence
 
         internal void AddMouseCaretToSelections()
         {
-            var caretPosition = View.Caret.Position.BufferPosition;
+            var caretPosition = view.Caret.Position.BufferPosition;
 
             if (!Selections.Any(s => s.Caret.GetPosition(Snapshot) == caretPosition))
             {
@@ -533,7 +533,7 @@ namespace SelectNextOccurrence
         #region stashed cursors
         internal void StashCurrentCaretPosition()
         {
-            StashedCaret = Snapshot.CreateTrackingPoint(View.Caret.Position.BufferPosition);
+            StashedCaret = Snapshot.CreateTrackingPoint(view.Caret.Position.BufferPosition);
         }
 
         internal void ClearStashedCaretPosition()
@@ -569,7 +569,7 @@ namespace SelectNextOccurrence
         {
             Selections.Clear();
             HasWrappedDocument = false;
-            View.Caret.IsHidden = false;
+            view.Caret.IsHidden = false;
         }
 
         internal void ClearSavedClipboard()
