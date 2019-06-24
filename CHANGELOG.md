@@ -3,6 +3,9 @@
 
 # Change log
 
+#### 1.3.114
+- [x] Keeping selections with undo/redo, refactoring and bugfixes
+
 #### 1.3.96
 - [x] Add Virtual space support
 - [x] Rebuilt copy/paste functionality to improve speed and enable pasting of multiple selections into external documents
