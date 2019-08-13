@@ -28,6 +28,7 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 | Multi copy/paste across files and to external programs | Yes | No |
 | Supports VS 2019 | Yes | Yes |
 | Supports VS 2017 | Yes | No |
+| Supports VS 2015 | Yes | No |
 | Multi-cursor IntelliSense | No | No |
 
 
