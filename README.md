@@ -5,11 +5,32 @@ Download this extension from the [VS Gallery](https://marketplace.visualstudio.c
 
 ---------------------------------------
 
-This extension makes it possible to select next occurrences of a selected text for editing.
+This extension makes it possible to select multiple occurrences of a selected text for simultaneous editing with multiple cursors. Provides the most common multi-editing features.
 
-Aims to replicate the Ctrl+D command of Sublime Text for faster coding.
+Aims to replicate the multi-editing features of Sublime Text/Visual Studio Code for faster coding.
 
 See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
+
+
+
+### What differs this from the built-in multi-edit of VS 2019?
+| Feature | Select Next Occurrence | Visual Studio |
+| --- | --- | ---|
+| Multiple cursors | Yes | Yes |
+| Can undo cursor | Yes | Yes |
+| Can select all occurrences | Yes | Yes |
+| Can skip occurrence | Yes | Yes |
+| Can select backwards/up | Yes | No |
+| Can add caret above/below | Yes | No |
+| Can add caret by mouse | Yes | No |
+| Can convert selection to carets | Yes | No |
+| Can search both case insensitive and exact | Yes | No, only exact |
+| Multi copy/paste across files and to external programs | Yes | No |
+| Supports VS 2019 | Yes | Yes |
+| Supports VS 2017 | Yes | No |
+| Multi-cursor IntelliSense | No | No |
+
+
 
 ## Features
 
