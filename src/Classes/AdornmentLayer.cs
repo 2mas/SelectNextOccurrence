@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -28,6 +29,8 @@ namespace SelectNextOccurrence
         private Brush caretBrush;
 
         private Brush selectionBrush;
+
+        private Brush insertionBrush;
 
         #endregion
 
@@ -104,6 +107,7 @@ namespace SelectNextOccurrence
             var b = (SolidColorBrush) dictSelectedText[EditorFormatDefinition.BackgroundBrushId];
 
             selectionBrush = new SolidColorBrush(Color.FromArgb(120, b.Color.R, b.Color.G, b.Color.B));
+            insertionBrush = new SolidColorBrush(Color.FromArgb(120, 220, 220, 220));
         }
 
         internal void OnLayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
@@ -129,10 +133,9 @@ namespace SelectNextOccurrence
                     DrawCaret(selection);
                 }
             }
-            else
+            else if (view.Caret.IsHidden)
             {
-                if (view.Caret.IsHidden)
-                    view.Caret.IsHidden = false;
+                view.Caret.IsHidden = false;
             }
         }
 
@@ -142,28 +145,52 @@ namespace SelectNextOccurrence
                 return;
 
             var span = new SnapshotSpan(selection.Caret.GetPoint(Snapshot), 1);
-            var geometry = view.TextViewLines.GetTextMarkerGeometry(span);
 
-            if (geometry != null)
+            Geometry geometry;
+            GeometryDrawing drawing;
+            UIElement element = null;
+            double virtualSpace = 0;
+
+            if (view.Caret.OverwriteMode && !selection.IsSelection())
             {
-                var drawing = new GeometryDrawing(
-                    caretBrush,
-                    null,
-                    geometry
-                );
-
-                var rectangle = new Rectangle()
+                geometry = view.TextViewLines.GetMarkerGeometry(span);
+                if (geometry != null)
                 {
-                    Fill = caretBrush,
-                    Width = drawing.Bounds.Width / 6,
-                    Height = drawing.Bounds.Height,
-                    Margin = new System.Windows.Thickness(0, 0, 0, 0),
-                };
+                    drawing = new GeometryDrawing(insertionBrush, new Pen(), geometry);
+                    drawing.Freeze();
 
-                Canvas.SetLeft(rectangle, geometry.Bounds.Left + (selection.VirtualSpaces * view.TextViewLines[0].VirtualSpaceWidth));
-                Canvas.SetTop(rectangle, geometry.Bounds.Top);
+                    var drawingImage = new DrawingImage(drawing);
+                    drawingImage.Freeze();
 
-                layer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, Vsix.Name, rectangle, null);
+                    element = new Image { Source = drawingImage };
+                }
+            }
+            else
+            {
+                geometry = view.TextViewLines.GetTextMarkerGeometry(span);
+                if (geometry != null)
+                {
+                    drawing = new GeometryDrawing(caretBrush, null, geometry);
+                    drawing.Freeze();
+
+                    element = new Rectangle
+                    {
+                        Fill = caretBrush,
+                        Width = drawing.Bounds.Width / 6,
+                        Height = drawing.Bounds.Height,
+                        Margin = new Thickness(0, 0, 0, 0),
+                    };
+
+                    virtualSpace = selection.VirtualSpaces * view.TextViewLines[0].VirtualSpaceWidth;
+                }
+            }
+
+            if (element != null)
+            {
+                Canvas.SetLeft(element, geometry.Bounds.Left + virtualSpace);
+                Canvas.SetTop(element, geometry.Bounds.Top);
+
+                layer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, Vsix.Name, element, null);
             }
         }
 
