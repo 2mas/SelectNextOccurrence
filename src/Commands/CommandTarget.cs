@@ -179,6 +179,7 @@ namespace SelectNextOccurrence.Commands
             }
             else if (pguidCmdGroup == PackageGuids.guidVS16Commands)
             {
+                // Support for toggle line comment and toggle block comment command that was introduced in VS2019
                 if (nCmdID == 48 || nCmdID == 49)
                 {
                     invokeCommand = true;
