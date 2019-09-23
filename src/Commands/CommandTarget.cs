@@ -155,6 +155,10 @@ namespace SelectNextOccurrence.Commands
                     case VSConstants.VSStd2KCmdID.UNCOMMENT_BLOCK:
                         invokeCommand = true;
                         break;
+                    case VSConstants.VSStd2KCmdID.TOGGLE_OVERTYPE_MODE:
+                        result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                        adornmentLayer.DrawAdornments();
+                        return result;
                     default:
                         Debug.WriteLine($"{nameof(VSConstants.VSStd2KCmdID)}, com: {(VSConstants.VSStd2KCmdID) nCmdID}");
                         break;
