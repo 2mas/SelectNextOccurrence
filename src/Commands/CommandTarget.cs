@@ -83,7 +83,7 @@ namespace SelectNextOccurrence.Commands
                         // this extension, otherwise paste as default.
                         if (Selector.SavedClipboard.Any() && Selector.Selections.Any())
                         {
-                            // Copy/cut has been made from a non-multiedit place, proceed normal multi-processing
+                            // Copy/cut has been made from a non multi-edit place, proceed normal multi-processing
                             if (Clipboard.GetText() != string.Join(Environment.NewLine, Selector.SavedClipboard))
                             {
                                 Selector.ClearSavedClipboard();
@@ -379,6 +379,9 @@ namespace SelectNextOccurrence.Commands
         /// <returns></returns>
         private int HandleMultiCopyCut(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
+            if (Selector.Selections.Count == 1)
+                return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+
             var result = VSConstants.S_OK;
 
             Selector.OpenUndoContext();
