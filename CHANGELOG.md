@@ -3,6 +3,12 @@
 
 # Change log
 
+#### 1.3.132
+- [x] Overwrite mode supported - [[PR]](https://github.com/2mas/SelectNextOccurrence/pull/48)
+- [x] Fixes issue when you copy/cut with only one selection/caret when in multi caret mode so it behaves like normal single selection copy/cut. - [[PR]](https://github.com/2mas/SelectNextOccurrence/pull/47)
+
+Thanks @ Mr-Badger
+
 #### 1.3.114
 - [x] Keeping selections with undo/redo, refactoring and bugfixes
 
