@@ -50,7 +50,7 @@ namespace SelectNextOccurrence
             return Caret.GetPosition(snapshot) == Start?.GetPosition(snapshot);
         }
 
-        internal void SetCaretPosition(CaretPosition caretPosition, bool verticalMove, ITextSnapshot snapshot)
+        internal void SetCaretPosition(CaretPosition caretPosition, bool verticalMove, int columnPosition, ITextSnapshot snapshot)
         {
             var position = caretPosition.BufferPosition.Position;
 
@@ -60,7 +60,7 @@ namespace SelectNextOccurrence
             }
             else
             {
-                ColumnPosition = position - snapshot.GetLineFromPosition(position).Start.Position;
+                ColumnPosition = columnPosition;
             }
 
             Caret = snapshot.CreateTrackingPoint(position);
@@ -152,15 +152,29 @@ namespace SelectNextOccurrence
             }
             else if (ColumnPosition > ( caretPosition - caretLine.Start.Position ))
             {
-                var correctColumnPosition = ( ColumnPosition > caretLine.Length ) ?
-                    caretLine.Length
-                    : ColumnPosition;
-                return caretLine.Start.Position + correctColumnPosition;
+                return caretLine.Start.Position + ColumnOffset(caretLine.GetText());
             }
             else
             {
                 return caretPosition;
             }
+        }
+
+        private int ColumnOffset(string lineText)
+        {
+            var caretOffset = 0;
+            if (lineText.Length != 0)
+            {
+                var yPosition = 0;
+                do
+                {
+                    yPosition += lineText[caretOffset] == '\t' ? 4 : 1;
+                    caretOffset++;
+                }
+                while (yPosition < ColumnPosition && caretOffset < lineText.Length);
+            }
+
+            return caretOffset;
         }
     }
 }

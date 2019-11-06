@@ -317,7 +317,7 @@ namespace SelectNextOccurrence.Commands
 
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
-                selection.SetCaretPosition(view.Caret.Position, verticalMove, Snapshot);
+                selection.SetCaretPosition(view.Caret.Position, verticalMove, Selector.GetColumnPosition(), Snapshot);
 
                 if (view.Selection.IsEmpty)
                 {
