@@ -50,23 +50,6 @@ namespace SelectNextOccurrence
             return Caret.GetPosition(snapshot) == Start?.GetPosition(snapshot);
         }
 
-        internal void SetCaretPosition(CaretPosition caretPosition, bool verticalMove, int columnPosition, ITextSnapshot snapshot)
-        {
-            var position = caretPosition.BufferPosition.Position;
-
-            if (verticalMove)
-            {
-                position = GetCaretColumnPosition(position, snapshot);
-            }
-            else
-            {
-                ColumnPosition = columnPosition;
-            }
-
-            Caret = snapshot.CreateTrackingPoint(position);
-            VirtualSpaces = caretPosition.VirtualSpaces;
-        }
-
         internal void UpdateSelection(int previousCaretPosition, ITextSnapshot snapshot)
         {
             var caretPosition = Caret.GetPosition(snapshot);
@@ -136,7 +119,7 @@ namespace SelectNextOccurrence
         /// <param name="caretPosition"></param>
         /// <param name="snapshot"></param>
         /// <returns></returns>
-        internal int GetCaretColumnPosition(int caretPosition, ITextSnapshot snapshot)
+        internal int GetCaretColumnPosition(int caretPosition, ITextSnapshot snapshot, int tabSize)
         {
             var previousLineNumber = snapshot.GetLineNumberFromPosition(Caret.GetPosition(snapshot));
             var caretLine = snapshot.GetLineFromPosition(caretPosition);
@@ -152,7 +135,7 @@ namespace SelectNextOccurrence
             }
             else if (ColumnPosition > ( caretPosition - caretLine.Start.Position ))
             {
-                return caretLine.Start.Position + ColumnOffset(caretLine.GetText());
+                return caretLine.Start.Position + ColumnOffset(caretLine.GetText(), tabSize);
             }
             else
             {
@@ -160,7 +143,7 @@ namespace SelectNextOccurrence
             }
         }
 
-        private int ColumnOffset(string lineText)
+        private int ColumnOffset(string lineText, int tabSize)
         {
             var caretOffset = 0;
             if (lineText.Length != 0)
@@ -168,7 +151,7 @@ namespace SelectNextOccurrence
                 var yPosition = 0;
                 do
                 {
-                    yPosition += lineText[caretOffset] == '\t' ? 4 : 1;
+                    yPosition += lineText[caretOffset] == '\t' ? tabSize : 1;
                     caretOffset++;
                 }
                 while (yPosition < ColumnPosition && caretOffset < lineText.Length);
