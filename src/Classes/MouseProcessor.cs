@@ -44,8 +44,10 @@ namespace SelectNextOccurrence
                 if (ExtensionOptions.Instance.AddMouseCursors && CheckModifiers())
                 {
                     if (AdornmentLayer.Selector.StashedCaret != null)
-                        AdornmentLayer.Selector.ApplyStashedCaretPosition();
-
+                    {
+                        var previousPosition = AdornmentLayer.Selector.ApplyStashedCaretPosition();
+                        AdornmentLayer.Selector.MoveToPosition(previousPosition);
+                    }
                     AdornmentLayer.Selector.AddMouseCaretToSelections();
                 }
                 else

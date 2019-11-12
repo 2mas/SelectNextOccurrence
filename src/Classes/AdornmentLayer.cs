@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -170,14 +170,11 @@ namespace SelectNextOccurrence
                 geometry = view.TextViewLines.GetTextMarkerGeometry(span);
                 if (geometry != null)
                 {
-                    drawing = new GeometryDrawing(caretBrush, null, geometry);
-                    drawing.Freeze();
-
                     element = new Rectangle
                     {
                         Fill = caretBrush,
-                        Width = drawing.Bounds.Width / 6,
-                        Height = drawing.Bounds.Height,
+                        Width = view.FormattedLineSource.ColumnWidth / 6,
+                        Height = view.FormattedLineSource.LineHeight,
                         Margin = new Thickness(0, 0, 0, 0),
                     };
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -116,7 +117,7 @@ namespace SelectNextOccurrence
                     Start = Snapshot.CreateTrackingPoint(start),
                     End = Snapshot.CreateTrackingPoint(end),
                     Caret = Snapshot.CreateTrackingPoint(caret),
-                    ColumnPosition = Snapshot.GetLineColumnFromPosition(caret),
+                    ColumnPosition = GetColumnPosition(),
                     VirtualSpaces = view.Caret.Position.VirtualSpaces
                 }
             );
@@ -164,19 +165,19 @@ namespace SelectNextOccurrence
                 var caret = Selections.Last().IsReversed(Snapshot)
                     ? start : end;
 
+                view.Caret.MoveTo(caret == start ? occurrence.Start : occurrence.End);
+
                 Selections.Add(
                     new Selection
                     {
                         Start = start,
                         End = end,
                         Caret = caret,
-                        ColumnPosition = Snapshot.GetLineColumnFromPosition(caret.GetPoint(Snapshot))
+                        ColumnPosition = GetColumnPosition()
                     }
                 );
 
                 outliningManager.ExpandAll(occurrence, r => r.IsCollapsed);
-
-                view.Caret.MoveTo(caret == start ? occurrence.Start : occurrence.End);
 
                 view.ViewScroller.EnsureSpanVisible(
                     new SnapshotSpan(view.Caret.Position.BufferPosition, 0)
@@ -308,28 +309,32 @@ namespace SelectNextOccurrence
             var beginLineNumber = view.Selection.Start.Position.GetContainingLine().LineNumber;
             var endLineNumber = view.Selection.End.Position.GetContainingLine().LineNumber;
 
+            var currentPosition = view.Caret.Position.BufferPosition;
             if (beginLineNumber != endLineNumber)
             {
                 for (var lineNumber = beginLineNumber; lineNumber < endLineNumber; lineNumber++)
                 {
                     var line = Snapshot.GetLineFromLineNumber(lineNumber);
+                    view.Caret.MoveTo(line.End);
                     Selections.Add(
                         new Selection
                         {
                             Caret = Snapshot.CreateTrackingPoint(line.End.Position),
-                            ColumnPosition = Snapshot.GetLineColumnFromPosition(line.End.Position)
+                            ColumnPosition = GetColumnPosition(),
                         }
                     );
                 }
 
+                view.Caret.MoveTo(view.Selection.End.Position);
                 Selections.Add(
                     new Selection
                     {
                         Caret = Snapshot.CreateTrackingPoint(view.Selection.End.Position),
-                        ColumnPosition = Snapshot.GetLineColumnFromPosition(view.Selection.End.Position)
+                        ColumnPosition = GetColumnPosition()
                     }
                 );
 
+                view.Caret.MoveTo(currentPosition);
                 view.Selection.Clear();
             }
             else
@@ -374,7 +379,10 @@ namespace SelectNextOccurrence
                 VirtualSpaces = view.Caret.Position.VirtualSpaces
             };
 
-            var newPosition = newSelection.GetCaretColumnPosition(caretPosition, Snapshot);
+            var newPosition = newSelection.GetCaretColumnPosition(
+                caretPosition,
+                Snapshot,
+                view.FormattedLineSource.TabSize);
             newSelection.Caret = Snapshot.CreateTrackingPoint(newPosition);
 
             if (Selections.Any(s => s.Caret.GetPoint(Snapshot) == newPosition))
@@ -392,8 +400,7 @@ namespace SelectNextOccurrence
                 var newSelection = new Selection
                 {
                     Caret = Snapshot.CreateTrackingPoint(caretPosition),
-                    ColumnPosition = Snapshot.GetLineColumnFromPosition(caretPosition)
-                        + view.Caret.Position.VirtualSpaces,
+                    ColumnPosition = GetColumnPosition() + view.Caret.Position.VirtualSpaces,
                     VirtualSpaces = view.Caret.Position.VirtualSpaces
                 };
 
@@ -416,10 +423,8 @@ namespace SelectNextOccurrence
                 Selections.Add(
                     new Selection
                     {
-                        Start = null,
-                        End = null,
                         Caret = Snapshot.CreateTrackingPoint(caretPosition),
-                        ColumnPosition = Snapshot.GetLineColumnFromPosition(caretPosition)
+                        ColumnPosition = GetColumnPosition()
                     }
                 );
             }
@@ -520,6 +525,12 @@ namespace SelectNextOccurrence
             }
         }
 
+        internal int GetColumnPosition()
+        {
+            var lineSource = view.FormattedLineSource;
+            return Convert.ToInt32(( view.Caret.Left - lineSource.BaseIndentation ) / lineSource.ColumnWidth);
+        }
+
         internal string GetCurrentlySelectedText()
         {
             return EditorOperations.SelectedText;
@@ -541,24 +552,31 @@ namespace SelectNextOccurrence
             StashedCaret = null;
         }
 
-        internal void ApplyStashedCaretPosition()
+        internal SnapshotPoint ApplyStashedCaretPosition()
         {
             var stashedCaretPosition = StashedCaret.GetPosition(Snapshot);
+
+            var position = view.Caret.Position.BufferPosition;
+
+            view.Caret.MoveTo(StashedCaret.GetPoint(Snapshot));
 
             if (!Selections.Any(s => s.Caret.GetPoint(Snapshot) == stashedCaretPosition))
             {
                 Selections.Add(
                     new Selection
                     {
-                        Start = null,
-                        End = null,
                         Caret = StashedCaret,
-                        ColumnPosition = Snapshot.GetLineColumnFromPosition(stashedCaretPosition)
+                        ColumnPosition = GetColumnPosition()
                     }
                 );
             }
-
             StashedCaret = null;
+            return position;
+        }
+
+        internal void MoveToPosition(SnapshotPoint position)
+        {
+            view.Caret.MoveTo(position);
         }
         #endregion
 

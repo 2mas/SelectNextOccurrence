@@ -317,7 +317,17 @@ namespace SelectNextOccurrence.Commands
 
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
-                selection.SetCaretPosition(view.Caret.Position, verticalMove, Snapshot);
+                var position = view.Caret.Position.BufferPosition.Position;
+                if (verticalMove)
+                {
+                    position = selection.GetCaretColumnPosition(position, Snapshot, view.FormattedLineSource.TabSize);
+                }
+                else
+                {
+                    selection.ColumnPosition = Selector.GetColumnPosition();
+                }
+                selection.Caret = Snapshot.CreateTrackingPoint(position);
+                selection.VirtualSpaces = view.Caret.Position.VirtualSpaces;
 
                 if (view.Selection.IsEmpty)
                 {
