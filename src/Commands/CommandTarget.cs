@@ -125,7 +125,7 @@ namespace SelectNextOccurrence.Commands
                         clearSelections = true;
                         break;
                     case VSConstants.VSStd2KCmdID.CANCEL:
-                        Selector.DiscardSelections();
+                        Selector.CancelSelectNextOccurence();
                         break;
                     case VSConstants.VSStd2KCmdID.PAGEDN:
                     case VSConstants.VSStd2KCmdID.PAGEUP:
@@ -156,6 +156,8 @@ namespace SelectNextOccurrence.Commands
                         invokeCommand = true;
                         break;
                     case VSConstants.VSStd2KCmdID.TOGGLE_OVERTYPE_MODE:
+                    case VSConstants.VSStd2KCmdID.TOGGLEVISSPACE:
+                    case VSConstants.VSStd2KCmdID.TOGGLEWORDWRAP:
                         result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                         adornmentLayer.DrawAdornments();
                         return result;
