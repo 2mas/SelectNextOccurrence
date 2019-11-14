@@ -45,7 +45,7 @@ namespace SelectNextOccurrence.Options
 
         [Category(Vsix.Name)]
         [DisplayName("Keep caret on first entry")]
-        [Description("Activate to keep caret on first entry when canceling(pressing escape)")]
+        [Description("Activate to keep caret on first entry when canceling (pressing escape)")]
         [DefaultValue(false)]
         [ExtensionSetting]
         public bool KeepFirstEntry { get; set; } = false;
