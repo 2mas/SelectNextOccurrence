@@ -28,7 +28,8 @@ namespace SelectNextOccurrence.Options
             {
                 ThreadHelper.ThrowIfNotOnUIThread();
 
-                if (instance == null) instance = new ExtensionOptions();
+                if (instance == null)
+                    instance = new ExtensionOptions();
 
                 instance.LoadSettingsFromStorage();
                 return instance;
@@ -41,6 +42,14 @@ namespace SelectNextOccurrence.Options
         [DefaultValue(true)]
         [ExtensionSetting]
         public bool AddMouseCursors { get; set; } = true;
+
+        [Category(Vsix.Name)]
+        [DisplayName("Keep caret on first entry")]
+        [Description("Activate to keep caret on first entry when canceling(pressing escape)")]
+        [DefaultValue(false)]
+        [ExtensionSetting]
+        public bool KeepFirstEntry { get; set; } = false;
+
 
         public override void SaveSettingsToStorage()
         {

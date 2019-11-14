@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Text.Outlining;
+using SelectNextOccurrence.Options;
 
 namespace SelectNextOccurrence
 {
@@ -585,6 +586,17 @@ namespace SelectNextOccurrence
         /// </summary>
         internal void DiscardSelections()
         {
+            Selections.Clear();
+            HasWrappedDocument = false;
+            view.Caret.IsHidden = false;
+        }
+
+        internal void CancelSelectNextOccurence()
+        {
+            if (ExtensionOptions.Instance.KeepFirstEntry)
+            {
+                view.Caret.MoveTo(Selections.First().Caret.GetPoint(view.TextSnapshot));
+            }
             Selections.Clear();
             HasWrappedDocument = false;
             view.Caret.IsHidden = false;
