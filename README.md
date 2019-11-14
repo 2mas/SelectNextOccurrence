@@ -56,7 +56,9 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 
 - Toggle match-whole word search by using the "Match whole word" setting from the find-dialog (Ctrl+F)
 
-- Deactivate Alt-Clicking to add carets in options-dialog
+- Options-dialog: Add cursors by mouse-clicking - true by default
+
+- Options-dialog: Keep caret on first entry - false by default, activates behaviour to keep caret on first entry when pressing escape
 
 ![Select Next Occurrence Options dialog](settings.png)
 
