@@ -104,13 +104,5 @@ There is a conflict with the extension Copy As Html, if you have this enabled, t
 Check out the [contribution guidelines](CONTRIBUTING.md)
 if you want to contribute to this project.
 
-For cloning and building this project yourself, make sure
-to install the
-[Extensibility Tools 2015](https://visualstudiogallery.msdn.microsoft.com/ab39a092-1343-46e2-b0f1-6a3f91155aa6)
-extension for Visual Studio which enables some features
-used by this project. 
-
-As far as I know you must have a 2015-edition of VS installed (or previously installed) to get the generators working for Extensibility Tools in 2017.
-
 ### License
 [Apache 2.0](LICENSE)
