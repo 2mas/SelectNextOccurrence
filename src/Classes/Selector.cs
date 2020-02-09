@@ -422,7 +422,8 @@ namespace SelectNextOccurrence
         {
             var caretPosition = view.Caret.Position.BufferPosition;
 
-            if (!Selections.Any(s => s.OverlapsWith(new SnapshotSpan(caretPosition, 1), Snapshot)))
+            if (!Selections.Any(s => s.Caret.GetPosition(Snapshot) == caretPosition
+                || s.OverlapsWith(new SnapshotSpan(caretPosition, 1), Snapshot)))
             {
                 Selections.Add(
                     new Selection
@@ -434,8 +435,9 @@ namespace SelectNextOccurrence
             }
             else
             {
-                Selections.Remove(
-                    Selections.First(s => s.OverlapsWith(new SnapshotSpan(caretPosition, 1), Snapshot))
+                Selections.RemoveAll(
+                    s => s.Caret.GetPosition(Snapshot) == caretPosition
+                    || s.OverlapsWith(new SnapshotSpan(caretPosition, 1), Snapshot)
                 );
             }
         }
