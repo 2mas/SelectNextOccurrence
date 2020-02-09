@@ -48,7 +48,7 @@ namespace SelectNextOccurrence
                         var previousPosition = AdornmentLayer.Selector.ApplyStashedCaretPosition();
                         AdornmentLayer.Selector.MoveToPosition(previousPosition);
                     }
-                    AdornmentLayer.Selector.AddMouseCaretToSelections();
+                    AdornmentLayer.Selector.AddMouseCaretToSelectionsOrRemoveExistingSelection();
                 }
                 else
                 {

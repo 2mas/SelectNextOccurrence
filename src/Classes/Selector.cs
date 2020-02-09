@@ -415,11 +415,14 @@ namespace SelectNextOccurrence
             }
         }
 
-        internal void AddMouseCaretToSelections()
+        /// <summary>
+        /// Adds the ALT-clicked caret to selections if it doesn't exist or removes the selection if an existing selection i ALT-clicked
+        /// </summary>
+        internal void AddMouseCaretToSelectionsOrRemoveExistingSelection()
         {
             var caretPosition = view.Caret.Position.BufferPosition;
 
-            if (!Selections.Any(s => s.Caret.GetPosition(Snapshot) == caretPosition))
+            if (!Selections.Any(s => s.OverlapsWith(new SnapshotSpan(caretPosition, 1), Snapshot)))
             {
                 Selections.Add(
                     new Selection
@@ -427,6 +430,12 @@ namespace SelectNextOccurrence
                         Caret = Snapshot.CreateTrackingPoint(caretPosition),
                         ColumnPosition = GetColumnPosition()
                     }
+                );
+            }
+            else
+            {
+                Selections.Remove(
+                    Selections.First(s => s.OverlapsWith(new SnapshotSpan(caretPosition, 1), Snapshot))
                 );
             }
         }
