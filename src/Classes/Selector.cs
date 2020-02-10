@@ -420,10 +420,10 @@ namespace SelectNextOccurrence
         /// </summary>
         internal void AddMouseCaretToSelectionsOrRemoveExistingSelection()
         {
-            var caretPosition = view.Caret.Position.BufferPosition;
+            var caretPosition = view.Caret.Position.Point.GetPoint(Snapshot, PositionAffinity.Predecessor).Value;
 
             if (!Selections.Any(s => s.Caret.GetPosition(Snapshot) == caretPosition
-                || s.OverlapsWith(new SnapshotSpan(caretPosition, 1), Snapshot)))
+                || s.OverlapsWith(new SnapshotSpan(caretPosition, Snapshot.Length > caretPosition ? 1 : 0), Snapshot)))
             {
                 Selections.Add(
                     new Selection
@@ -437,7 +437,7 @@ namespace SelectNextOccurrence
             {
                 Selections.RemoveAll(
                     s => s.Caret.GetPosition(Snapshot) == caretPosition
-                    || s.OverlapsWith(new SnapshotSpan(caretPosition, 1), Snapshot)
+                    || s.OverlapsWith(new SnapshotSpan(caretPosition, Snapshot.Length > caretPosition ? 1 : 0), Snapshot)
                 );
             }
         }
