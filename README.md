@@ -45,7 +45,7 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 - Undo occurrence
 - Add caret above/below
 - Use multiple carets to edit
-  - Alt-Click to add caret
+  - Alt-Click to add a new caret or remove clicked caret/selection
 
 ![Select Next Occurrence](select_next.gif)
 
