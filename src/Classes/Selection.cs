@@ -36,7 +36,8 @@ namespace SelectNextOccurrence
             }
             else
             {
-                return span.OverlapsWith(new SnapshotSpan(Caret.GetPoint(snapshot), 1));
+                var caretPoint = Caret.GetPoint(snapshot);
+                return span.OverlapsWith(new SnapshotSpan(caretPoint, snapshot.Length > caretPoint.Position ? 1 : 0));
             }
         }
 
