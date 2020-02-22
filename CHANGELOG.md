@@ -3,6 +3,9 @@
 
 # Change log
 
+#### 1.3.150
+- [x] Adding the ability to remove a caret/selection with ALT-click
+
 #### 1.3.141
 - [x] Adding feature from feature request: Setting for choosing first or last entry on escape key - [[ISSUE]](https://github.com/2mas/SelectNextOccurrence/issues/52)
 - [x] Fixing vertical navigation/add caret above/below when mixing tabs and spaces - [[ISSUE]](https://github.com/2mas/SelectNextOccurrence/issues/51)
