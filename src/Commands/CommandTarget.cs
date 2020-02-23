@@ -210,8 +210,7 @@ namespace SelectNextOccurrence.Commands
             }
             else if (pguidCmdGroup == PackageGuids.guidNextOccurrenceCommandsPackageCmdSet)
             {
-                verticalMove = nCmdID == PackageIds.AddCaretAboveCommandId
-                                || nCmdID == PackageIds.AddCaretBelowCommandId;
+                return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
             }
             else
             {
@@ -322,7 +321,8 @@ namespace SelectNextOccurrence.Commands
                 var position = view.Caret.Position.BufferPosition.Position;
                 if (verticalMove)
                 {
-                    position = selection.GetCaretColumnPosition(position, Snapshot, view.FormattedLineSource.TabSize);
+                    position = selection.MoveCaretToStartOrEnd(position, Snapshot)
+                            ?? selection.GetCaretColumnPosition(position, Snapshot, view.FormattedLineSource.TabSize);
                 }
                 else
                 {
