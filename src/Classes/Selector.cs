@@ -416,29 +416,22 @@ namespace SelectNextOccurrence
         }
 
         /// <summary>
-        /// Adds the ALT-clicked caret to selections if it doesn't exist or removes the selection if an existing selection i ALT-clicked
+        /// Adds the ALT-clicked caret to selections if it doesn't exist or removes the selection if an existing selection is ALT-clicked
         /// </summary>
         internal void AddMouseCaretToSelectionsOrRemoveExistingSelection()
         {
-            var caretPosition = view.Caret.Position.Point.GetPoint(Snapshot, PositionAffinity.Predecessor).Value;
+            var caretPosition = view.Caret.Position.BufferPosition;
 
-            if (!Selections.Any(s => s.Caret.GetPosition(Snapshot) == caretPosition
-                || s.OverlapsWith(new SnapshotSpan(caretPosition, Snapshot.Length > caretPosition ? 1 : 0), Snapshot)))
+            var overlaps = Selections.Where(s => s.Caret.GetPosition(Snapshot) == caretPosition
+                || s.OverlapsWith(new SnapshotSpan(caretPosition, Snapshot.Length > caretPosition ? 1 : 0), Snapshot));
+
+            if (overlaps.Count() == 0)
             {
-                Selections.Add(
-                    new Selection
-                    {
-                        Caret = Snapshot.CreateTrackingPoint(caretPosition),
-                        ColumnPosition = GetColumnPosition()
-                    }
-                );
+                AddCurrentCaretToSelections();
             }
             else
             {
-                Selections.RemoveAll(
-                    s => s.Caret.GetPosition(Snapshot) == caretPosition
-                    || s.OverlapsWith(new SnapshotSpan(caretPosition, Snapshot.Length > caretPosition ? 1 : 0), Snapshot)
-                );
+                overlaps.ToList().ForEach(s => Selections.Remove(s));
             }
         }
 
