@@ -141,13 +141,22 @@ namespace SelectNextOccurrence
 
         private void DrawCaret(Selection selection)
         {
-            if (selection.Caret.GetPosition(Snapshot) >= Snapshot.Length)
+            if (selection.Caret.GetPosition(Snapshot) > Snapshot.Length)
                 return;
 
-            var span = new SnapshotSpan(selection.Caret.GetPoint(Snapshot), 1);
+            bool atEOF = false;
+            SnapshotSpan span;
+            if (selection.Caret.GetPosition(Snapshot) == Snapshot.Length)
+            {
+                atEOF = true;
+                span = new SnapshotSpan(selection.Caret.GetPoint(Snapshot).Subtract(1), 1);
+            }
+            else
+            {
+                span = new SnapshotSpan(selection.Caret.GetPoint(Snapshot), 1);
+            }
 
             Geometry geometry;
-            GeometryDrawing drawing;
             UIElement element = null;
             double virtualSpace = 0;
 
@@ -156,7 +165,7 @@ namespace SelectNextOccurrence
                 geometry = view.TextViewLines.GetMarkerGeometry(span);
                 if (geometry != null)
                 {
-                    drawing = new GeometryDrawing(insertionBrush, new Pen(), geometry);
+                    var drawing = new GeometryDrawing(insertionBrush, new Pen(), geometry);
                     drawing.Freeze();
 
                     var drawingImage = new DrawingImage(drawing);
@@ -184,7 +193,7 @@ namespace SelectNextOccurrence
 
             if (element != null)
             {
-                Canvas.SetLeft(element, geometry.Bounds.Left + virtualSpace);
+                Canvas.SetLeft(element, (atEOF ? geometry.Bounds.Right : geometry.Bounds.Left) + virtualSpace);
                 Canvas.SetTop(element, geometry.Bounds.Top);
 
                 layer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, Vsix.Name, element, null);
