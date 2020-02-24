@@ -110,17 +110,7 @@ namespace SelectNextOccurrence
             );
         }
 
-        /// <summary>
-        /// Gets the caret column position when moving caret vertically.
-        /// If the Caret is already on first or last line the caret is set
-        /// to the start of file or to the end of the file, respectively.
-        /// If the Caret is positioned left off the stored column position
-        /// the caret is set to the stored column position or the end of line.
-        /// </summary>
-        /// <param name="caretPosition"></param>
-        /// <param name="snapshot"></param>
-        /// <returns></returns>
-        internal int GetCaretColumnPosition(int caretPosition, ITextSnapshot snapshot, int tabSize)
+        internal int? MoveCaretToStartOrEnd(int caretPosition, ITextSnapshot snapshot)
         {
             var previousLineNumber = snapshot.GetLineNumberFromPosition(Caret.GetPosition(snapshot));
             var caretLine = snapshot.GetLineFromPosition(caretPosition);
@@ -134,14 +124,25 @@ namespace SelectNextOccurrence
             {
                 return snapshot.Length;
             }
-            else if (ColumnPosition > ( caretPosition - caretLine.Start.Position ))
-            {
-                return caretLine.Start.Position + ColumnOffset(caretLine.GetText(), tabSize);
-            }
             else
             {
-                return caretPosition;
+                return null;
             }
+        }
+
+        /// <summary>
+        /// Gets the correct caret column position. If the caret is positioned left
+        /// of the stored column position the caret is set to the stored column position.
+        /// </summary>
+        /// <param name="caretPosition"></param>
+        /// <param name="snapshot"></param>
+        /// <returns></returns>
+        internal int GetCaretColumnPosition(int caretPosition, ITextSnapshot snapshot, int tabSize)
+        {
+            var caretLine = snapshot.GetLineFromPosition(caretPosition);
+            return (ColumnPosition > ( caretPosition - caretLine.Start.Position ))
+                ? caretLine.Start.Position + ColumnOffset(caretLine.GetText(), tabSize)
+                : caretPosition;
         }
 
         private int ColumnOffset(string lineText, int tabSize)
