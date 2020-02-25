@@ -318,17 +318,31 @@ namespace SelectNextOccurrence.Commands
 
                 result = NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
-                var position = view.Caret.Position.BufferPosition.Position;
+                var newCaretPosition = view.Caret.Position.BufferPosition.Position;
+
                 if (verticalMove)
                 {
-                    position = selection.MoveCaretToStartOrEnd(position, Snapshot)
-                            ?? selection.GetCaretColumnPosition(position, Snapshot, view.FormattedLineSource.TabSize);
+                    // Sets new caret position to start- or end-position of snapshot if the new/processed caret
+                    // is on the same line as the previous caret after a vertical move has been made.
+                    var previousLine = Snapshot.GetLineNumberFromPosition(selection.Caret.GetPosition(Snapshot));
+                    var newLine = Snapshot.GetLineFromPosition(newCaretPosition).LineNumber;
+
+                    if (previousLine == newLine)
+                    {
+                        newCaretPosition = newLine == 0 ? 0 : Snapshot.Length;
+                    }
+                    else
+                    {
+                        newCaretPosition = selection
+                            .GetCaretColumnPosition(newCaretPosition, Snapshot, view.FormattedLineSource.TabSize);
+                    }
                 }
                 else
                 {
                     selection.ColumnPosition = Selector.GetColumnPosition();
                 }
-                selection.Caret = Snapshot.CreateTrackingPoint(position);
+
+                selection.Caret = Snapshot.CreateTrackingPoint(newCaretPosition);
                 selection.VirtualSpaces = view.Caret.Position.VirtualSpaces;
 
                 if (view.Selection.IsEmpty)
@@ -344,6 +358,7 @@ namespace SelectNextOccurrence.Commands
                 {
                     selection.SetSelection(view.Selection.StreamSelectionSpan, Snapshot);
                 }
+
                 view.Selection.Clear();
             }
 

@@ -384,6 +384,7 @@ namespace SelectNextOccurrence
                 caretPosition,
                 Snapshot,
                 view.FormattedLineSource.TabSize);
+
             newSelection.Caret = Snapshot.CreateTrackingPoint(newPosition);
 
             if (Selections.Any(s => s.Caret.GetPoint(Snapshot) == newPosition))

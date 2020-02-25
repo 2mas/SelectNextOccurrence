@@ -110,26 +110,6 @@ namespace SelectNextOccurrence
             );
         }
 
-        internal int? MoveCaretToStartOrEnd(int caretPosition, ITextSnapshot snapshot)
-        {
-            var previousLineNumber = snapshot.GetLineNumberFromPosition(Caret.GetPosition(snapshot));
-            var caretLine = snapshot.GetLineFromPosition(caretPosition);
-
-            if (caretLine.LineNumber == previousLineNumber && caretLine.LineNumber == 0)
-            {
-                return 0;
-            }
-            else if (caretLine.LineNumber == previousLineNumber
-                && caretLine.LineNumber == snapshot.LineCount - 1)
-            {
-                return snapshot.Length;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         /// <summary>
         /// Gets the correct caret column position. If the caret is positioned left
         /// of the stored column position the caret is set to the stored column position.
