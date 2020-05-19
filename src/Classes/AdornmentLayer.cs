@@ -141,29 +141,33 @@ namespace SelectNextOccurrence
 
         private void DrawCaret(Selection selection)
         {
-            if (selection.Caret.GetPosition(Snapshot) > Snapshot.Length)
-                return;
-
-            bool atEOF = false;
             SnapshotSpan span;
+            Geometry geometry;
+
+            // EOF edge case fix
             if (selection.Caret.GetPosition(Snapshot) == Snapshot.Length)
             {
-                atEOF = true;
                 span = new SnapshotSpan(selection.Caret.GetPoint(Snapshot).Subtract(1), 1);
+                var textView = view.TextViewLines[view.TextViewLines.Count - 1];
+                var rect = new Rect(
+                    textView.Right,
+                    textView.Bottom - view.FormattedLineSource.LineHeight,
+                    view.FormattedLineSource.ColumnWidth,
+                    view.FormattedLineSource.LineHeight);
+                geometry = new RectangleGeometry(rect);
             }
             else
             {
                 span = new SnapshotSpan(selection.Caret.GetPoint(Snapshot), 1);
+                geometry = view.TextViewLines.GetMarkerGeometry(span);
             }
 
-            Geometry geometry;
             UIElement element = null;
             double virtualSpace = 0;
 
-            if (view.Caret.OverwriteMode && !selection.IsSelection())
+            if (geometry != null)
             {
-                geometry = view.TextViewLines.GetMarkerGeometry(span);
-                if (geometry != null)
+                if (view.Caret.OverwriteMode && !selection.IsSelection())
                 {
                     var drawing = new GeometryDrawing(insertionBrush, new Pen(), geometry);
                     drawing.Freeze();
@@ -173,11 +177,7 @@ namespace SelectNextOccurrence
 
                     element = new Image { Source = drawingImage };
                 }
-            }
-            else
-            {
-                geometry = view.TextViewLines.GetTextMarkerGeometry(span);
-                if (geometry != null)
+                else
                 {
                     element = new Rectangle
                     {
@@ -193,7 +193,7 @@ namespace SelectNextOccurrence
 
             if (element != null)
             {
-                Canvas.SetLeft(element, (atEOF ? geometry.Bounds.Right : geometry.Bounds.Left) + virtualSpace);
+                Canvas.SetLeft(element, geometry.Bounds.Left + virtualSpace);
                 Canvas.SetTop(element, geometry.Bounds.Top);
 
                 layer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, Vsix.Name, element, null);
