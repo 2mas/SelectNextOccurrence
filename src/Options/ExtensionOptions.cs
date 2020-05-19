@@ -50,6 +50,12 @@ namespace SelectNextOccurrence.Options
         [ExtensionSetting]
         public bool KeepFirstEntry { get; set; } = false;
 
+        [Category(Vsix.Name)]
+        [DisplayName("Select in-between selections first")]
+        [Description("Activate to select in-between selections first before selecting next selection")]
+        [DefaultValue(true)]
+        [ExtensionSetting]
+        public bool InwardSelection { get; set; } = true;
 
         public override void SaveSettingsToStorage()
         {

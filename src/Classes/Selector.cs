@@ -230,7 +230,7 @@ namespace SelectNextOccurrence
                 else
                 {
                     var orderedSelections = Selections.OrderBy(n => n.Caret.GetPosition(Snapshot)).ToList();
-                    var startIndex = reverseDirection ? orderedSelections.Count - 1 : 0;
+                    var startIndex = ExtensionOptions.Instance.InwardSelection ^ reverseDirection ? 0 : orderedSelections.Count - 1;
                     var direction = reverseDirection ? -1 : 1;
 
                     var currentIndex = startIndex;
