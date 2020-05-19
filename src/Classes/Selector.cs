@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
@@ -137,6 +137,7 @@ namespace SelectNextOccurrence
         private FindData GetFindData(bool reverse = false, bool exact = false)
         {
             var findData = new FindData(SearchText, Snapshot);
+            findData.FindOptions = FindOptions.Multiline;
 
             if (exact)
             {
