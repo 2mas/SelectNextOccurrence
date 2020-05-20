@@ -141,22 +141,35 @@ namespace SelectNextOccurrence
 
         private void DrawCaret(Selection selection)
         {
-            if (selection.Caret.GetPosition(Snapshot) >= Snapshot.Length)
-                return;
-
-            var span = new SnapshotSpan(selection.Caret.GetPoint(Snapshot), 1);
-
+            SnapshotSpan span;
             Geometry geometry;
-            GeometryDrawing drawing;
+
+            // EOF edge case fix
+            if (selection.Caret.GetPosition(Snapshot) == Snapshot.Length)
+            {
+                span = new SnapshotSpan(selection.Caret.GetPoint(Snapshot).Subtract(1), 1);
+                var textView = view.TextViewLines[view.TextViewLines.Count - 1];
+                var rect = new Rect(
+                    textView.Right,
+                    textView.Bottom - view.FormattedLineSource.LineHeight,
+                    view.FormattedLineSource.ColumnWidth,
+                    view.FormattedLineSource.LineHeight);
+                geometry = new RectangleGeometry(rect);
+            }
+            else
+            {
+                span = new SnapshotSpan(selection.Caret.GetPoint(Snapshot), 1);
+                geometry = view.TextViewLines.GetMarkerGeometry(span);
+            }
+
             UIElement element = null;
             double virtualSpace = 0;
 
-            if (view.Caret.OverwriteMode && !selection.IsSelection())
+            if (geometry != null)
             {
-                geometry = view.TextViewLines.GetMarkerGeometry(span);
-                if (geometry != null)
+                if (view.Caret.OverwriteMode && !selection.IsSelection())
                 {
-                    drawing = new GeometryDrawing(insertionBrush, new Pen(), geometry);
+                    var drawing = new GeometryDrawing(insertionBrush, new Pen(), geometry);
                     drawing.Freeze();
 
                     var drawingImage = new DrawingImage(drawing);
@@ -164,11 +177,7 @@ namespace SelectNextOccurrence
 
                     element = new Image { Source = drawingImage };
                 }
-            }
-            else
-            {
-                geometry = view.TextViewLines.GetTextMarkerGeometry(span);
-                if (geometry != null)
+                else
                 {
                     element = new Rectangle
                     {
