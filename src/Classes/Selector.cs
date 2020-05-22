@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
@@ -233,22 +233,22 @@ namespace SelectNextOccurrence
                     var startIndex = ExtensionOptions.Instance.InwardSelection ^ reverseDirection ? 0 : orderedSelections.Count - 1;
                     var direction = reverseDirection ? -1 : 1;
 
-                    var currentIndex = startIndex;
+                    var index = startIndex;
                     do
                     {
-                        var currentPosition = reverseDirection
-                            ? orderedSelections[currentIndex].Start.GetPosition(Snapshot)
-                            : orderedSelections[currentIndex].End.GetPosition(Snapshot);
+                        var position = reverseDirection
+                            ? orderedSelections[index].Start.GetPosition(Snapshot)
+                            : orderedSelections[index].End.GetPosition(Snapshot);
 
-                        currentIndex = ( currentIndex + direction + orderedSelections.Count ) % orderedSelections.Count;
-                        if (textSearchService.FindNext(currentPosition, true, GetFindData(reverseDirection, exactMatch))
+                        index = (index + direction + orderedSelections.Count ) % orderedSelections.Count;
+                        if (textSearchService.FindNext(position, true, GetFindData(reverseDirection, exactMatch))
                             is SnapshotSpan occurrence
-                            && !orderedSelections[currentIndex].OverlapsWith(occurrence, Snapshot))
+                            && !orderedSelections[index].OverlapsWith(occurrence, Snapshot))
                         {
                             ProcessFoundOccurrence(occurrence);
                             break;
                         }
-                    } while (startIndex != currentIndex);
+                    } while (startIndex != index);
                 }
 
                 view.Selection.Clear();
@@ -417,7 +417,7 @@ namespace SelectNextOccurrence
             // Checks if any existing caret overlaps, or if this clicked careposition is within another selection, or at the beginning or the end of it, which is considered an overlap here
             var overlaps = Selections.Where(s =>
                 s.Caret.GetPosition(Snapshot) == caretPosition
-                || (s.IsSelection() && (s.Start.GetPosition(Snapshot) == caretPosition || s.End.GetPosition(Snapshot) == caretPosition))
+                || ( s.IsSelection() && ( s.Start.GetPosition(Snapshot) == caretPosition || s.End.GetPosition(Snapshot) == caretPosition ) )
                 || s.OverlapsWith(new SnapshotSpan(caretPosition, Snapshot.Length > caretPosition ? 1 : 0), Snapshot));
 
             if (overlaps.Count() == 0)
