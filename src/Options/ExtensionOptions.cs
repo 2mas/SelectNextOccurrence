@@ -52,8 +52,8 @@ namespace SelectNextOccurrence.Options
 
         [Category(Vsix.Name)]
         [DisplayName("Select in-between selections first")]
-        [Description("Activate to select in-between selections first before selecting next selection")]
-        [DefaultValue(true)]
+        [Description("Activate to select in-between selections first, before selecting next selection")]
+        [DefaultValue(false)]
         [ExtensionSetting]
         public bool InwardSelection { get; set; } = false;
 
