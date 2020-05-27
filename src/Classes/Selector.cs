@@ -70,8 +70,6 @@ namespace SelectNextOccurrence
         /// </summary>
         internal ITrackingPoint StashedCaret { get; private set; }
 
-        internal bool HasWrappedDocument { get; set; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Selector"/> class.
         /// </summary>
@@ -417,7 +415,7 @@ namespace SelectNextOccurrence
             // Checks if any existing caret overlaps, or if this clicked careposition is within another selection, or at the beginning or the end of it, which is considered an overlap here
             var overlaps = Selections.Where(s =>
                 s.Caret.GetPosition(Snapshot) == caretPosition
-                || ( s.IsSelection() && ( s.Start.GetPosition(Snapshot) == caretPosition || s.End.GetPosition(Snapshot) == caretPosition ) )
+                || (s.IsSelection() && (s.Start.GetPosition(Snapshot) == caretPosition || s.End.GetPosition(Snapshot) == caretPosition))
                 || s.OverlapsWith(new SnapshotSpan(caretPosition, Snapshot.Length > caretPosition ? 1 : 0), Snapshot));
 
             if (overlaps.Count() == 0)
