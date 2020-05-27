@@ -212,7 +212,8 @@ namespace SelectNextOccurrence
                     var oldSelections = Selections;
                     Selections = new List<Selection>();
 
-                    foreach (var selection in oldSelections)
+                    // Note: The list is in reverse order to fix a bug in EditorOperations.SelectCurrentWord()
+                    foreach (var selection in oldSelections.OrderByDescending(n => n.Caret.GetPosition(Snapshot)))
                     {
                         if (!selection.IsSelection())
                         {
@@ -264,19 +265,13 @@ namespace SelectNextOccurrence
         {
             EditorOperations.SelectCurrentWord();
 
-            if (EditorOperations.SelectedText.Length != 0)
+            if (EditorOperations.SelectedText.Length != 0
+                && !char.IsLetterOrDigit(EditorOperations.SelectedText[0])
+                && Snapshot.GetLineColumnFromPosition(caretPosition) != 0
+                && char.IsLetterOrDigit(Snapshot[caretPosition - 1]))
             {
-                if (!char.IsLetterOrDigit(EditorOperations.SelectedText[0])
-                    && Snapshot.GetLineColumnFromPosition(caretPosition) != 0)
-                {
-                    var previousChar = Snapshot.ToCharArray(caretPosition - 1, 1)[0];
-
-                    if (char.IsLetterOrDigit(previousChar))
-                    {
-                        view.Caret.MoveTo(caretPosition - 1);
-                        EditorOperations.SelectCurrentWord();
-                    }
-                }
+                view.Caret.MoveTo(caretPosition - 1);
+                EditorOperations.SelectCurrentWord();
             }
 
             AddCurrentSelectionToSelections();
