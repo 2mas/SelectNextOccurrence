@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
@@ -69,8 +69,6 @@ namespace SelectNextOccurrence
         /// made when releasing the cursor
         /// </summary>
         internal ITrackingPoint StashedCaret { get; private set; }
-
-        internal bool HasWrappedDocument { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Selector"/> class.
@@ -229,36 +227,26 @@ namespace SelectNextOccurrence
                 }
                 else
                 {
-                    var orderedSelections = HasWrappedDocument
-                        ? Selections
-                        : Selections.OrderBy(n => n.Caret.GetPosition(Snapshot)).ToList();
+                    var orderedSelections = Selections.OrderBy(n => n.Caret.GetPosition(Snapshot)).ToList();
+                    var startIndex = ExtensionOptions.Instance.InwardSelection ^ reverseDirection ? 0 : orderedSelections.Count - 1;
+                    var direction = reverseDirection ? -1 : 1;
 
-                    var startSelection = reverseDirection && !HasWrappedDocument
-                        ? orderedSelections.First()
-                        : orderedSelections.Last();
-
-                    var startIndex = reverseDirection ?
-                        startSelection.Start?.GetPosition(Snapshot) ?? startSelection.Caret.GetPosition(Snapshot)
-                        : startSelection.End?.GetPosition(Snapshot) ?? startSelection.Caret.GetPosition(Snapshot);
-
-                    var occurrence = textSearchService.FindNext(
-                        startIndex,
-                        true,
-                        GetFindData(reverseDirection, exactMatch)
-                    );
-
-                    if (occurrence.HasValue)
+                    var index = startIndex;
+                    do
                     {
-                        ProcessFoundOccurrence(occurrence.Value);
+                        var position = reverseDirection
+                            ? orderedSelections[index].Start.GetPosition(Snapshot)
+                            : orderedSelections[index].End.GetPosition(Snapshot);
 
-                        if (!reverseDirection && Selections.Last().Caret.GetPosition(Snapshot) <
-                            Selections.First().Caret.GetPosition(Snapshot))
-                            HasWrappedDocument = true;
-
-                        if (reverseDirection && Selections.Last().Caret.GetPosition(Snapshot) >
-                            Selections.First().Caret.GetPosition(Snapshot))
-                            HasWrappedDocument = true;
-                    }
+                        index = (index + direction + orderedSelections.Count ) % orderedSelections.Count;
+                        if (textSearchService.FindNext(position, true, GetFindData(reverseDirection, exactMatch))
+                            is SnapshotSpan occurrence
+                            && !orderedSelections[index].OverlapsWith(occurrence, Snapshot))
+                        {
+                            ProcessFoundOccurrence(occurrence);
+                            break;
+                        }
+                    } while (startIndex != index);
                 }
 
                 view.Selection.Clear();
@@ -596,7 +584,6 @@ namespace SelectNextOccurrence
         internal void DiscardSelections()
         {
             Selections.Clear();
-            HasWrappedDocument = false;
             view.Caret.IsHidden = false;
         }
 
@@ -607,7 +594,6 @@ namespace SelectNextOccurrence
                 view.Caret.MoveTo(Selections.First().Caret.GetPoint(view.TextSnapshot));
             }
             Selections.Clear();
-            HasWrappedDocument = false;
             view.Caret.IsHidden = false;
         }
 

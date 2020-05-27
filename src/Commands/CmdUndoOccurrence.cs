@@ -22,9 +22,6 @@ namespace SelectNextOccurrence.Commands
             if (AdornmentLayer.Selector.Selections.Count > 1)
             {
                 AdornmentLayer.Selector.Selections.RemoveAt(AdornmentLayer.Selector.Selections.Count - 1);
-
-                if (AdornmentLayer.Selector.Selections.Count == 1)
-                    AdornmentLayer.Selector.HasWrappedDocument = false;
             }
 
             if (AdornmentLayer.Selector.Selections.Any())
