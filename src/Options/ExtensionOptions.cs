@@ -55,7 +55,7 @@ namespace SelectNextOccurrence.Options
         [Description("Activate to select in-between selections first before selecting next selection")]
         [DefaultValue(true)]
         [ExtensionSetting]
-        public bool InwardSelection { get; set; } = true;
+        public bool InwardSelection { get; set; } = false;
 
         public override void SaveSettingsToStorage()
         {
