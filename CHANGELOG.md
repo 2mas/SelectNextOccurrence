@@ -3,6 +3,12 @@
 
 # Change log
 
+
+#### 1.3.172
+- [x] Bugfixes on caret positions at document start or EOF
+- [x] Enabled selecting next occurrence on multi-line selections
+- [x] Adding an option to select occurrences between selections. Enable this in settings. See [[PR]](https://github.com/2mas/SelectNextOccurrence/pull/63) for description of usage
+
 #### 1.3.150
 - [x] Adding the ability to remove a caret/selection with ALT-click
 
