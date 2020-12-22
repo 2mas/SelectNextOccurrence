@@ -327,7 +327,7 @@ namespace SelectNextOccurrence.Commands
                     var previousLine = Snapshot.GetLineNumberFromPosition(selection.Caret.GetPosition(Snapshot));
                     var newLine = Snapshot.GetLineFromPosition(newCaretPosition).LineNumber;
 
-                    if (previousLine == newLine)
+                    if (previousLine == newLine && (newLine == 0 || newLine == Snapshot.LineCount - 1))
                     {
                         newCaretPosition = newLine == 0 ? 0 : Snapshot.Length;
                     }
