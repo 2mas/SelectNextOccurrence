@@ -4,6 +4,9 @@
 # Change log
 
 
+#### 1.3.175
+- [x] Bugfix, fix caret jumping to EOF when selecting from intellisense dialog
+
 #### 1.3.172
 - [x] Bugfixes on caret positions at document start or EOF
 - [x] Enabled selecting next occurrence on multi-line selections
