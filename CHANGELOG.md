@@ -1,5 +1,5 @@
 # Road map
-- [ ] Make statement completion working on multiple selections, see [issue](https://github.com/2mas/SelectNextOccurrence/issues/5)
+- [ ] Add support for Visual Studio 2022
 
 # Change log
 
