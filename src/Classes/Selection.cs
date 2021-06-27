@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
 
 namespace SelectNextOccurrence
 {

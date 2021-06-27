@@ -41,14 +41,12 @@ namespace SelectNextOccurrence
         /// <param name="textSearchService"></param>
         /// <param name="editorOperationsService"></param>
         /// <param name="formatMapService"></param>
-        /// <param name="textStructureNavigator"></param>
         /// <param name="outliningManagerService"></param>
         public AdornmentLayer(
             IWpfTextView view,
             ITextSearchService textSearchService,
             IEditorOperationsFactoryService editorOperationsService,
             IEditorFormatMapService formatMapService,
-            ITextStructureNavigator textStructureNavigator,
             IOutliningManagerService outliningManagerService
             )
         {
@@ -63,7 +61,6 @@ namespace SelectNextOccurrence
                 view,
                 textSearchService,
                 editorOperationsService,
-                textStructureNavigator,
                 outliningManagerService
             );
 

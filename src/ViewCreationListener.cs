@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
@@ -22,7 +21,9 @@ namespace SelectNextOccurrence
         [Export(typeof(AdornmentLayerDefinition))]
         [Name(Vsix.Name)]
         [Order(After = PredefinedAdornmentLayers.Selection, Before = PredefinedAdornmentLayers.Text)]
-        private AdornmentLayerDefinition editorAdornmentLayer;
+#pragma warning disable IDE0051 // Remove unused private members
+        private readonly AdornmentLayerDefinition editorAdornmentLayer;
+#pragma warning restore IDE0051 // Remove unused private members
 
         [Import(typeof(IVsEditorAdaptersFactoryService))]
         internal IVsEditorAdaptersFactoryService EditorFactory = null;
@@ -37,26 +38,20 @@ namespace SelectNextOccurrence
         internal IEditorFormatMapService FormatMapService = null;
 
         [Import]
-        internal ITextStructureNavigatorSelectorService NavigatorSelector = null;
-
-        [Import]
         internal IOutliningManagerService OutliningManagerService = null;
 
 #pragma warning restore 649, 169
 
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {
-#pragma warning disable S1848 // Objects should not be created to be dropped immediately without being used
             var textView = EditorFactory.GetWpfTextView(textViewAdapter);
             new AdornmentLayer(
                     textView,
                     TextSearchService,
                     EditorOperations,
                     FormatMapService,
-                    NavigatorSelector.GetTextStructureNavigator(textView.TextBuffer),
                     OutliningManagerService
                 );
-#pragma warning restore S1848 // Objects should not be created to be dropped immediately without being used
 
             AddCommandFilter(
                 textView,
@@ -64,7 +59,7 @@ namespace SelectNextOccurrence
             );
         }
 
-        void AddCommandFilter(IWpfTextView textView, CommandTarget commandTarget)
+        private void AddCommandFilter(IWpfTextView textView, CommandTarget commandTarget)
         {
             if (EditorFactory != null)
             {

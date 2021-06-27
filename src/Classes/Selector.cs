@@ -30,11 +30,6 @@ namespace SelectNextOccurrence
         private readonly ITextSearchService textSearchService;
 
         /// <summary>
-        /// In case of case-sensitive search this is provided to FindData
-        /// </summary>
-        private readonly ITextStructureNavigator textStructureNavigator;
-
-        /// <summary>
         /// Expands regions if selected text is in this region
         /// </summary>
         private readonly IOutliningManager outliningManager;
@@ -77,13 +72,11 @@ namespace SelectNextOccurrence
         /// <param name="view"></param>
         /// <param name="textSearchService"></param>
         /// <param name="editorOperationsService"></param>
-        /// <param name="textStructureNavigator"></param>
         /// <param name="outliningManagerService"></param>
         public Selector(
             IWpfTextView view,
             ITextSearchService textSearchService,
             IEditorOperationsFactoryService editorOperationsService,
-            ITextStructureNavigator textStructureNavigator,
             IOutliningManagerService outliningManagerService)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -92,7 +85,6 @@ namespace SelectNextOccurrence
             // Services
             this.textSearchService = textSearchService;
             this.EditorOperations = editorOperationsService.GetEditorOperations(this.view);
-            this.textStructureNavigator = textStructureNavigator;
             this.outliningManager = outliningManagerService?.GetOutliningManager(this.view);
             this.Dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
             Assumes.Present(Dte);
