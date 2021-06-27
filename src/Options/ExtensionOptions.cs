@@ -59,6 +59,7 @@ namespace SelectNextOccurrence.Options
 
         public override void SaveSettingsToStorage()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             SettingsManager settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
             var settingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
 
@@ -78,6 +79,7 @@ namespace SelectNextOccurrence.Options
 
         public override void LoadSettingsFromStorage()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             SettingsManager settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
             var settingsStore = settingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
 

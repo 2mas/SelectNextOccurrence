@@ -36,11 +36,13 @@ namespace SelectNextOccurrence.Commands
 
         public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
         {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             return NextCommandTarget.QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
         }
 
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             if (pguidCmdGroup == VSConstants.VSStd2K)
             {
                 switch ((VSConstants.VSStd2KCmdID) nCmdID)
@@ -243,6 +245,7 @@ namespace SelectNextOccurrence.Commands
 
         private int ProcessSingleCursor(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut, ref int result)
         {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             // if copy/cut, clear saved clipboard
             if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
             {
@@ -281,6 +284,7 @@ namespace SelectNextOccurrence.Commands
             IntPtr pvaIn,
             IntPtr pvaOut)
         {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             var result = VSConstants.S_OK;
 
             Selector.OpenUndoContext();
@@ -410,6 +414,7 @@ namespace SelectNextOccurrence.Commands
         /// <returns></returns>
         private int HandleMultiCopyCut(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             if (Selector.Selections.Count == 1)
                 return NextCommandTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
