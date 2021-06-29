@@ -1,8 +1,13 @@
 # Road map
-- [ ] Add support for Visual Studio 2022
+Empty at the moment
 
 # Change log
 
+#### 1.4.182
+- [x] Added support for Visual Studio 2022
+- [x] Removed support for Visual Studio 2015
+- [x] Bumping .NET version from 4.6 to 4.7.2
+- [x] Using PackageReference instead of packages.config and some minor refactorings
 
 #### 1.3.175
 - [x] Bugfix, fix caret jumping to EOF when selecting from intellisense dialog

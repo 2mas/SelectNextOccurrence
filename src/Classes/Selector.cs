@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
+using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
@@ -27,11 +28,6 @@ namespace SelectNextOccurrence
         internal readonly DTE2 Dte;
 
         private readonly ITextSearchService textSearchService;
-
-        /// <summary>
-        /// In case of case-sensitive search this is provided to FindData
-        /// </summary>
-        private readonly ITextStructureNavigator textStructureNavigator;
 
         /// <summary>
         /// Expands regions if selected text is in this region
@@ -76,24 +72,22 @@ namespace SelectNextOccurrence
         /// <param name="view"></param>
         /// <param name="textSearchService"></param>
         /// <param name="editorOperationsService"></param>
-        /// <param name="textStructureNavigator"></param>
         /// <param name="outliningManagerService"></param>
         public Selector(
             IWpfTextView view,
             ITextSearchService textSearchService,
             IEditorOperationsFactoryService editorOperationsService,
-            ITextStructureNavigator textStructureNavigator,
             IOutliningManagerService outliningManagerService)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             this.view = view;
 
             // Services
             this.textSearchService = textSearchService;
             this.EditorOperations = editorOperationsService.GetEditorOperations(this.view);
-            this.textStructureNavigator = textStructureNavigator;
             this.outliningManager = outliningManagerService?.GetOutliningManager(this.view);
             this.Dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
-
+            Assumes.Present(Dte);
             this.Selections = new List<Selection>();
             this.historyManager = new HistoryManager();
         }
@@ -134,8 +128,11 @@ namespace SelectNextOccurrence
         /// <returns></returns>
         private FindData GetFindData(bool reverse = false, bool exact = false)
         {
-            var findData = new FindData(SearchText, Snapshot);
-            findData.FindOptions = FindOptions.Multiline;
+            ThreadHelper.ThrowIfNotOnUIThread();
+            var findData = new FindData(SearchText, Snapshot)
+            {
+                FindOptions = FindOptions.Multiline
+            };
 
             if (exact)
             {
@@ -479,6 +476,7 @@ namespace SelectNextOccurrence
         /// </summary>
         internal void OpenUndoContext()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (!Dte.UndoContext.IsOpen)
                 Dte.UndoContext.Open(Vsix.Name);
 
@@ -490,6 +488,7 @@ namespace SelectNextOccurrence
         /// </summary>
         internal void CloseUndoContext()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (Dte.UndoContext.IsOpen)
                 Dte.UndoContext.Close();
 

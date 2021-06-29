@@ -88,7 +88,6 @@ namespace SelectNextOccurrence
             }
         }
 
-#pragma warning disable S1186 // Methods should not be empty
         public void PostprocessDragEnter(DragEventArgs e)
         {
         }
@@ -208,7 +207,5 @@ namespace SelectNextOccurrence
         public void PreprocessQueryContinueDrag(QueryContinueDragEventArgs e)
         {
         }
-#pragma warning restore S1186 // Methods should not be empty
-
     }
 }

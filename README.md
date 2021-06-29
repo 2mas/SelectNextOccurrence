@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/66dy10xgquyw3y7x?svg=true)](https://ci.appveyor.com/project/2mas/selectnextoccurrence)
+﻿[![Build status](https://ci.appveyor.com/api/projects/status/66dy10xgquyw3y7x?svg=true)](https://ci.appveyor.com/project/2mas/selectnextoccurrence)
 # Select Next Occurrence
 
 Download this extension from the [VS Gallery](https://marketplace.visualstudio.com/items?itemName=thomaswelen.SelectNextOccurrence) or get the latest [CI-build](http://vsixgallery.com/extension/NextOccurrence.b213c4e9-b96f-4f9d-b1d6-fa8bc7e9da21/).
@@ -13,7 +13,7 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 
 
 
-### What differs this from the built-in multi-edit of VS 2019?
+### What differs this from the built-in multi-edit of VS 2019/2022?
 | Feature | Select Next Occurrence | Visual Studio |
 | --- | --- | ---|
 | Multiple cursors | Yes | Yes |
@@ -26,9 +26,9 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 | Can convert selection to carets | Yes | No |
 | Can search both case insensitive and exact | Yes | No, only exact |
 | Multi copy/paste across files and to external programs | Yes | No |
+| Supports VS 2022 | Yes | Yes |
 | Supports VS 2019 | Yes | Yes |
 | Supports VS 2017 | Yes | From v15.8 |
-| Supports VS 2015 | Yes | No |
 | Multi-cursor IntelliSense | No | No |
 
 
