@@ -21,17 +21,17 @@ See the [change log/roadmap](CHANGELOG.md) for changes and Roadmap.
 | Can select all occurrences | Yes | Yes |
 | Can skip occurrence | Yes | Yes |
 | Can select backwards/up | Yes | No |
-| Can add caret above/below | Yes | No |
-| Can add caret by mouse | Yes | No |
+| Can add caret above/below | Yes | Kind of, different implementation * |
+| Can add caret by mouse | Yes | Yes * |
 | Can convert selection to carets | Yes | No |
 | Can search both case insensitive and exact | Yes | No, only exact |
-| Multi copy/paste across files and to external programs | Yes | No |
+| Multi copy/paste across files and to external programs | Yes | Yes * |
 | Supports VS 2022 | Yes | Yes |
 | Supports VS 2019 | Yes | Yes |
 | Supports VS 2017 | Yes | From v15.8 |
 | Multi-cursor IntelliSense | No | No |
 
-
+`*` Unsure when
 
 ## Features
 
