@@ -1,6 +1,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/66dy10xgquyw3y7x?svg=true)](https://ci.appveyor.com/project/2mas/selectnextoccurrence)
 # Select Next Occurrence
 
+Temp branch for 2015 build
 Download this extension from the [VS Gallery](https://marketplace.visualstudio.com/items?itemName=thomaswelen.SelectNextOccurrence) or get the latest [CI-build](http://vsixgallery.com/extension/NextOccurrence.b213c4e9-b96f-4f9d-b1d6-fa8bc7e9da21/).
 
 ---------------------------------------
