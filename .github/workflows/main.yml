@@ -41,7 +41,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Select_Next_Occurrence.vsix
+          name: Select_Next_Occurrence_v${{ env.MAJOR_VERSION }}_${{ env.MINOR_VERSION }}_${{ github.run_number }}
           path: .\src\bin\Release\SelectNextOccurrence.vsix
           if-no-files-found: error
           retention-days: 14
