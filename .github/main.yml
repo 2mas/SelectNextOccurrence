@@ -1,0 +1,48 @@
+name: Build extension
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      MAJOR_VERSION: 1
+      MINOR_VERSION: 5
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v1
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          msbuild-architecture: x64
+
+      - name: Bump version
+        working-directory: src
+        run: |
+          (Get-Content -Path source.extension.vsixmanifest) |
+            ForEach-Object {$_ -Replace '1.0', '${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ github.run_number }}'} |
+              Set-Content -Path source.extension.vsixmanifest
+          (Get-Content -Path source.extension.cs) |
+            ForEach-Object {$_ -Replace '1.0', '${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ github.run_number }}'} |
+              Set-Content -Path source.extension.cs
+
+      - name: Nuget restore
+        run: nuget restore SelectNextOccurrence.sln
+
+      - name: Build
+        working-directory: src
+        run: msbuild.exe SelectNextOccurrence.csproj /p:configuration=Release /p:DeployExtension=false /p:ZipPackageCompressionLevel=normal
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        working-directory: src
+        with:
+          name: Select_Next_Occurrence.vsix
+          path: bin\Release\SelectNextOccurrence.vsix
+          if-no-files-found: error
+          retention-days: 14
