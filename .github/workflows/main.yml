@@ -40,9 +40,8 @@ jobs:
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
-        working-directory: src
         with:
           name: Select_Next_Occurrence.vsix
-          path: bin\Release\SelectNextOccurrence.vsix
+          path: .\src\bin\Release\SelectNextOccurrence.vsix
           if-no-files-found: error
           retention-days: 14
