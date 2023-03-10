@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="2bdcabe0-9a85-4f32-b037-4ccb53280277" Version="1.0" Language="en-US" Publisher="Thomas Welén" />
+        <Identity Id="2bdcabe0-9a85-4f32-b037-4ccb53280277" Version="1.0.0" Language="en-US" Publisher="Thomas Welén" />
         <DisplayName>Select Next Occurrence (64-bit)</DisplayName>
         <Description xml:space="preserve">Selects the next occurrence of the current selection and adds multiple cursors for editing.</Description>
         <MoreInfo>https://github.com/2mas/SelectNextOccurrence</MoreInfo>

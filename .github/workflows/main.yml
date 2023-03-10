@@ -25,11 +25,11 @@ jobs:
         working-directory: src
         run: |
           (Get-Content -Path source.extension.vsixmanifest) |
-            ForEach-Object {$_ -Replace '1.0', '${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ github.run_number }}'} |
-              Set-Content -Path source.extension.vsixmanifest
+            ForEach-Object {$_ -Replace '1.0.0', '${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ github.run_number }}'} |
+              Set-Content -Path source.extension.vsixmanifest -Encoding UTF8
           (Get-Content -Path source.extension.cs) |
-            ForEach-Object {$_ -Replace '1.0', '${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ github.run_number }}'} |
-              Set-Content -Path source.extension.cs
+            ForEach-Object {$_ -Replace '1.0.0', '${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ github.run_number }}'} |
+              Set-Content -Path source.extension.cs -Encoding UTF8
 
       - name: Nuget restore
         run: nuget restore SelectNextOccurrence.sln
