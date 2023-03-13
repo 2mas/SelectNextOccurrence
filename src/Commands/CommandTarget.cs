@@ -187,14 +187,20 @@ namespace SelectNextOccurrence.Commands
             }
             else if (pguidCmdGroup == PackageGuids.guidVS16Commands)
             {
-                // Support for toggle line comment and toggle block comment command that was introduced in VS2019
-                if (nCmdID == 48 || nCmdID == 49)
+                switch (nCmdID)
                 {
-                    invokeCommand = true;
-                }
-                else
-                {
-                    Debug.WriteLine($"{nameof(PackageGuids.guidVS16Commands)}, id: {nCmdID}");
+                    case 48:
+                    case 49:
+                        // Support for toggle line comment and toggle block comment command that was introduced in VS2019
+                        invokeCommand = true;
+                        break;
+                    case 84: // Edit.MoveToNextSubWordExtend
+                    case 85: // Edit.MoveToPreviousSubWordExtend
+                        modifySelections = true;
+                        break;
+                    default:
+                        Debug.WriteLine($"{nameof(PackageGuids.guidVS16Commands)}, id: {nCmdID}");
+                        break;
                 }
             }
             else if (pguidCmdGroup == PackageGuids.guidExtensionSubWordNavigation)
