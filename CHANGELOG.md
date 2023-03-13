@@ -4,7 +4,7 @@ Empty at the moment
 # Change log
 
 #### 1.5.6
-- [x] Support commands: Edit.MoveToNextSubWordExtend and Edit.MoveToPreviousSubWordExtend
+- [x] Support commands: Edit.NextSubwordExtend and Edit.PreviousSubwordExtend
 - [x] Use new VisualStudio SDK's (not compatible with versions < VS 2022>)
 
 #### 1.4.182

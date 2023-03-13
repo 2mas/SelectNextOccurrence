@@ -194,8 +194,8 @@ namespace SelectNextOccurrence.Commands
                         // Support for toggle line comment and toggle block comment command that was introduced in VS2019
                         invokeCommand = true;
                         break;
-                    case 84: // Edit.MoveToNextSubWordExtend
-                    case 85: // Edit.MoveToPreviousSubWordExtend
+                    case 84: // Edit.NextSubwordExtend
+                    case 85: // Edit.PreviousSubwordExtend
                         modifySelections = true;
                         break;
                     default:
