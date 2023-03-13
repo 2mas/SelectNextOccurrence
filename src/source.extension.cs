@@ -7,12 +7,12 @@ namespace SelectNextOccurrence
 {
     static class Vsix
     {
-        public const string Id = "2bdcabe0-9a85-4f32-b037-4ccb53280277";
+        public const string Id = "3e97a706-1af0-4994-846f-18f5d704e533";
         public const string Name = "Select Next Occurrence (64-bit)";
         public const string Description = @"Selects the next occurrence of the current selection and adds multiple cursors for editing.";
         public const string Language = "en-US";
         public const string Version = "1.0.0";
         public const string Author = "Thomas Welén";
-        public const string Tags = "next occurrence, multi selection, ctrl+d";
+        public const string Tags = "next occurrence, multi selection, ctrl+d, multi edit";
     }
 }
