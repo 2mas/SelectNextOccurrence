@@ -1,7 +1,10 @@
-# Road map
+﻿# Road map
 Empty at the moment
 
 # Change log
+
+#### 1.5.0
+- [x] Use new VisualStudio SDK's (not compatible with versions < VS 2022>)
 
 #### 1.4.182
 - [x] Added support for Visual Studio 2022

@@ -152,14 +152,19 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Interop">
+      <Version>17.5.33428.366</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK">
-      <Version>15.0.1</Version>
+      <Version>17.5.33428.388</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers">
-      <Version>16.10.1</Version>
+      <Version>16.10.10</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
-      <Version>17.0.2140-preview2</Version>
+      <Version>17.5.4065</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

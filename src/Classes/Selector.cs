@@ -86,7 +86,7 @@ namespace SelectNextOccurrence
             this.textSearchService = textSearchService;
             this.EditorOperations = editorOperationsService.GetEditorOperations(this.view);
             this.outliningManager = outliningManagerService?.GetOutliningManager(this.view);
-            this.Dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
+            this.Dte = (DTE2) Package.GetGlobalService(typeof(DTE));
             Assumes.Present(Dte);
             this.Selections = new List<Selection>();
             this.historyManager = new HistoryManager();
@@ -139,7 +139,7 @@ namespace SelectNextOccurrence
                 findData.FindOptions |= FindOptions.MatchCase | FindOptions.WholeWord;
             }
             else
-            {
+            {   
                 if (Dte.Find.MatchCase)
                     findData.FindOptions |= FindOptions.MatchCase;
 
